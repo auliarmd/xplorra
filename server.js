@@ -17,7 +17,9 @@ const limiter = rateLimit({
 
 });
 
-app.use(limiter);
+// app.use(limiter);
+app.use('/register', limiter);
+app.use('/login', limiter);
 
 app.use(
   helmet({
@@ -37,19 +39,15 @@ app.use(cors({
 }));
 
 app.use(
-  '/uploads/resep',
-  express.static(path.join(__dirname,'src/uploads/resep'))
+  '/uploads',
+  express.static(path.join(__dirname,'uploads'))
 );
 
-app.use(
-  '/uploads/profile',
-  express.static(path.join(__dirname,'src/uploads/profile'))
-);
 const storage = multer.diskStorage({
 
   destination:(req,file,cb)=>{
 
-  cb(null,'src/uploads/resep/');
+  cb(null,'uploads/');
 
 },
 
@@ -69,7 +67,7 @@ const profileStorage = multer.diskStorage({
 
   destination:(req,file,cb)=>{
 
-    cb(null,'src/uploads/profile/');
+    cb(null,'uploads/');
 
   },
 

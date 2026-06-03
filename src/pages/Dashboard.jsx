@@ -90,9 +90,15 @@ function Dashboard() {
             <div key={item.id} style={styles.trendingCard} onClick={goToRegister}>
                 <div style={styles.imageWrapper}>
                 <img
-                    src={`${BASE_URL}/uploads/${item.gambar}`}
-                    style={styles.trendingImg}
-                    alt=""
+                  src={`http://localhost:5000/uploads/${item.gambar}`}
+                  style={styles.trendingImg}
+                  alt={item.nama}
+                  onError={(e) => {
+                    console.log("Trending gagal:", item.gambar);
+
+                    e.target.src =
+                      "https://via.placeholder.com/600x250?text=No+Image";
+                  }}
                 />
 
                 {/* INI YANG BARU */}
@@ -408,9 +414,15 @@ function Dashboard() {
           {foods.map((item) => (
             <div key={item.id} style={styles.card} onClick={goToRegister}>
               <img
-                src={`${BASE_URL}/uploads/${item.gambar}`}
+                src={`http://localhost:5000/uploads/${item.gambar}`}
                 style={styles.cardImg}
-                alt=""
+                alt={item.nama}
+                onError={(e) => {
+                  console.log("Image gagal:", item.gambar);
+
+                  e.target.src =
+                    "https://via.placeholder.com/300x200?text=No+Image";
+                }}
               />
 
               <div style={styles.cardBody}>

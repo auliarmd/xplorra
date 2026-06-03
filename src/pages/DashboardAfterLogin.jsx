@@ -10,6 +10,7 @@ function DashboardAfterLogin() {
   const [trendingFoods, setTrendingFoods] = useState([]);
   const [search, setSearch] = useState("");
   const [kategori, setKategori] = useState("");
+  const [user, setUser] = useState({});
   const [daerah, setDaerah] = useState("");
 
   const filterFoods = (newKategori, newDaerah) => {
@@ -57,6 +58,14 @@ function DashboardAfterLogin() {
       navigate('/Masuk');
       return;
     }
+
+    api.get('/profile')
+      .then((res) => {
+
+        setUser(res.data.user);
+
+      })
+      .catch((err) => console.log(err));
 
     api.get('/my-bookmarks')
       .then((res)=>{
@@ -169,7 +178,21 @@ const toggleSave = async (id) => {
             style={styles.profileCircle}
             onClick={() => navigate("/profil")}
           >
-            <span className="material-symbols-outlined">person</span>
+
+            {
+              user.foto ? (
+                <img
+                  src={`http://localhost:5000/uploads/${user.foto}`}
+                  alt="Profile"
+                  style={styles.profileImg}
+                />
+              ) : (
+                <span className="material-symbols-outlined">
+                  person
+                </span>
+              )
+            }
+
           </div>
         </div>
       </div>
@@ -185,9 +208,15 @@ const toggleSave = async (id) => {
             <div key={item.id} style={styles.trendingCard} onClick={() => navigate(`/detail/${item.id}`)}>
                 <div style={styles.imageWrapper}>
                 <img
-                    src={`http://localhost:5000/uploads/${item.gambar}`}
-                    style={styles.trendingImg}
-                    alt=""
+                  src={`http://localhost:5000/uploads/${item.gambar}`}
+                  style={styles.trendingImg}
+                  alt={item.nama}
+                  onError={(e) => {
+                    console.log("Trending gagal:", item.gambar);
+
+                    e.target.src =
+                      "https://via.placeholder.com/600x250?text=No+Image";
+                  }}
                 />
 
                 {/* INI YANG BARU */}
@@ -558,9 +587,10 @@ const toggleSave = async (id) => {
 
   {/* WRAPPER GAMBAR */}
   <div style={styles.cardImgWrapper}>
-
+        {console.log(item.gambar)}
+        {console.log(`${api.defaults.baseURL}/uploads/${item.gambar}`)}
         <img
-          src={`http://localhost:5000/uploads/${item.gambar}`}
+          src={`${api.defaults.baseURL}/uploads/${item.gambar}`}
           style={styles.cardImg}
           alt=""
         />
@@ -734,18 +764,17 @@ const styles = {
     width: "100%",
     maxWidth: "600px",
     minWidth: "100px",
-    //width: "580px", // lebih kecil & proporsional
     borderRadius: "20px",
     overflow: "hidden",
     background: "#fff",
     boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
-    },
+  },
 
   trendingImg: {
     width: "100%",
     height: "250px",
     objectFit: "cover",
-    },
+  },
 
   trendingOverlay: {
     padding: "20px",
@@ -809,6 +838,13 @@ btnTambah: {
   borderRadius: "20px",
   cursor: "pointer",
   fontWeight: "600",
+},
+
+profileImg: {
+  width: "100%",
+  height: "100%",
+  borderRadius: "50%",
+  objectFit: "cover",
 },
 
 profileCircle: {
