@@ -569,6 +569,8 @@ app.get('/resep/:id', verifyToken, (req,res)=>{
         ON ratings.user_id = users.id
 
         WHERE ratings.food_id=?
+        AND ratings.komentar IS NOT NULL
+        AND ratings.komentar <> ''
 
         ORDER BY ratings.id DESC
         `,
@@ -710,6 +712,155 @@ app.get('/my-likes', verifyToken,(req,res)=>{
       }
 
       res.json(result);
+
+    }
+
+  );
+
+});
+
+app.post('/like/:id', verifyToken, (req,res)=>{
+
+  const food_id = req.params.id;
+
+  const user_id = req.user.id;
+
+  // cek apakah sudah like
+  db.query(
+
+    'SELECT * FROM likes WHERE user_id=? AND food_id=?',
+
+    [user_id, food_id],
+
+    (err,result)=>{
+
+      if(err){
+
+        return res.status(500).json(err);
+
+      }
+
+      // =========================
+      // UNLIKE
+      // =========================
+      if(result.length > 0){
+
+        db.query(
+
+          'DELETE FROM likes WHERE user_id=? AND food_id=?',
+
+          [user_id, food_id],
+
+          (err2)=>{
+
+            if(err2){
+
+              return res.status(500).json(err2);
+
+            }
+
+            // kurangi jumlah likes
+            db.query(
+
+              'UPDATE foods SET likes = likes - 1 WHERE id=?',
+
+              [food_id]
+
+            );
+
+            res.json({
+              status:true,
+              liked:false,
+              message:'Like dibatalkan'
+            });
+
+          }
+
+        );
+
+      }
+
+      // =========================
+      // LIKE
+      // =========================
+      else{
+
+        db.query(
+
+          'INSERT INTO likes(user_id, food_id) VALUES (?,?)',
+
+          [user_id, food_id],
+
+          (err3)=>{
+
+            if(err3){
+
+              return res.status(500).json(err3);
+
+            }
+
+            // tambah likes
+            db.query(
+
+              'UPDATE foods SET likes = likes + 1 WHERE id=?',
+
+              [food_id]
+
+            );
+
+            res.json({
+              status:true,
+              liked:true,
+              message:'Resep disukai'
+            });
+
+          }
+
+        );
+
+      }
+
+    }
+
+  );
+
+});
+
+app.get('/my-rating/:id', verifyToken, (req,res)=>{
+
+  const food_id = req.params.id;
+
+  db.query(
+
+    `
+    SELECT star
+    FROM ratings
+    WHERE user_id=? AND food_id=?
+    `,
+
+    [req.user.id, food_id],
+
+    (err,result)=>{
+
+      if(err){
+
+        return res.status(500).json(err);
+
+      }
+
+      if(result.length > 0){
+
+        return res.json({
+          status:true,
+          star:result[0].star
+        });
+
+      }
+
+      res.json({
+        status:false,
+        star:0
+      });
 
     }
 

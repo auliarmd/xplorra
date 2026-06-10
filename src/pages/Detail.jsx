@@ -13,9 +13,22 @@ const [rating, setRating] = useState(0);
 const [liked, setLiked] = useState(false);
 const [bookmarked, setBookmarked] = useState(false);
 const [likedFoods, setLikedFoods] = useState([]);
+const [user, setUser] = useState({});
 const [bookmarkedFoods, setBookmarkedFoods] = useState([]);
 
 useEffect(()=>{
+
+  api.get(`/my-rating/${id}`)
+    .then((res)=>{
+
+      if(res.data.status){
+
+        setRating(res.data.star);
+
+      }
+
+    })
+    .catch((err)=>console.log(err));
 
   api.get('/my-bookmarks')
     .then((res)=>{
@@ -47,12 +60,18 @@ useEffect(()=>{
   })
   .catch((err)=>console.log(err));
 
+  api.get('/profile')
+    .then((res)=>{
+
+      setUser(res.data.user);
+
+    })
+    .catch((err)=>console.log(err));
+
   api.get(`/resep/${id}`)
   .then((res)=>{
 
     setFood(res.data.resep);
-
-    setRating(0);
     
     setKomentar(res.data.komentar);   
     api.get('/my-bookmarks')
@@ -144,8 +163,6 @@ const handleLike = async () => {
 
     setFood(resepBaru.data.resep);
 
-    alert(response.data.message);
-
   }catch(err){
 
     console.log(err);
@@ -179,6 +196,9 @@ const handleRating = async (value) => {
 
   try{
 
+    // update realtime frontend
+    setRating(value);
+
     const response = await api.post(
       `/rating/${id}`,
       {
@@ -186,10 +206,7 @@ const handleRating = async (value) => {
       }
     );
 
-    // update stars aktif
-    setRating(value);
-
-    // update rating resep realtime
+    // update rating makanan realtime
     setFood({
       ...food,
       rating:response.data.rating
@@ -225,7 +242,23 @@ return (
             style={styles.profileCircle}
             onClick={() => navigate("/profil")}
           >
-            <span className="material-symbols-outlined">person</span>
+            {
+              user.foto ? (
+
+                <img
+                  src={`http://localhost:5000/uploads/${user.foto}`}
+                  alt="Profile"
+                  style={styles.profileImg}
+                />
+
+              ) : (
+
+                <span className="material-symbols-outlined">
+                  person
+                </span>
+
+              )
+            }
           </div>
         </div>
         </div>
@@ -578,6 +611,13 @@ const styles = {
     fontWeight: "bold",
   },
 
+  profileImg: {
+    width: "100%",
+    height: "100%",
+    borderRadius: "50%",
+    objectFit: "cover",
+  },
+
   profileCircle: {
     width: "35px",
     height: "35px",
@@ -588,16 +628,6 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     color: "#fff",
-  },
-
-  recipeText: {
-    fontSize: "20px",
-
-    lineHeight: "2",
-
-    color: "#111",
-
-    width: "100%",
   },
 
   container: {
