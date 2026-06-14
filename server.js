@@ -993,6 +993,85 @@ app.post(
 
 });
 
+app.put(
+  '/edit-food/:id',
+  verifyToken,
+  upload.single('gambar'),
+  (req,res)=>{
+
+    const foodId = req.params.id;
+
+    const {
+      nama,
+      kategori,
+      daerah,
+      deskripsi,
+      bahan,
+      langkah
+    } = req.body;
+
+    let sql = `
+      UPDATE foods
+      SET
+      nama=?,
+      kategori=?,
+      daerah=?,
+      deskripsi=?,
+      bahan=?,
+      langkah=?
+    `;
+
+    let params = [
+      nama,
+      kategori,
+      daerah,
+      deskripsi,
+      bahan,
+      langkah
+    ];
+
+    if(req.file){
+
+      sql += `,
+      gambar=?
+      `;
+
+      params.push(req.file.filename);
+
+    }
+
+    sql += `
+      WHERE id=? AND creator_id=?
+    `;
+
+    params.push(
+      foodId,
+      req.user.id
+    );
+
+    db.query(
+      sql,
+      params,
+      (err,result)=>{
+
+        if(err){
+
+          console.log(err);
+
+          return res.status(500).json(err);
+
+        }
+
+        res.json({
+          status:true,
+          message:'Resep berhasil diupdate'
+        });
+
+      }
+    );
+
+});
+
 app.post(
   '/komentar/:id',
   verifyToken,

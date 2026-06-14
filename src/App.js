@@ -9,6 +9,7 @@ import Tambah from "./pages/Tambah";
 import Profil from "./pages/Profil";
 import Notifikasi from "./pages/Notifikasi";
 import Feedback from "./pages/Feedback";
+import EditResep from "./pages/EditResep";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/profil" element={<Profil />} />
         <Route path="/notifikasi" element={<Notifikasi />} />
         <Route path="/feedback" element={<Feedback />} />
+        <Route path="/edit/:id" element={<EditResep />} />
       
       </Routes>
     </BrowserRouter>
