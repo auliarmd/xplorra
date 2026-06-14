@@ -332,7 +332,17 @@ app.get('/my-recipes', verifyToken,(req,res)=>{
 
   db.query(
 
-    'SELECT * FROM foods WHERE creator_id=?',
+    `
+    SELECT
+      f.*,
+      (
+        SELECT COUNT(*)
+        FROM ratings r
+        WHERE r.food_id = f.id
+      ) AS total_komentar
+    FROM foods f
+    WHERE creator_id=?
+    `,
 
     [req.user.id],
 
@@ -354,11 +364,23 @@ app.get('/my-bookmarks', verifyToken,(req,res)=>{
 
   db.query(
 
-    `SELECT foods.*
-     FROM bookmarks
-     JOIN foods
-     ON bookmarks.food_id = foods.id
-     WHERE bookmarks.user_id=?`,
+    `
+    SELECT
+      foods.*,
+
+      (
+        SELECT COUNT(*)
+        FROM ratings r
+        WHERE r.food_id = foods.id
+      ) AS total_komentar
+
+    FROM bookmarks
+
+    JOIN foods
+    ON bookmarks.food_id = foods.id
+
+    WHERE bookmarks.user_id=?
+    `,
 
     [req.user.id],
 

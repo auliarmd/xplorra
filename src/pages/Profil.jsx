@@ -55,6 +55,7 @@ function Profil() {
           .then((res)=>{
 
             setMyBookmarks(res.data);
+            console.log(res.data);
 
           })
           .catch((err)=>console.log(err));
@@ -391,74 +392,129 @@ function Profil() {
 
                   <div style={styles.recipeGrid}>
 
-                    {myRecipes.map((item)=>(
+                    {myRecipes.map((item) => (
 
-                      <div key={item.id} style={styles.recipeCard}>
+                      <div
+                        key={item.id}
+                        style={styles.card}
+                      >
 
-                        <img
-                          src={`http://localhost:5000/uploads/${item.gambar}`}
-                          alt=""
-                          style={styles.recipeImg}
-                        />
+                        <div style={styles.cardImgWrapper}>
 
-                        <div style={styles.recipeBody}>
+                          <img
+                            src={`http://localhost:5000/uploads/${item.gambar}`}
+                            style={styles.cardImg}
+                            alt=""
+                          />
 
-                          <div style={styles.recipeTitle}>
+                          {/* HAPUS menggantikan bookmark */}
+                          <button
+                            style={styles.deleteFloatingBtn}
+                            onClick={async (e) => {
+
+                              e.stopPropagation();
+
+                              const confirmDelete =
+                                window.confirm(
+                                  "Yakin ingin menghapus resep ini?"
+                                );
+
+                              if(!confirmDelete) return;
+
+                              try{
+
+                                await api.delete(
+                                  `/delete-food/${item.id}`
+                                );
+
+                                setMyRecipes(
+                                  myRecipes.filter(
+                                    resep => resep.id !== item.id
+                                  )
+                                );
+
+                              }catch(err){
+
+                                console.log(err);
+
+                              }
+
+                            }}
+                          >
+                            <span
+                              className="material-symbols-outlined"
+                              style={styles.bookmark}
+                            >
+                              delete
+                            </span>
+                          </button>
+
+                        </div>
+
+                        <div style={styles.cardBody}>
+
+                          <h4 style={styles.cardTitle}>
                             {item.nama}
+                          </h4>
+
+                          <div style={styles.infoRow}>
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                comment
+                              </span>
+
+                              {item.total_komentar}
+                            </span>
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                thumb_up
+                              </span>
+
+                              {item.likes}
+                            </span>
+
                           </div>
 
-                          <div style={styles.rating}>
-                            ⭐ {item.rating}
+                          <div style={styles.bottomRow}>
+
+                            <div style={styles.rating}>
+                              <span style={styles.ratingNumber}>
+                                {item.rating}
+                              </span>
+
+                              {[1,2,3,4,5].map((star) => (
+                                <span
+                                  key={star}
+                                  className="material-symbols-outlined"
+                                  style={
+                                    star <= Math.round(item.rating)
+                                      ? styles.star
+                                      : styles.starEmpty
+                                  }
+                                >
+                                  star
+                                </span>
+                              ))}
+                            </div>
+
+                            <button
+                              style={styles.btnLihat}
+                              onClick={() =>
+                                navigate(`/edit/${item.id}`)
+                              }
+                            >
+                              Edit
+                            </button>
+
                           </div>
-
-                          <div style={styles.btnRow}>
-
-  <button
-    style={styles.editBtn}
-    onClick={()=>navigate(`/edit/${item.id}`)}
-  >
-    Edit
-  </button>
-
-  <button
-      style={styles.deleteBtn}
-
-      onClick={async ()=>{
-
-        const confirmDelete = window.confirm(
-          'Yakin ingin menghapus resep ini?'
-        );
-
-        if(!confirmDelete) return;
-
-        try{
-
-          await api.delete(
-            `/delete-food/${item.id}`
-          );
-
-          alert('Resep berhasil dihapus');
-
-          setMyRecipes(
-            myRecipes.filter(
-              resep => resep.id !== item.id
-            )
-          );
-
-        }catch(err){
-
-          console.log(err);
-
-          alert('Gagal menghapus resep');
-
-        }
-
-      }}
-    >
-      Hapus
-    </button>
-
-  </div>
 
                         </div>
 
@@ -485,9 +541,9 @@ function Profil() {
 
                     <span
                       className="material-symbols-outlined"
-                      style={styles.emptyIcon}
+                      style={styles.bookmarkActive}
                     >
-                      favorite
+                      bookmark
                     </span>
 
                     <p>Belum ada resep favorit</p>
@@ -500,22 +556,122 @@ function Profil() {
 
                     {myBookmarks.map((item)=>(
 
-                      <div key={item.id} style={styles.recipeCard}>
+                      <div
+                        key={item.id}
+                        style={styles.card}
+                      >
 
-                        <img
-                          src={`http://localhost:5000/uploads/${item.gambar}`}
-                          alt=""
-                          style={styles.recipeImg}
-                        />
+                        <div style={styles.cardImgWrapper}>
 
-                        <div style={styles.recipeBody}>
+                          <img
+                            src={`http://localhost:5000/uploads/${item.gambar}`}
+                            style={styles.cardImg}
+                            alt=""
+                          />
 
-                          <div style={styles.recipeTitle}>
+                          <button
+                            style={styles.bookmarkBtn}
+                            onClick={async (e)=>{
+
+                              e.stopPropagation();
+
+                              try{
+
+                                await api.post(
+                                  `/bookmark/${item.id}`
+                                );
+
+                                setMyBookmarks(
+
+                                  myBookmarks.filter(
+                                    resep => resep.id !== item.id
+                                  )
+
+                                );
+
+                              }catch(err){
+
+                                console.log(err);
+
+                              }
+
+                            }}
+                          >
+                            <span
+                              className="material-symbols-outlined"
+                              style={styles.bookmarkActive}
+                            >
+                              bookmark
+                            </span>
+                          </button>
+
+                        </div>
+
+                        <div style={styles.cardBody}>
+
+                          <h4 style={styles.cardTitle}>
                             {item.nama}
+                          </h4>
+
+                          <div style={styles.infoRow}>
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                comment
+                              </span>
+
+                              {item.total_komentar}
+                            </span>
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                thumb_up
+                              </span>
+
+                              {item.likes}
+                            </span>
+
                           </div>
 
-                          <div style={styles.rating}>
-                            ⭐ {item.rating}
+                          <div style={styles.bottomRow}>
+
+                            <span style={styles.rating}>
+
+                              {item.rating}
+
+                              {[1,2,3,4,5].map((star)=>(
+
+                                <span
+                                  key={star}
+                                  className="material-symbols-outlined"
+                                  style={
+                                    star <= Math.round(item.rating)
+                                    ? styles.star
+                                    : styles.starEmpty
+                                  }
+                                >
+                                  star
+                                </span>
+
+                              ))}
+
+                            </span>
+
+                            <button
+                              style={styles.btnLihat}
+                              onClick={() =>
+                                navigate(`/detail/${item.id}`)
+                              }
+                            >
+                              Lihat
+                            </button>
+
                           </div>
 
                         </div>
@@ -613,24 +769,29 @@ const styles = {
 
   /* LAYOUT */
   container: {
-    display: "flex",
-    alignItems: "flex-start",
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "50px",
 
-    gap: "50px",
+  paddingTop: "90px",
 
-    paddingTop: "90px",
-    paddingLeft: "260px",
-    paddingRight: "200px",
-  },
+  paddingLeft: "40px",
+
+  paddingRight: "40px",
+
+  justifyContent: "center",
+},
 
   /* SIDEBAR */
   sidebar: {
   width: "300px",
   background: "#f5f2ef",
   borderRadius: "22px",
-  padding: "28px 24px",
+  padding: "25px 20px",
   boxShadow: "0 6px 12px rgba(0,0,0,0.25)",
-  marginTop: "100px",
+  height: "220px",
+  alignSelf: "flex-start",
+  marginTop: "120px",
 },
 
   sidebarMenu: {
@@ -803,28 +964,19 @@ const styles = {
 
   /* RECIPE */
   recipeContainer: {
-    width: "850px",
-
-    minHeight: "auto",
+    width: "840px",
+    height: "500px",
 
     background: "#f4ebe2",
 
     borderRadius: "28px",
 
-    padding: "40px",
+    padding: "20px",
 
     border: "2px solid #e46b3c",
 
-    boxShadow: `
-      0 8px 20px rgba(0,0,0,0.12),
-      0 0 15px rgba(228,107,60,0.15)
-    `,
-
-    display: "flex",
-
-    justifyContent: "flex-start",
-
-    alignItems: "flex-start",
+    overflowY: "auto",
+    overflowX: "hidden",
   },
 
   recipeSection: {
@@ -839,100 +991,26 @@ const styles = {
     boxShadow: "0 5px 10px rgba(0,0,0,0.2)",
   },
 
-  recipeCard: {
-    width: "250px",
-
-    background: "#fff",
-
-    borderRadius: "22px",
-
-    overflow: "hidden",
-
-    boxShadow: `
-      0 8px 18px rgba(0,0,0,0.12),
-      0 0 12px rgba(228,107,60,0.12)
-    `,
-
-    transition: "0.3s",
-
-    display: "flex",
-
-    flexDirection: "column",
-
-    justifyContent: "space-between",
-
-    minHeight: "330px",
-  },
-
   recipeGrid: {
-    display: "flex",
-    flexWrap: "wrap",
+    display: "grid",
+
+    gridTemplateColumns: "repeat(3, 250px)",
+
+    justifyContent: "center",
 
     gap: "25px",
 
-    alignItems: "flex-start",
-  },
-
-  recipeImg: {
     width: "100%",
-
-    height: "180px",
-
-    objectFit: "cover",
-
-    display: "block",
-  },
-
-  recipeBody: {
-    padding: "18px",
-
-    display: "flex",
-
-    flexDirection: "column",
-
-    gap: "10px",
-},
-
-  recipeTitle: {
-    fontWeight: "700",
-
-    fontSize: "20px",
-
-    color: "#222",
-
-    lineHeight: "1.3",
-  },
-
-  rating: {
-    fontSize: "15px",
-
-    color: "#555",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "5px",
   },
 
   editBtn:{
-    flex:1,
-
-    background:'#e46b3c',
-
-    border:'none',
-
-    color:'#fff',
-
-    padding:'10px',
-
-    borderRadius:'12px',
-
-    cursor:'pointer',
-
-    fontSize:'14px',
-
-    fontWeight:'600',
+    border:"none",
+    background:"#df6d4f",
+    color:"#fff",
+    padding:"10px 25px",
+    borderRadius:"999px",
+    cursor:"pointer",
+    fontWeight:"700",
   },
 
   btnRow:{
@@ -980,6 +1058,162 @@ const styles = {
 
     color:'#666',
   },
+
+  deleteFloatingBtn:{
+    position:"absolute",
+    top:"12px",
+    right:"12px",
+
+    width:"32px",
+    height:"32px",
+
+    border:"none",
+    borderRadius:"50%",
+
+    background:"#fff",
+
+    cursor:"pointer",
+
+    fontSize:"18px",
+
+    boxShadow:"0 2px 8px rgba(0,0,0,0.2)",
+  },
+
+  bottomRow:{
+    display:"flex",
+    justifyContent:"space-between",
+    alignItems:"center",
+    marginTop:"10px",
+  },
+  
+  card: {
+    background: "#fff",
+    borderRadius: "18px",
+    overflow: "hidden",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+    width: "250px",
+  },
+
+    cardImg: {
+      width: "100%",
+      height: "120px",
+      objectFit: "cover",
+    },
+
+  cardImgWrapper: {
+    position: "relative",
+  },
+
+    cardBody: {
+    padding: "12px 15px",
+    display: "flex",
+    flexDirection: "column",
+  },
+
+  cardTitle: {
+    fontSize: "16px",
+    fontWeight: "700",
+    margin: "0 0 10px 0",
+    lineHeight: "1.3",
+    marginTop: "-5px",
+  },
+
+  infoRow: {
+    display: "flex",
+    gap: "8px",
+    fontSize: "11px",
+    color: "#555",
+    margin: "0",
+    marginTop: "0px",
+  },
+
+  bottomRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    margin: "0",
+  },
+
+  iconText: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    fontSize: "12px",
+    color: "#555",
+    fontWeight: "700",
+  },
+
+  materialIcon: {
+    fontSize: "18px",
+  },
+
+  rating: {
+    display: "flex",
+    alignItems: "center",
+    gap: "2px",
+    fontSize: "14px",
+  },
+
+  star: {
+    fontSize: "20px",
+    color: "#FFC107", // kuning
+    //fontVariationSettings: "'OPSZ' 14",
+  },
+
+  starEmpty: {
+    fontSize: "22px",
+    color: "#ddd", // abu
+  // fontVariationSettings: "'OPSZ' 14",
+  },
+
+  btnLihat: {
+    background: "#d86936",
+    color: "#fff",
+    border: "none",
+    padding: "6px 22px",
+    borderRadius: "20px",
+    cursor: "pointer",
+  },
+
+  bookmarkBtn: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+
+    width: "36px",
+    height: "36px",
+
+    borderRadius: "50%",
+    border: "none",
+
+    background: "#fff",
+
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+
+    cursor: "pointer",
+
+    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+  },
+
+  bookmarkActive: {
+    fontSize: "24px",
+    color: "#E46B3C",
+
+    fontVariationSettings:
+      "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+
+    WebkitTextStroke: "1px #000",
+  },
+
+  ratingNumber: {
+    fontWeight: "700",
+    fontSize: "15px",
+    color: "#000",
+    marginRight: "1px",
+  },
+
 };
 
 export default Profil;
