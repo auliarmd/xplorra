@@ -700,6 +700,7 @@ const styles = {
     minHeight: "100vh",
     background: "linear-gradient(to bottom, #e8d9c5, #c8845e)",
     fontFamily: "Segoe UI, sans-serif",
+    paddingTop: "70px",
   },
 
   /* NAVBAR */
@@ -707,8 +708,16 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+
     padding: "15px 15px",
     background: "#fff",
+
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+
+    zIndex: 9999,
   },
 
   emptyContainer: {

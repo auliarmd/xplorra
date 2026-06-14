@@ -402,14 +402,24 @@ const styles = {
     position: "relative",
     overflow: "hidden",
     fontFamily: "Poppins, sans-serif",
+  paddingTop: "70px",
   },
 
+  /* NAVBAR */
   navbar: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+
     padding: "15px 15px",
     background: "#fff",
+
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+
+    zIndex: 9999,
   },
 
   emptyContainer: {

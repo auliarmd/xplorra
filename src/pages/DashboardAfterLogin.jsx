@@ -577,13 +577,17 @@ const toggleSave = async (id) => {
           </h2>
         )}
         {/* GRID */}
+        <div style={styles.cardContainer}>
+
         <div style={styles.grid}>
+
           {foods.map((item) => (
+
             <div
-  key={item.id}
-  style={styles.card}
-  onClick={() => navigate(`/detail/${item.id}`)}
->
+              key={item.id}
+              style={styles.card}
+              onClick={() => navigate(`/detail/${item.id}`)}
+            >
 
   {/* WRAPPER GAMBAR */}
   <div style={styles.cardImgWrapper}>
@@ -682,9 +686,12 @@ const toggleSave = async (id) => {
         <span className="material-symbols-outlined">chat</span>
       </div>
     </div>
+</div>
 
   );
 }
+
+
 
 const styles = {
   container: {
@@ -700,6 +707,9 @@ const styles = {
     alignItems: "center",
     padding: "15px 15px",
     background: "#fff",
+    position: "sticky",
+    top: 0,
+    zIndex: 999,
   },
 
   logoContainer: {
@@ -935,8 +945,13 @@ feedbackBtn: {
 
   sidebar: {
     width: "260px",
-    marginTop: "20px", // biar sejajar dengan search
-    marginLeft: "25px",
+
+    position: "sticky",
+    top: "20px",
+
+    alignSelf: "flex-start",
+
+    height: "fit-content",
   },
 
   title: {
@@ -1015,16 +1030,25 @@ feedbackBtn: {
     alignItems: "flex-start",
   },
 
-  grid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", // ⬅️ fix 3 kolom
-  gap: "25px",
-  flex: 1,
-  width:"100%",
-  marginTop: "105px",
-  alignItems: "start", 
-  //alignContent: "flex-start", 
-},
+ grid: {
+    display: "grid",
+
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(260px, 1fr))",
+
+    gap: "25px",
+
+    alignContent: "start",
+  },
+
+cardContainer: {
+    flex: 1,
+    height: "640px",
+    overflowY: "auto",
+    overflowX: "hidden",
+    paddingRight: "10px",
+    marginTop: "50px",
+  },
 
   card: {
   background: "#fff",

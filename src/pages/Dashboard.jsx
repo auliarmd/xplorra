@@ -410,20 +410,29 @@ function Dashboard() {
         </div>
 
         {/* GRID */}
-        <div style={styles.grid}>
-          {foods.map((item) => (
-            <div key={item.id} style={styles.card} onClick={goToRegister}>
-              <img
-                src={`http://localhost:5000/uploads/${item.gambar}`}
-                style={styles.cardImg}
-                alt={item.nama}
-                onError={(e) => {
-                  console.log("Image gagal:", item.gambar);
+        <div style={styles.cardContainer}>
 
-                  e.target.src =
-                    "https://via.placeholder.com/300x200?text=No+Image";
-                }}
-              />
+        <div style={styles.grid}>
+
+          {foods.map((item) => (
+
+            <div
+              key={item.id}
+              style={styles.card}
+              onClick={goToRegister}
+            >
+
+  {/* WRAPPER GAMBAR */}
+  <div style={styles.cardImgWrapper}>
+        {console.log(item.gambar)}
+        {console.log(`${BASE_URL}/uploads/${item.gambar}`)}
+        <img
+          src={`${BASE_URL}/uploads/${item.gambar}`}
+          style={styles.cardImg}
+          alt=""
+        />
+
+      </div>
 
               <div style={styles.cardBody}>
                 <h4>{item.nama}</h4>
@@ -460,8 +469,14 @@ function Dashboard() {
 
                     ))}
 
-                  </span>
-                  <button style={styles.btnLihat} onClick={goToRegister}>
+                  </span>                  
+                  <button
+                    style={styles.btnLihat}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToRegister();
+                    }}
+                  >
                     Lihat
                   </button>
                 </div>
@@ -471,6 +486,8 @@ function Dashboard() {
         </div>
       </div>
     </div>
+</div>
+
   );
 }
 
@@ -488,6 +505,9 @@ const styles = {
     alignItems: "center",
     padding: "15px 15px",
     background: "#fff",
+    position: "sticky",
+    top: 0,
+    zIndex: 999,
   },
 
   logoContainer: {
@@ -594,6 +614,15 @@ const styles = {
     marginTop: "-8px"
   },
 
+  cardContainer: {
+    flex: 1,
+    height: "640px",
+    overflowY: "auto",
+    overflowX: "hidden",
+    paddingRight: "10px",
+    marginTop: "50px",
+  },
+
   //trendingTitle: {
     //fontSize: "16px",
     //fontWeight: "600",
@@ -640,26 +669,6 @@ trendingText: {
   WebkitTextStroke: "0.7px white",
 },
 
-//bookmarkBtn: {
-  //position: "absolute",
-  //top: "10px",
-  //right: "15px",
-
-  //background: "#fff",
-  //border: "none",
-  //borderRadius: "50%",
-  //width: "35px",
-  //height: "35px",
-
- //display: "flex",
-  //alignItems: "center",
-  //justifyContent: "center",
-
-  //cursor: "pointer",
-  //fontSize: "18px",
-  //boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-//},
-
   searchBox: {
     display: "flex",
     alignItems: "center",
@@ -696,8 +705,13 @@ trendingText: {
 
   sidebar: {
     width: "260px",
-    marginTop: "20px", // biar sejajar dengan search
-    marginLeft: "25px",
+
+    position: "sticky",
+    top: "20px",
+
+    alignSelf: "flex-start",
+
+    height: "fit-content",
   },
 
   title: {
@@ -777,15 +791,15 @@ trendingText: {
   },
 
   grid: {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", // ⬅️ fix 3 kolom
-  gap: "25px",
-  flex: 1,
-  width:"100%",
-  marginTop: "105px",
-  alignItems: "start", 
-  //alignContent: "flex-start", 
-},
+    display: "grid",
+
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(260px, 1fr))",
+
+    gap: "25px",
+
+    alignContent: "start",
+  },
 
   card: {
   background: "#fff",
@@ -795,6 +809,7 @@ trendingText: {
   width: "100%",
   maxWidth: "320px",
   marginTop: "20px",
+  cursor: "pointer",
 },
 
   cardImg: {
