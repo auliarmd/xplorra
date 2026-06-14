@@ -1527,6 +1527,11 @@ app.post(
 );
 
 const PORT = 5000;
-app.listen(5000, '0.0.0.0', () => {
-  console.log('Server running on port 5000');
-});
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log('Server running on port 5000');
+  });
+}
+
+module.exports = app;
