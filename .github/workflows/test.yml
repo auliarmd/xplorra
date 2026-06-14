@@ -1,0 +1,22 @@
+name: Regression Test CI
+
+on:
+  push:
+    branches:
+      - main
+      - testing-regression
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - run: npm install
+
+      - run: npx jest tests/auth.test.js tests/foods.test.js tests/profile.test.js tests/advanced.test.js tests/owner.test.js tests/error-path.test.js
