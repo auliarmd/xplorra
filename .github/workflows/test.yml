@@ -19,4 +19,4 @@ jobs:
 
       - run: npm install
 
-      - run: npx jest tests/auth.test.js tests/foods.test.js tests/profile.test.js tests/advanced.test.js tests/owner.test.js tests/error-path.test.js
+      - run: npx jest --forceExit
