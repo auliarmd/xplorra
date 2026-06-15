@@ -182,4 +182,5 @@ Workflow yang digunakan berada pada:
     
 5. GitHub Actions Workflow
 
-    <img width="1919" height="944" alt="Screenshot 2026-06-15 101030" src="https://github.com/user-attachments/assets/4fdc50fa-3da8-47ab-a384-4dc3d8311098" />
+    <img width="1458" height="136" alt="Screenshot 2026-06-15 101030" src="https://github.com/user-attachments/assets/6f5ad2a0-eaa2-4d5b-8c13-c9029ed037de" />
+
