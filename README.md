@@ -1,70 +1,165 @@
-# Getting Started with Create React App
+# Xplorra - Regression Testing Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Deskripsi Proyek
 
-## Available Scripts
+Xplorra merupakan aplikasi berbagi resep makanan yang memungkinkan pengguna untuk menambahkan resep, melihat resep, memberikan rating, bookmark, like, komentar, serta mengelola profil pengguna.
 
-In the project directory, you can run:
+Pengujian regresi dilakukan untuk memastikan bahwa perubahan pada kode program tidak menyebabkan kerusakan pada fitur yang sebelumnya telah berjalan dengan baik.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Teknologi yang Digunakan
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend
 
-### `npm test`
+* Node.js
+* Express.js
+* MySQL
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Testing
 
-### `npm run build`
+* Jest
+* Supertest
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Continuous Integration
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* GitHub Actions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Cara Menjalankan Project
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Install dependency:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Menjalankan server:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+node server.js
+```
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Menjalankan Pengujian
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Menjalankan seluruh test:
 
-### Code Splitting
+```bash
+npx jest
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Menjalankan test dengan coverage:
 
-### Analyzing the Bundle Size
+```bash
+npx jest --coverage
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## Regression Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Regression testing dilakukan pada berbagai endpoint utama aplikasi, antara lain:
 
-### Advanced Configuration
+### Authentication
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+* Register user
+* Login user
 
-### Deployment
+### Food Management
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+* Menampilkan daftar makanan
+* Detail makanan
+* Pencarian makanan
+* Menambah makanan
+* Mengubah makanan
+* Menghapus makanan
 
-### `npm run build` fails to minify
+### User Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+* Profile
+* Bookmark
+* Like
+* Rating
+* Notifications
+* Feedback
+* Upload profile picture
+
+### Error Handling
+
+* Token tidak valid
+* Data kosong
+* ID tidak ditemukan
+* Endpoint yang membutuhkan autentikasi
+
+---
+
+## Hasil Pengujian
+
+| Keterangan      | Hasil |
+| --------------- | ----- |
+| Total Test Case | 62    |
+| Passed          | 62    |
+| Failed          | 0     |
+
+Seluruh test case berhasil dijalankan tanpa kegagalan.
+
+---
+
+## Hasil Code Coverage
+
+| Metric     | Hasil  |
+| ---------- | ------ |
+| Statements | 74.35% |
+| Branches   | 57.74% |
+| Functions  | 90.27% |
+| Lines      | 76.25% |
+
+Target minimum line coverage sebesar 75% berhasil tercapai.
+
+---
+
+## Simulasi Regression Testing
+
+Untuk membuktikan kemampuan regression testing dalam mendeteksi bug, dilakukan perubahan pada validasi endpoint register.
+
+Hasil pengujian menunjukkan bahwa test case yang telah dibuat berhasil mendeteksi perubahan tersebut dan menghasilkan failing test. Setelah kode dikembalikan ke kondisi semula, seluruh test kembali berhasil dijalankan.
+
+---
+
+## Continuous Integration
+
+GitHub Actions digunakan untuk menjalankan test suite secara otomatis setiap kali terjadi push ke repository.
+
+Workflow yang digunakan berada pada:
+
+```text
+.github/workflows/test.yml
+```
+
+---
+
+## Screenshot
+1. Hasil seluruh test PASS
+   <img width="457" height="107" alt="image" src="https://github.com/user-attachments/assets/ef1dbb17-432b-40fa-8889-1c3fb829881b" />
+2. Hasil code coverage
+   <img width="723" height="204" alt="Screenshot 2026-06-15 100533" src="https://github.com/user-attachments/assets/50861210-c3ee-4b36-8515-b7d356acf045" />
+3. Simulasi regression testing (FAIL)
+   <img width="866" height="408" alt="Screenshot 2026-06-15 025532" src="https://github.com/user-attachments/assets/55727269-7a00-4731-be52-27db0e6002fe" />
+4. Simulasi regression testing (PASS)
+   #### Auth Test
+   <img width="689" height="472" alt="Screenshot 2026-06-15 045213" src="https://github.com/user-attachments/assets/940340f9-f2f2-45c2-b20a-65e12b4161ad" />
+   #### Foods Test
+   <img width="616" height="626" alt="Screenshot 2026-06-15 102029" src="https://github.com/user-attachments/assets/5cf054f6-0fb8-4edf-b016-22b610dba5b5" />
+   #### Profile Test
+   <img width="609" height="680" alt="Screenshot 2026-06-15 045325" src="https://github.com/user-attachments/assets/84d41254-80c2-4063-a087-b96c66379465" />
+   #### Advanced Test
+   <img width="596" height="448" alt="Screenshot 2026-06-15 045357" src="https://github.com/user-attachments/assets/56245bbe-49fc-482b-9c84-db4d4cb50de6" />
+   #### Owner Test
+   <img width="601" height="513" alt="Screenshot 2026-06-15 045428" src="https://github.com/user-attachments/assets/40678be8-800d-4b2b-b900-2302c84c0f26" />
+   #### Error-Path Test
+   <img width="606" height="535" alt="Screenshot 2026-06-15 045504" src="https://github.com/user-attachments/assets/c8e3274a-aca5-41fd-b274-ab7f533ae456" />
+5. GitHub Actions Workflow
+    <img width="1919" height="944" alt="Screenshot 2026-06-15 101030" src="https://github.com/user-attachments/assets/4fdc50fa-3da8-47ab-a384-4dc3d8311098" />
