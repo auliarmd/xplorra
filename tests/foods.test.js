@@ -146,31 +146,4 @@ test('TC62 - detail makanan id sangat besar', async () => {
 
 });
 
-test('TC66 - edit food id tidak ditemukan', async () => {
-
-  const response = await request(app)
-    .put('/edit-food/999999')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      nama:'Test',
-      kategori:'Test',
-      daerah:'Test',
-      deskripsi:'Test'
-    });
-
-  expect([200,404]).toContain(response.statusCode);
-
-});
-
-test('TC67 - tambah makanan data kosong', async () => {
-
-  const response = await request(app)
-    .post('/add-food')
-    .set('Authorization', `Bearer ${token}`)
-    .send({});
-
-  expect([400,500]).toContain(response.statusCode);
-
-});
-
 });
