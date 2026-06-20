@@ -108,8 +108,8 @@ if(!food){
 }
 
 const bahanArray = food?.bahan
-                    ? JSON.parse(food.bahan)
-                    : [];
+  ? food.bahan.split("\n").filter(item => item.trim() !== "")
+  : [];
 
 const half = Math.ceil(bahanArray.length / 2);
 
@@ -365,20 +365,23 @@ return (
           <h2 style={styles.heading}>Langkah-Langkah</h2>
 
           <div style={styles.recipeText}>
-          {
-            food?.langkah
-          ? JSON.parse(food.langkah).map((item,index)=>(
+        {
+          food?.langkah
+          ? food.langkah
+              .split("\n")
+              .filter(item => item.trim() !== "")
+              .map((item,index)=>(
 
-              <div
-                key={index}
-                style={{marginBottom:'15px'}}
-              >
-                {index+1}. {item}
-              </div>
+                <div
+                  key={index}
+                  style={{marginBottom:'15px'}}
+                >
+                  {index + 1}. {item}
+                </div>
 
-            ))
+              ))
           : null
-          }
+        }  
         </div>
 
         </div>

@@ -15,6 +15,29 @@ function Notifikasi() {
 
   const navigate = useNavigate();
 
+  const getTimeAgo = (dateString) => {
+
+    const now = new Date();
+    const date = new Date(dateString);
+
+    const diff =
+      Math.floor((now - date) / 1000);
+
+    if (diff < 60)
+      return "Baru saja";
+
+    if (diff < 3600)
+      return `${Math.floor(diff / 60)} menit lalu`;
+
+    if (diff < 86400)
+      return `${Math.floor(diff / 3600)} jam lalu`;
+
+    if (diff < 2592000)
+      return `${Math.floor(diff / 86400)} hari lalu`;
+
+    return date.toLocaleDateString("id-ID");
+  };
+
   useEffect(()=>{
 
     api.get('/notifications')
@@ -32,6 +55,13 @@ function Notifikasi() {
     });
 
   },[]);
+
+  const filteredNotifications =
+  tabAktif === "belum"
+    ? notifications.filter(
+        notif => !notif.is_read
+      )
+    : notifications;
 
   return (
     <div style={styles.page}>
@@ -124,16 +154,36 @@ function Notifikasi() {
       <div style={styles.notifList}>
 
         {
-          notifications.map((notif)=>(
+          filteredNotifications.map((notif) => (
 
             <div
               key={notif.id}
-              style={styles.notifItem}
+              style={{
+                ...styles.notifItem,
+                cursor: "pointer"
+              }}
+              onClick={async () => {
+
+                try {
+
+                  await api.put(
+                    `/notifications/read/${notif.id}`
+                  );
+
+                } catch(err) {
+
+                  console.log(err);
+
+                }
+
+                navigate(`/detail/${notif.food_id}`);
+
+              }}
             >
 
               <div style={styles.leftNotif}>
 
-                {
+                { 
                   notif.foto ? (
 
                     <img
@@ -157,11 +207,21 @@ function Notifikasi() {
                 <div>
 
                   <div style={styles.textNotif}>
+
+                    <b>{notif.from_user}</b>
+
+                    {" "}
+
                     {notif.message}
+
+                    {" "}
+
+                    <b>{notif.recipe_name}</b>
+
                   </div>
 
                   <div style={styles.time}>
-                    Baru saja
+                    {getTimeAgo(notif.created_at)}
                   </div>
 
                 </div>

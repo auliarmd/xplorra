@@ -823,11 +823,54 @@ app.post('/like/:id', verifyToken, (req,res)=>{
 
             // tambah likes
             db.query(
-
               'UPDATE foods SET likes = likes + 1 WHERE id=?',
-
               [food_id]
+            );
 
+            db.query(
+              `
+              SELECT creator_id,nama
+              FROM foods
+              WHERE id=?
+              `,
+              [food_id],
+              (errFood, foodRows)=>{
+
+                if(foodRows.length > 0){
+
+                  const ownerId = foodRows[0].creator_id;
+                  const namaResep = foodRows[0].nama;
+
+                  if(ownerId !== req.user.id){
+
+                    db.query(
+                      `
+                      INSERT INTO notifications
+                      (
+                        user_id,
+                        from_user,
+                        food_id,
+                        recipe_name,
+                        message,
+                        foto
+                      )
+                      VALUES (?,?,?,?,?,?)
+                      `,
+                      [
+                        ownerId,
+                        req.user.nama,
+                        food_id,
+                        namaResep,
+                        `menyukai resep`,
+                        req.user.foto
+                      ]
+                    );
+
+                  }
+
+                }
+
+              }
             );
 
             res.json({
@@ -1140,17 +1183,19 @@ app.post(
                     user_id,
                     from_user,
                     food_id,
+                    recipe_name,
                     message,
                     foto
                   )
-                  VALUES (?,?,?,?,?)
+                  VALUES (?,?,?,?,?,?)
                   `,
 
                   [
                     ownerId,
                     req.user.nama,
                     food_id,
-                    `${req.user.nama} mengomentari resep ${namaResep}`,
+                    namaResep,
+                    `mengomentari resep`,
                     req.user.foto
                   ]
 
@@ -1322,6 +1367,78 @@ app.post('/rating/:id', verifyToken,(req,res)=>{
 
             }
 
+            db.query(
+              `
+              SELECT creator_id,nama
+              FROM foods
+              WHERE id=?
+              `,
+              [food_id],
+              (errFood, foodRows)=>{
+
+                if(foodRows.length > 0){
+
+                  const ownerId = foodRows[0].creator_id;
+                  const namaResep = foodRows[0].nama;
+
+                  if(ownerId !== req.user.id){
+
+  db.query(
+
+    `
+    SELECT *
+    FROM notifications
+    WHERE
+      from_user=?
+      AND food_id=?
+      AND message LIKE 'memberi rating%'
+    `,
+
+    [
+      req.user.nama,
+      food_id
+    ],
+
+    (errNotif, notifRows)=>{
+
+      if(notifRows.length === 0){
+
+        db.query(
+          `
+          INSERT INTO notifications
+          (
+            user_id,
+            from_user,
+            food_id,
+            recipe_name,
+            message,
+            foto
+          )
+          VALUES (?,?,?,?,?,?)
+          `,
+          [
+            ownerId,
+            req.user.nama,
+            food_id,
+            namaResep,
+            `memberi rating ${star}`,
+            req.user.foto
+          ]
+        );
+
+      }
+
+    }
+
+  );
+
+}
+
+                }
+
+              }
+            );
+
             res.json({
               status:true,
               rating:avgRating
@@ -1387,18 +1504,15 @@ app.get('/notifications', verifyToken, (req,res)=>{
 
     `
     SELECT
-
-    notifications.*,
-
-    users.foto
-
+      notifications.*,
+      users.foto,
+      foods.nama AS recipe_name
     FROM notifications
-
     JOIN users
-    ON notifications.from_user = users.nama
-
+      ON notifications.from_user = users.nama
+    LEFT JOIN foods
+      ON notifications.food_id = foods.id
     WHERE notifications.user_id=?
-
     ORDER BY notifications.created_at DESC
     `,
 
@@ -1416,6 +1530,26 @@ app.get('/notifications', verifyToken, (req,res)=>{
 
     }
 
+  );
+
+});
+
+app.put('/notifications/read/:id', verifyToken, (req,res)=>{
+
+  db.query(
+    'UPDATE notifications SET is_read=1 WHERE id=?',
+    [req.params.id],
+    (err)=>{
+
+      if(err){
+        return res.status(500).json(err);
+      }
+
+      res.json({
+        status:true
+      });
+
+    }
   );
 
 });
