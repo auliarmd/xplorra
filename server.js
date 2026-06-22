@@ -1503,7 +1503,7 @@ app.get('/notifications', verifyToken, (req,res)=>{
   db.query(
 
     `
-    SELECT
+    SELECT DISTINCT
       notifications.*,
       users.foto,
       foods.nama AS recipe_name

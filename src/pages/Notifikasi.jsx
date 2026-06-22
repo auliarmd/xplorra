@@ -12,6 +12,7 @@ function Notifikasi() {
 
   const [notifications, setNotifications] =
   useState([]);
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
 
@@ -39,6 +40,20 @@ function Notifikasi() {
   };
 
   useEffect(()=>{
+
+      api.get('/profile')
+
+      .then((res) => {
+
+        setUser(res.data.user);
+
+      })
+
+      .catch((err) => {
+
+        console.log(err);
+
+      });
 
     api.get('/notifications')
 
@@ -83,7 +98,30 @@ function Notifikasi() {
             style={styles.profileCircle}
             onClick={() => navigate("/profil")}
           >
-            <span className="material-symbols-outlined">person</span>
+
+            {
+              user?.foto ? (
+
+                <img
+                  src={`http://localhost:5000/uploads/${user.foto}`}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover"
+                  }}
+                />
+
+              ) : (
+
+                <span className="material-symbols-outlined">
+                  person
+                </span>
+
+              )
+            }
+
           </div>
         </div>
       </div>
@@ -170,13 +208,24 @@ function Notifikasi() {
                     `/notifications/read/${notif.id}`
                   );
 
+                  setNotifications(prev =>
+                    prev.map(item =>
+                      item.id === notif.id
+                        ? {
+                            ...item,
+                            is_read: 1
+                          }
+                        : item
+                    )
+                  );
+
+                  navigate(`/detail/${notif.food_id}`);
+
                 } catch(err) {
 
                   console.log(err);
 
                 }
-
-                navigate(`/detail/${notif.food_id}`);
 
               }}
             >
@@ -395,8 +444,11 @@ const styles = {
   },
 
   userIcon: {
-    width: "80px",
-    height: "65px",
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid #eee",
   },
 
   textNotif: {
