@@ -9,6 +9,9 @@ function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [backHover, setBackHover] = useState(false);
 
   const handleRegister = async (e) => {
 
@@ -74,12 +77,24 @@ function Register() {
       {/* LEFT SIDE */}
       <div style={styles.left}>
         <div
-          style={styles.backButton}
+          style={{
+            ...styles.backButton,
+            color: backHover ? "#d86936" : "#e46b3c",
+            transform: backHover ? "translateX(5px)" : "translateX(0)",
+            background: backHover ? "rgba(255,255,255,0.15)" : "transparent",
+          }}
+          onMouseEnter={() => setBackHover(true)}
+          onMouseLeave={() => setBackHover(false)}
           onClick={() => navigate("/dashboard")}
         >
           <span
             className="material-symbols-outlined"
-            style={styles.backIcon}
+            style={{
+              ...styles.backIcon,
+              transform: backHover
+                ? "translateX(-4px)"
+                : "translateX(0)",
+            }}
           >
             arrow_back
           </span>
@@ -119,6 +134,14 @@ function Register() {
               style={styles.input}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onFocus={(e) => {
+                e.target.style.border = "2px solid #d86936";
+                e.target.style.boxShadow = "0 0 0 3px rgba(216,105,54,0.15)";
+              }}
+              onBlur={(e) => {
+                e.target.style.border = "2px solid #b9b6b6";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -129,6 +152,14 @@ function Register() {
               style={styles.input}
               value={nama}
               onChange={(e) => setNama(e.target.value)}
+              onFocus={(e) => {
+                e.target.style.border = "2px solid #d86936";
+                e.target.style.boxShadow = "0 0 0 3px rgba(216,105,54,0.15)";
+              }}
+              onBlur={(e) => {
+                e.target.style.border = "2px solid #b9b6b6";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -143,31 +174,56 @@ function Register() {
                 style={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={(e) => {
+                  e.target.style.border = "2px solid #d86936";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(216,105,54,0.15)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = "2px solid #b9b6b6";
+                  e.target.style.boxShadow = "none";
+                }}
               />
               <div
                 style={styles.eye}
                 onClick={() => setShow(!show)}
               >
-                {show ? <FaEye /> : <FaEyeSlash />}
+                {show ? <FaEyeSlash /> : <FaEye />}
               </div>
             </div>
           </div>
 
           {/* LINK */}
-          <p style={styles.text}>
-            Apakah Anda sudah memiliki Akun?{" "}
-            <span style={styles.link} onClick={() => navigate("/Masuk")}>
-              Masuk
-            </span>
-          </p>
-
-          {/* BUTTON */}
           <button
             type="submit"
-            style={styles.button}
+            style={{
+              ...styles.button,
+              background: hover ? "#d86936" : "transparent",
+              color: hover ? "#fff" : "#d86936",
+              transform: pressed ? "scale(0.97)" : "scale(1)",
+              boxShadow: hover
+                ? "0 8px 20px rgba(216,105,54,0.35)"
+                : "0 4px 12px rgba(216,105,54,0.15)",
+            }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => {
+              setHover(false);
+              setPressed(false);
+            }}
+            onMouseDown={() => setPressed(true)}
+            onMouseUp={() => setPressed(false)}
           >
             Daftar
           </button>
+
+          <p style={styles.text}>
+            Sudah memiliki akun?{" "}
+            <span
+              style={styles.link}
+              onClick={() => navigate("/Masuk")}
+            >
+              Masuk
+            </span>
+          </p>
 
         </form>
       </div>
@@ -176,158 +232,165 @@ function Register() {
 }
 
 const styles = {
-  container: {
-    display: "flex",
-    width: "100vw", 
-    height: "100vh",
-    fontFamily: "sans-serif",
-    position: "relative",
-  },
-
-  /* LEFT */
-  left: {
-    width: "63%",
-    background: "linear-gradient(180deg, #F6E1C7, #C17854)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  logo: {
-    width: "140px",
-  },
-
-  logoWrapper: {
+container: {
   display: "flex",
-  flexDirection: "column", // ⬅️ INI KUNCI
-  alignItems: "center",    // ⬅️ biar center
+  width: "100vw",
+  height: "100vh",
+  fontFamily: "sans-serif",
+  position: "relative",
+  overflow: "hidden",
+  backgroundColor: "#ffffff",
+  },
+
+left: {
+  width: "55%",
+  background: "linear-gradient(180deg, #F6E1C7, #C17854)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  position: "relative",
+  },
+
+logoWrapper: {
+  textAlign: "center",
+  },
+
+logo: {
+  width: "170px",
+  },
+
+brand: {
+  marginTop: "10px",
+  color: "#d86936",
+  fontSize: "40px",
+  fontWeight: "700",
+  },
+
+right: {
+  width: "45%",
+  background: "#ffffff",
+
+  borderTopLeftRadius: "50px",
+  borderBottomLeftRadius: "50px",
+
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+
+  marginLeft: "-40px",
+
+  boxShadow: "-10px 0 30px rgba(0,0,0,0.08)",
+  zIndex: 1,
 },
 
-  brand: {
-    marginTop: "10px",
-    color: "#F28C28",
-    fontSize: "32px",
-    fontWeight: "700",
-  },
-
-  /* RIGHT */
-  right: {
-    width: "60%",
-    background: "#f6f6f6",
-
-    borderTopLeftRadius: "45px",
-    borderBottomLeftRadius: "45px",
-
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    
-    marginLeft: "-40px", // ⬅️ INI KUNCI (overlap)
-    zIndex: 2,
-    boxShadow: "-10px 0 30px rgba(0,0,0,0.1)",
+formWrapper: {
+  width: "380px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "8px",
 },
 
-  formWrapper: {
-    width: "380px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "18px",
+icon: {
+  fontSize: "45px",
+  color: "#d86936",
+  textAlign: "center",
   },
 
-  icon: {
-    fontSize: "50px",
-    color: "#d86936",
-    textAlign: "center",
+title: {
+  textAlign: "center",
+  fontSize: "24px",
+  fontWeight: "800",
+  marginBottom: "10px",
+  marginTop: "-10px",
+  color: "#111",
   },
 
-  title: {
-    textAlign: "center",
-    fontSize: "26px",
-    fontWeight: "800",
-    marginBottom: "20px",
-    marginTop: "-10px",
+inputGroup: {
+  display: "flex",
+  flexDirection: "column",
+  marginBottom: "8px",
+},
+
+label: {
+  fontSize: "13px",
+  color: "#555",
+  fontWeight: "700",
+  marginBottom: "4px",
+  marginTop: "0px",
+},
+
+input: {
+  padding: "14px",
+  borderRadius: "8px",
+  border: "2px solid #b9b6b6",
+  fontSize: "14px",
+  width: "100%",
+  boxSizing: "border-box",
+  outline: "none",
+  transition: "all 0.25s ease",
+},
+
+passwordWrapper: {
+  position: "relative",
+  width: "100%",
   },
 
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "5px",
+eye: {
+  position: "absolute",
+  right: "14px",
+  top: "55%",
+  transform: "translateY(-50%)",
+  fontSize: "18px",
+  color: "#999",
+  cursor: "pointer",
+  outline: "none",
   },
 
-  label: {
-    fontSize: "13px",
-    color: "#9b9b9b",
-    marginBottom: "5px",
-    //padding: "50px",
-  },
+button: {
+  marginTop: "35px",
+  padding: "16px",
+  borderRadius: "40px",
+  border: "2px solid #d86936",
+  background: "transparent",
+  color: "#d86936",
+  fontWeight: "700",
+  fontSize: "16px",
+  cursor: "pointer",
+  width: "100%",
+  transition: "all 0.25s ease",
+},
 
-  input: {
-    padding: "12px",
-    borderRadius: "5px",
-    border: "1px solid #ddd",
-    outline: "none",
-    fontSize: "14px",
-    width: "100%",
-    marginBottom: "5px"
-  },
+text: {
+  fontSize: "14px",
+  color: "#666",
+  marginTop: "15px",
+  textAlign: "center",
+},
 
-  passwordWrapper: {
-    position: "relative",
-  },
-
-  eye: {
-    position: "absolute",
-    right: "10px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    fontSize: "18px",
-    color: "#999",
-    cursor: "pointer",
-  },
-
-  text: {
-    fontSize: "13px",
-    color: "#666",
-    marginTop: "0px",
-  },
-
-  link: {
-    color: "#51504f",
-    fontWeight: "600",
-    cursor: "pointer",
-  },
-
-  button: {
-    marginTop: "50px",
-    padding: "17px",
-    borderRadius: "40px",
-    border: "2px solid #d86936",
-    background: "transparent",
-    color: "#d86936",
-    fontWeight: "700",
-    fontSize: "16px",
-    cursor: "pointer",
-    marginLeft: "20px",
+link: {
+  color: "#333",
+  fontWeight: "700",
+  cursor: "pointer",
   },
 
   backButton: {
     position: "absolute",
-    top: "50px",
-    left: "50px",
-
+    top: "20px",
+    left: "20px",
     display: "flex",
     alignItems: "center",
-    gap: "11px",
-
+    gap: "8px",
     color: "#e46b3c",
     fontWeight: "700",
+    fontSize: "15px",
     cursor: "pointer",
-
-    fontSize: "18px",
+    padding: "10px 14px",
+    borderRadius: "12px",
+    transition: "all 0.25s ease",
   },
-
   backIcon: {
-    fontSize: "30px",
+    fontSize: "24px",
+    transition: "all 0.25s ease",
   },
 };
 

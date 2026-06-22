@@ -11,6 +11,7 @@ function Masuk() {
   const [show, setShow] = useState(false);
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
+  const [backHover, setBackHover] = useState(false);
 
   const handleLogin = async (e) => {
     if (e) {
@@ -51,12 +52,24 @@ function Masuk() {
       {/* LEFT */}
       <div style={styles.left}>
         <div
-          style={styles.backButton}
+          style={{
+            ...styles.backButton,
+            color: backHover ? "#d86936" : "#e46b3c",
+            transform: backHover ? "translateX(5px)" : "translateX(0)",
+            background: backHover ? "rgba(255,255,255,0.15)" : "transparent",
+          }}
+          onMouseEnter={() => setBackHover(true)}
+          onMouseLeave={() => setBackHover(false)}
           onClick={() => navigate("/dashboard")}
         >
           <span
             className="material-symbols-outlined"
-            style={styles.backIcon}
+            style={{
+              ...styles.backIcon,
+              transform: backHover
+                ? "translateX(-4px)"
+                : "translateX(0)",
+            }}
           >
             arrow_back
           </span>
@@ -91,6 +104,14 @@ function Masuk() {
               style={styles.input}
               value={nama}
               onChange={(e) => setNama(e.target.value)}
+              onFocus={(e) => {
+                e.target.style.border = "2px solid #d86936";
+                e.target.style.boxShadow = "0 0 0 3px rgba(216,105,54,0.15)";
+              }}
+              onBlur={(e) => {
+                e.target.style.border = "2px solid #b9b6b6";
+                e.target.style.boxShadow = "none";
+              }}
             />
           </div>
 
@@ -106,6 +127,14 @@ function Masuk() {
                 style={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={(e) => {
+                  e.target.style.border = "2px solid #d86936";
+                  e.target.style.boxShadow = "0 0 0 3px rgba(216,105,54,0.15)";
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = "2px solid #b9b6b6";
+                  e.target.style.boxShadow = "none";
+                }}
               />
               <div
                 style={styles.eye}
@@ -120,6 +149,12 @@ function Masuk() {
           <div style={styles.forgotWrapper}>
             <p
               style={styles.forgotPassword}
+              onMouseEnter={(e) => {
+                e.target.style.color = "#b84f22";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.color = "#d86936";
+              }}
               onClick={() => navigate("/lupa-password")}
             >
               Lupa Password?
@@ -237,6 +272,7 @@ const styles = {
     width: "100%",
     boxSizing: "border-box",
     transition: "0.3s",
+    outline: "none"
   },
   passwordWrapper: {
     position: "relative",
@@ -245,7 +281,7 @@ const styles = {
   eye: {
     position: "absolute",
     right: "14px",
-    top: "50%",
+    top: "55%",
     transform: "translateY(-50%)",
     fontSize: "18px",
     color: "#999",
@@ -278,32 +314,38 @@ const styles = {
   },
   backButton: {
     position: "absolute",
-    top: "40px",
-    left: "40px",
+    top: "20px",
+    left: "20px",
     display: "flex",
     alignItems: "center",
     gap: "8px",
     color: "#e46b3c",
     fontWeight: "700",
-    cursor: "pointer",
     fontSize: "15px",
+    cursor: "pointer",
+    padding: "10px 14px",
+    borderRadius: "12px",
+    transition: "all 0.25s ease",
   },
   backIcon: {
     fontSize: "24px",
+    transition: "all 0.25s ease",
   },
 
-  forgotPassword: {
-    color: "#d86936",
-    cursor: "pointer",
-    fontSize: "13px",
-    margin: 0,
-  },
+forgotPassword: {
+  color: "#d86936",
+  cursor: "pointer",
+  fontSize: "13px",
+  margin: 0,
+  fontWeight: "500",
+  transition: "0.25s ease",
+},
 
   forgotWrapper: {
     width: "100%",
     display: "flex",
     justifyContent: "flex-end",
-    marginTop: "-10px",
+    marginTop: "-5px",
     marginBottom: "10px",
   },
 };
