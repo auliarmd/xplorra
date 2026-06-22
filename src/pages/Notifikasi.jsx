@@ -12,10 +12,48 @@ function Notifikasi() {
 
   const [notifications, setNotifications] =
   useState([]);
+  const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
 
+  const getTimeAgo = (dateString) => {
+
+    const now = new Date();
+    const date = new Date(dateString);
+
+    const diff =
+      Math.floor((now - date) / 1000);
+
+    if (diff < 60)
+      return "Baru saja";
+
+    if (diff < 3600)
+      return `${Math.floor(diff / 60)} menit lalu`;
+
+    if (diff < 86400)
+      return `${Math.floor(diff / 3600)} jam lalu`;
+
+    if (diff < 2592000)
+      return `${Math.floor(diff / 86400)} hari lalu`;
+
+    return date.toLocaleDateString("id-ID");
+  };
+
   useEffect(()=>{
+
+      api.get('/profile')
+
+      .then((res) => {
+
+        setUser(res.data.user);
+
+      })
+
+      .catch((err) => {
+
+        console.log(err);
+
+      });
 
     api.get('/notifications')
 
@@ -32,6 +70,13 @@ function Notifikasi() {
     });
 
   },[]);
+
+  const filteredNotifications =
+  tabAktif === "belum"
+    ? notifications.filter(
+        notif => !notif.is_read
+      )
+    : notifications;
 
   return (
     <div style={styles.page}>
@@ -53,7 +98,30 @@ function Notifikasi() {
             style={styles.profileCircle}
             onClick={() => navigate("/profil")}
           >
-            <span className="material-symbols-outlined">person</span>
+
+            {
+              user?.foto ? (
+
+                <img
+                  src={`http://localhost:5000/uploads/${user.foto}`}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover"
+                  }}
+                />
+
+              ) : (
+
+                <span className="material-symbols-outlined">
+                  person
+                </span>
+
+              )
+            }
+
           </div>
         </div>
       </div>
@@ -124,16 +192,47 @@ function Notifikasi() {
       <div style={styles.notifList}>
 
         {
-          notifications.map((notif)=>(
+          filteredNotifications.map((notif) => (
 
             <div
               key={notif.id}
-              style={styles.notifItem}
+              style={{
+                ...styles.notifItem,
+                cursor: "pointer"
+              }}
+              onClick={async () => {
+
+                try {
+
+                  await api.put(
+                    `/notifications/read/${notif.id}`
+                  );
+
+                  setNotifications(prev =>
+                    prev.map(item =>
+                      item.id === notif.id
+                        ? {
+                            ...item,
+                            is_read: 1
+                          }
+                        : item
+                    )
+                  );
+
+                  navigate(`/detail/${notif.food_id}`);
+
+                } catch(err) {
+
+                  console.log(err);
+
+                }
+
+              }}
             >
 
               <div style={styles.leftNotif}>
 
-                {
+                { 
                   notif.foto ? (
 
                     <img
@@ -157,11 +256,21 @@ function Notifikasi() {
                 <div>
 
                   <div style={styles.textNotif}>
+
+                    <b>{notif.from_user}</b>
+
+                    {" "}
+
                     {notif.message}
+
+                    {" "}
+
+                    <b>{notif.recipe_name}</b>
+
                   </div>
 
                   <div style={styles.time}>
-                    Baru saja
+                    {getTimeAgo(notif.created_at)}
                   </div>
 
                 </div>
@@ -335,8 +444,11 @@ const styles = {
   },
 
   userIcon: {
-    width: "80px",
-    height: "65px",
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid #eee",
   },
 
   textNotif: {
