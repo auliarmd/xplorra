@@ -107,9 +107,23 @@ if(!food){
 
 }
 
-const bahanArray = food?.bahan
-                    ? JSON.parse(food.bahan)
-                    : [];
+const bahanArray = (() => {
+
+  if(!food?.bahan) return [];
+
+  try {
+
+    return JSON.parse(food.bahan);
+
+  } catch {
+
+    return food.bahan
+      .split('\n')
+      .filter(item => item.trim() !== '');
+
+  }
+
+})();
 
 const half = Math.ceil(bahanArray.length / 2);
 
@@ -366,18 +380,36 @@ return (
 
           <div style={styles.recipeText}>
           {
-            food?.langkah
-          ? JSON.parse(food.langkah).map((item,index)=>(
+            (() => {
 
-              <div
-                key={index}
-                style={{marginBottom:'15px'}}
-              >
-                {index+1}. {item}
-              </div>
+              if(!food?.langkah) return null;
 
-            ))
-          : null
+              let langkahArray = [];
+
+              try {
+
+                langkahArray = JSON.parse(food.langkah);
+
+              } catch {
+
+                langkahArray = food.langkah
+                  .split('\n')
+                  .filter(item => item.trim() !== '');
+
+              }
+
+              return langkahArray.map((item,index)=>(
+
+                <div
+                  key={index}
+                  style={{marginBottom:'15px'}}
+                >
+                  {index + 1}. {item}
+                </div>
+
+              ));
+
+            })()
           }
         </div>
 
