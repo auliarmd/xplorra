@@ -20,6 +20,10 @@ function Dashboard() {
     navigate("/Masuk");
   };
 
+  const requireLogin = () => {
+    navigate("/Masuk");
+  };
+
   useEffect(() => {
 
     fetch(`${BASE_URL}/foods/trending`)
@@ -79,7 +83,7 @@ function Dashboard() {
           <span style={styles.active}>Home</span>
 
           <span
-            onClick={goToRegister}
+            onClick={requireLogin}
             style={{ cursor:"pointer" }}
           >
             Profil
@@ -110,7 +114,7 @@ function Dashboard() {
       <div style={styles.wrapper}>
         <div style={styles.trending}>
             {trendingFoods.map((item) => (
-            <div key={item.id} style={styles.trendingCard} onClick={goToRegister}>
+            <div key={item.id} style={styles.trendingCard} onClick={requireLogin}>
                 <div style={styles.imageWrapper}>
                 <img
                   src={`http://localhost:5000/uploads/${item.gambar}`}
@@ -170,7 +174,7 @@ function Dashboard() {
                       </span>
                     <button
                       style={styles.btnLihat}
-                      onClick={goToRegister}
+                      onClick={requireLogin}
                     >
                       Lihat
                     </button>
@@ -455,7 +459,7 @@ function Dashboard() {
             <div
               key={item.id}
               style={styles.card}
-              onClick={goToRegister}
+              onClick={requireLogin}
             >
 
   {/* WRAPPER GAMBAR */}
@@ -510,7 +514,7 @@ function Dashboard() {
                     style={styles.btnLihat}
                     onClick={(e) => {
                       e.stopPropagation();
-                      goToRegister();
+                      requireLogin();
                     }}
                   >
                     Lihat
