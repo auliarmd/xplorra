@@ -5,6 +5,7 @@ const BASE_URL = "http://localhost:5000";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [notFound, setNotFound] = useState(false);
   const [foods, setFoods] = useState([]);
   const [search, setSearch] = useState("");
   const [kategori, setKategori] = useState("");
@@ -19,30 +20,52 @@ function Dashboard() {
     navigate("/Masuk");
   };
 
+  useEffect(() => {
+
+    fetch(`${BASE_URL}/foods/trending`)
+      .then((res) => res.json())
+      .then((data) => {
+
+        setTrendingFoods(
+          Array.isArray(data)
+            ? data
+            : []
+        );
+
+      })
+      .catch((err) => {
+
+        console.log(err);
+
+      });
+
+  }, []);
+
   useEffect(()=>{
 
-    fetch(`${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`)
+    fetch(
+      `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
+    )
+
     .then((res)=>res.json())
+
     .then((data)=>{
 
       console.log(data);
 
       setFoods(data);
 
+      setNotFound(
+        data.length === 0
+      );
+
     })
+
     .catch((err)=>{
       console.log(err);
     });
 
-    fetch(`${BASE_URL}/foods/trending`)
-  .then((res) => res.json())
-  .then((data) => {
-    setTrendingFoods(data);
-  })
-  .catch((err) => console.log(err));
-
-},[kategori, daerah, search]);
-
+  },[kategori, daerah, search]);
   return (
     <div style={styles.container}>
       {/* NAVBAR */}
@@ -171,14 +194,11 @@ function Dashboard() {
               style={styles.searchInput}
               value={search}
               onChange={(e) => {
+
                 const keyword = e.target.value;
+
                 setSearch(keyword);
 
-                fetch(`${BASE_URL}/foods/search/${keyword}`)
-                  .then((res) => res.json())
-                  .then((data) => {
-                    setFoods(data);
-                  });
               }}
             />
           </div>
@@ -408,6 +428,22 @@ function Dashboard() {
             </div>
           </div>
         </div>
+
+        {
+          notFound && (
+            <h2
+              style={{
+                color:'#d86936',
+                textAlign:'center',
+                width:'100%',
+                marginTop:'200px',
+                fontSize:'20px'
+              }}
+            >
+              Resep tidak ditemukan
+            </h2>
+          )
+        }
 
         {/* GRID */}
         <div style={styles.cardContainer}>

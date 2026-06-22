@@ -13,43 +13,43 @@ function DashboardAfterLogin() {
   const [user, setUser] = useState({});
   const [daerah, setDaerah] = useState("");
 
-  const filterFoods = (newKategori, newDaerah) => {
+  const filterFoods = (
+    newKategori,
+    newDaerah,
+    newSearch
+  ) => {
 
-  const kategoriValue = newKategori ?? kategori;
-  const daerahValue = newDaerah ?? daerah;
+    const kategoriValue =
+      newKategori ?? kategori;
 
-  api.get(`/foods?kategori=${kategoriValue}&daerah=${daerahValue}`)
-    .then((res) => {
-      const data = res.data;
+    const daerahValue =
+      newDaerah ?? daerah;
 
-  setFoods(data);
+    const searchValue =
+      newSearch ?? search;
 
-  // CEK DATA KOSONG
-  if(data.length === 0){
+      console.log(
+      `/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`
+    );
+    api.get(
+      `/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`
+    )
 
-    setNotFound(true);
+    .then((res)=>{
 
-  }else{
-
-    setNotFound(false);
-
-  }
-
-})
-.catch((err) => console.log(err));
-
-};
-
-  const filterDaerah = (value) => {
-  setDaerah(value);
-
-  api.get(`/foods?daerah=${value}`)
-    .then((res) => {
       setFoods(res.data);
-    })
-    .catch((err) => console.log(err));
-};
 
+      setNotFound(res.data.length === 0);
+
+    })
+
+    .catch((err)=>{
+
+      console.log(err);
+
+    });
+
+  };
   useEffect(() => {
 
     const token = localStorage.getItem("token");
@@ -109,9 +109,21 @@ function DashboardAfterLogin() {
 
         setTrendingFoods([]);
 
-      });
+      }, []);
 
   }, []);
+
+  useEffect(() => {
+
+        filterFoods();
+        console.log(
+          "FILTER",
+          kategori,
+          daerah,
+          search
+        );
+
+      }, [kategori, daerah, search]);
 
 const toggleSave = async (id) => {
 
@@ -320,26 +332,21 @@ const toggleSave = async (id) => {
               style={styles.searchInput}
               value={search}
               onChange={(e) => {
+
                 const keyword = e.target.value;
+
                 setSearch(keyword);
 
-                api.get(`/foods/search/${keyword}`)
-                  .then((res) => {
+                if(keyword.trim() === ""){
 
-                    setFoods(res.data);
+                  filterFoods(
+                    kategori,
+                    daerah,
+                    ""
+                  );
 
-                    if(res.data.length === 0){
+                }
 
-                      setNotFound(true);
-
-                    }else{
-
-                      setNotFound(false);
-
-                    }
-
-                  })
-                  .catch((err) => console.log(err));
               }}
             />
           </div>
@@ -354,7 +361,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setKategori("Makanan utama");
-              filterFoods("Makanan utama", daerah);
             }}
           >
             <span>Makanan utama</span>
@@ -375,7 +381,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setKategori("Minuman");
-              filterFoods("Minuman", daerah);
             }}
           >
             <span>Minuman</span>
@@ -396,7 +401,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setKategori("Dessert");
-              filterFoods("Dessert", daerah);
             }}
           >
             <span>Dessert</span>
@@ -421,7 +425,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Sumatera");
-              filterFoods(kategori, "Sumatera");
             }}
           >
             <span>Sumatera</span>
@@ -442,7 +445,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Kalimantan");
-              filterFoods(kategori, "Kalimantan");
             }}
           >
             <span>Kalimantan</span>
@@ -463,7 +465,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Sulawesi");
-              filterFoods(kategori, "Sulawesi");
             }}
           >
             <span>Sulawesi</span>
@@ -483,7 +484,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Maluku");
-              filterFoods(kategori, "Maluku");
             }}
           >
             <span>Maluku</span>
@@ -504,7 +504,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Irian Jaya");
-              filterFoods(kategori, "Irian Jaya");
             }}
           >
             <span>Irian jaya</span>
@@ -525,7 +524,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Nusa Tenggara");
-              filterFoods(kategori, "Nusa Tenggara");
             }}
           >
             <span>Nusa Tenggara</span>
@@ -546,7 +544,6 @@ const toggleSave = async (id) => {
             style={styles.optionRow}
             onClick={() => {
               setDaerah("Jawa");
-              filterFoods(kategori, "Jawa");
             }}
           >
             <span>Jawa</span>
@@ -581,7 +578,7 @@ const toggleSave = async (id) => {
 
         <div style={styles.grid}>
 
-          {foods.map((item) => (
+          {(Array.isArray(foods) ? foods : []).map((item) => (
 
             <div
               key={item.id}
