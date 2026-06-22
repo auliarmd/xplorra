@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../api/axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Masuk() {
   const navigate = useNavigate();
@@ -9,7 +10,11 @@ function Masuk() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+
+    if(e){
+      e.preventDefault();
+    }
 
     if(!nama || !password){
       return alert("Isi semua form terlebih dahulu");
@@ -61,6 +66,22 @@ function Masuk() {
       
       {/* LEFT */}
       <div style={styles.left}>
+        <div
+          style={styles.backButton}
+          onClick={() => navigate("/dashboard")}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={styles.backIcon}
+          >
+            arrow_back
+          </span>
+
+          <span>
+            KEMBALI KE DASHBOARD
+          </span>
+        </div>
+
         <div style={{ textAlign: "center" }}>
           <img src="/logo_X.png" alt="logo" style={styles.logo} />
           <h1 style={styles.brand}>XpLorra</h1>
@@ -69,7 +90,10 @@ function Masuk() {
 
       {/* RIGHT */}
       <div style={styles.right}>
-        <div style={styles.formWrapper}>
+        <form
+            style={styles.formWrapper}
+            onSubmit={handleLogin}
+          >
 
           {/* ICON */}
           <span className="material-symbols-outlined" style={styles.icon}>
@@ -103,13 +127,12 @@ function Masuk() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <span
-                className="material-symbols-outlined"
+              <div
                 style={styles.eye}
                 onClick={() => setShow(!show)}
               >
-                {show ? "visibility" : "visibility_off"}
-              </span>
+                {show ? <FaEye /> : <FaEyeSlash />}
+              </div>
             </div>
           </div>
 
@@ -121,15 +144,22 @@ function Masuk() {
             </span>
           </p>
 
+          <p
+            style={styles.forgotPassword}
+            onClick={() => navigate("/lupa-password")}
+          >
+            Lupa Password?
+          </p>
+
           {/* BUTTON */}
           <button
+            type="submit"
             style={styles.button}
-            onClick={handleLogin}
           >
             Masuk
           </button>
 
-        </div>
+        </form>
       </div>
     </div>
   );
@@ -141,6 +171,7 @@ const styles = {
     width: "100vw",
     height: "100vh",
     fontFamily: "sans-serif",
+    position: "relative",
   },
 
   left: {
@@ -252,6 +283,34 @@ const styles = {
     cursor: "pointer",
     width: "90%",
     alignSelf: "center",
+  },
+
+  forgotPassword: {
+    fontSize: "13px",
+    color: "#d86936",
+    cursor: "pointer",
+    textAlign: "right",
+    marginTop: "-10px",
+  },
+
+  backButton: {
+    position: "absolute",
+    top: "50px",
+    left: "50px",
+
+    display: "flex",
+    alignItems: "center",
+    gap: "11px",
+
+    color: "#e46b3c",
+    fontWeight: "700",
+    cursor: "pointer",
+
+    fontSize: "18px",
+  },
+
+  backIcon: {
+    fontSize: "30px",
   },
 };
 

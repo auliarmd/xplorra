@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../api/axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Register() {
   const navigate = useNavigate();
@@ -9,7 +10,11 @@ function Register() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+
+    if(e){
+      e.preventDefault();
+    }
 
       if(!nama || !email || !password){
         return alert("Isi semua form terlebih dahulu");
@@ -68,6 +73,22 @@ function Register() {
       
       {/* LEFT SIDE */}
       <div style={styles.left}>
+        <div
+          style={styles.backButton}
+          onClick={() => navigate("/dashboard")}
+        >
+          <span
+            className="material-symbols-outlined"
+            style={styles.backIcon}
+          >
+            arrow_back
+          </span>
+
+          <span>
+            KEMBALI KE DASHBOARD
+          </span>
+        </div>
+
         <div style={styles.logoWrapper}>
           <img src="/logo_X.png" alt="logo" style={styles.logo} />
           <h1 style={styles.brand}>XpLorra</h1>
@@ -76,7 +97,10 @@ function Register() {
 
       {/* RIGHT SIDE */}
       <div style={styles.right}>
-        <div style={styles.formWrapper}>
+        <form
+            style={styles.formWrapper}
+            onSubmit={handleRegister}
+          >
 
           {/* ICON */}
           <span className="material-symbols-outlined" style={styles.icon}>
@@ -120,13 +144,12 @@ function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <span
-                className="material-symbols-outlined"
+              <div
                 style={styles.eye}
                 onClick={() => setShow(!show)}
               >
-                {show ? "visibility" : "visibility_off"}
-              </span>
+                {show ? <FaEye /> : <FaEyeSlash />}
+              </div>
             </div>
           </div>
 
@@ -140,13 +163,13 @@ function Register() {
 
           {/* BUTTON */}
           <button
+            type="submit"
             style={styles.button}
-            onClick={handleRegister}
           >
             Daftar
           </button>
 
-        </div>
+        </form>
       </div>
     </div>
   );
@@ -158,6 +181,7 @@ const styles = {
     width: "100vw", 
     height: "100vh",
     fontFamily: "sans-serif",
+    position: "relative",
   },
 
   /* LEFT */
@@ -284,6 +308,26 @@ const styles = {
     fontSize: "16px",
     cursor: "pointer",
     marginLeft: "20px",
+  },
+
+  backButton: {
+    position: "absolute",
+    top: "50px",
+    left: "50px",
+
+    display: "flex",
+    alignItems: "center",
+    gap: "11px",
+
+    color: "#e46b3c",
+    fontWeight: "700",
+    cursor: "pointer",
+
+    fontSize: "18px",
+  },
+
+  backIcon: {
+    fontSize: "30px",
   },
 };
 

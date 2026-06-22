@@ -1660,6 +1660,63 @@ app.post(
   }
 );
 
+app.put(
+  '/reset-password',
+
+  (req,res)=>{
+
+    const {
+      nama,
+      passwordBaru
+    } = req.body;
+
+    db.query(
+
+      `
+      UPDATE users
+      SET password=?
+      WHERE nama=?
+      `,
+
+      [
+        passwordBaru,
+        nama
+      ],
+
+      (err,result)=>{
+
+        if(err){
+
+          return res.status(500)
+          .json({
+            message:'Server error'
+          });
+
+        }
+
+        if(
+          result.affectedRows === 0
+        ){
+
+          return res.json({
+            message:
+            'User tidak ditemukan'
+          });
+
+        }
+
+        res.json({
+          message:
+          'Password berhasil diubah'
+        });
+
+      }
+
+    );
+
+  }
+);
+
 const PORT = 5000;
 app.listen(5000, '0.0.0.0', () => {
   console.log('Server running on port 5000');

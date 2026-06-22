@@ -10,6 +10,7 @@ import Profil from "./pages/Profil";
 import Notifikasi from "./pages/Notifikasi";
 import Feedback from "./pages/Feedback";
 import EditResep from "./pages/EditResep";
+import LupaPassword from "./pages/LupaPassword";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/notifikasi" element={<Notifikasi />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/edit/:id" element={<EditResep />} />
+        <Route path="/lupa-password" element={<LupaPassword />} />
       
       </Routes>
     </BrowserRouter>
