@@ -9,58 +9,42 @@ function Masuk() {
   const [nama, setNama] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   const handleLogin = async (e) => {
-
-    if(e){
+    if (e) {
       e.preventDefault();
     }
 
-    if(!nama || !password){
+    if (!nama || !password) {
       return alert("Isi semua form terlebih dahulu");
     }
 
     try {
-
-      const response = await api.post('/login',{
-
+      const response = await api.post('/login', {
         nama,
         password
-
       });
 
       const data = response.data;
-
       console.log(data);
 
-      if(data.status){
-
+      if (data.status) {
         localStorage.setItem("token", data.token);
-
         alert("Login berhasil");
-
-        setTimeout(()=>{
-
+        setTimeout(() => {
           navigate('/dashboardAfterLogin');
-
-        },300);
-
-      }else{
-
+        }, 300);
+      } else {
         alert(data.message);
-
       }
-
-    } catch(err){
-
+    } catch (err) {
       console.log(err);
-
       alert("Gagal connect ke server");
-
     }
-
   };
-  
+
   return (
     <div style={styles.container}>
       
@@ -76,10 +60,7 @@ function Masuk() {
           >
             arrow_back
           </span>
-
-          <span>
-            KEMBALI KE DASHBOARD
-          </span>
+          <span>KEMBALI KE DASHBOARD</span>
         </div>
 
         <div style={{ textAlign: "center" }}>
@@ -91,10 +72,9 @@ function Masuk() {
       {/* RIGHT */}
       <div style={styles.right}>
         <form
-            style={styles.formWrapper}
-            onSubmit={handleLogin}
-          >
-
+          style={styles.formWrapper}
+          onSubmit={handleLogin}
+        >
           {/* ICON */}
           <span className="material-symbols-outlined" style={styles.icon}>
             notifications
@@ -105,7 +85,7 @@ function Masuk() {
 
           {/* INPUT NAMA */}
           <div style={styles.inputGroup}>
-            <label style={styles.label}>Nama Anda</label>
+            <label style={styles.label}>Nama</label>
             <input
               placeholder="Masukkan nama anda"
               style={styles.input}
@@ -122,7 +102,7 @@ function Masuk() {
                 type={show ? "text" : "password"}
                 minLength={6}
                 maxLength={6}
-                placeholder="Masukkan kata sandi anda (6 Karakter)"
+                placeholder="Kata sandi harus 6 karakter"
                 style={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -131,34 +111,49 @@ function Masuk() {
                 style={styles.eye}
                 onClick={() => setShow(!show)}
               >
-                {show ? <FaEye /> : <FaEyeSlash />}
+                {show ? <FaEyeSlash /> : <FaEye />}
               </div>
             </div>
           </div>
 
           {/* LINK */}
-          <p style={styles.text}>
-            Apakah Anda belum mendaftar?{" "}
-            <span style={styles.link} onClick={() => navigate("/Register")}>
-              Daftar
-            </span>
-          </p>
+          <div style={styles.forgotWrapper}>
+            <p
+              style={styles.forgotPassword}
+              onClick={() => navigate("/lupa-password")}
+            >
+              Lupa Password?
+            </p>
+          </div>
 
-          <p
-            style={styles.forgotPassword}
-            onClick={() => navigate("/lupa-password")}
-          >
-            Lupa Password?
-          </p>
-
-          {/* BUTTON */}
           <button
             type="submit"
-            style={styles.button}
+            style={{
+              ...styles.button,
+              background: hover ? "#d86936" : "transparent",
+              color: hover ? "#fff" : "#d86936",
+              transform: pressed ? "scale(0.97)" : "scale(1)",
+              boxShadow: hover
+                ? "0 8px 20px rgba(216,105,54,0.35)"
+                : "0 4px 12px rgba(216,105,54,0.15)",
+            }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => {
+              setHover(false);
+              setPressed(false);
+            }}
+            onMouseDown={() => setPressed(true)}
+            onMouseUp={() => setPressed(false)}
           >
             Masuk
           </button>
 
+          <p style={styles.text}>
+            Apakah Anda sudah mendaftar?{" "}
+            <span style={styles.link} onClick={() => navigate("/Register")}>
+              Daftar
+            </span>
+          </p>
         </form>
       </div>
     </div>
@@ -172,108 +167,105 @@ const styles = {
     height: "100vh",
     fontFamily: "sans-serif",
     position: "relative",
+    overflow: "hidden", // Mencegah scroll horizontal akibat margin negatif
+    backgroundColor: "#ffffff"
   },
-
   left: {
-    width: "63%",
+    width: "55%", // Disesuaikan agar proporsi mirip gambar asli
     background: "linear-gradient(180deg, #F6E1C7, #C17854)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    position: "relative", // Agar tombol back absolute berada di dalam area ini
   },
-
   logo: {
-    width: "140px",
+    width: "170px",
   },
-
   brand: {
     marginTop: "10px",
-    color: "#F28C28",
-    fontSize: "32px",
+    color: "#d86936",
+    fontSize: "40px",
     fontWeight: "700",
   },
-
   right: {
-    width: "60%",
-    background: "#f6f6f6",
+    width: "45%", // Disesuaikan sisa layar
+    background: "#ffffff",
     borderTopLeftRadius: "50px",
     borderBottomLeftRadius: "50px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: "-40px",
-    boxShadow: "-10px 0 30px rgba(0,0,0,0.1)",
+    marginLeft: "-40px", // Membuat efek overlap menimpa background kiri
+    boxShadow: "-10px 0 30px rgba(0,0,0,0.08)",
+    zIndex: 1, // Memastikan panel kanan berada di atas panel kiri
   },
-
   formWrapper: {
     width: "380px",
     display: "flex",
     flexDirection: "column",
     gap: "22px",
   },
-
   icon: {
     fontSize: "45px",
     color: "#d86936",
     textAlign: "center",
   },
-
   title: {
     textAlign: "center",
-    fontSize: "26px",
+    fontSize: "24px",
     fontWeight: "800",
-    marginBottom: "20px",
-    marginTop: "-20px",
+    marginBottom: "10px",
+    marginTop: "-10px",
+    color: "#111",
   },
-
   inputGroup: {
     display: "flex",
     flexDirection: "column",
   },
-
   label: {
     fontSize: "13px",
-    color: "#a0a0a0",
-    marginBottom: "6px",
+    color: "#555",
+    fontWeight: "700",
+    marginBottom: "8px",
     marginTop: "10px",
   },
-
   input: {
     padding: "14px",
-    borderRadius: "8px",
-    border: "1px solid #e5e5e5",
+    borderRadius: "10px",
+    border: "2px solid #b9b6b6",
     fontSize: "14px",
     width: "100%",
+    boxSizing: "border-box",
+    transition: "0.3s",
   },
-
   passwordWrapper: {
     position: "relative",
+    width: "100%",
   },
-
   eye: {
     position: "absolute",
-    right: "10px",
+    right: "14px",
     top: "50%",
     transform: "translateY(-50%)",
     fontSize: "18px",
     color: "#999",
     cursor: "pointer",
   },
-
   text: {
-    fontSize: "13px",
+    fontSize: "14px",
     color: "#666",
+    marginTop: "15px",
+    textAlign: "center",
   },
-
   link: {
-    color: "#51504f",
-    fontWeight: "600",
+    color: "#333",
+    fontWeight: "700",
     cursor: "pointer",
   },
-
-  button: {
-    marginTop: "40px",
+ button: {
+    marginTop: "10px",
     padding: "16px",
+    width: "100%",
     borderRadius: "40px",
     border: "2px solid #d86936",
     background: "transparent",
@@ -281,36 +273,38 @@ const styles = {
     fontWeight: "700",
     fontSize: "16px",
     cursor: "pointer",
-    width: "90%",
-    alignSelf: "center",
+    transition: "all 0.25s ease",
+    boxShadow: "0 4px 12px rgba(216,105,54,0.15)",
   },
-
-  forgotPassword: {
-    fontSize: "13px",
-    color: "#d86936",
-    cursor: "pointer",
-    textAlign: "right",
-    marginTop: "-10px",
-  },
-
   backButton: {
     position: "absolute",
-    top: "50px",
-    left: "50px",
-
+    top: "40px",
+    left: "40px",
     display: "flex",
     alignItems: "center",
-    gap: "11px",
-
+    gap: "8px",
     color: "#e46b3c",
     fontWeight: "700",
     cursor: "pointer",
-
-    fontSize: "18px",
+    fontSize: "15px",
+  },
+  backIcon: {
+    fontSize: "24px",
   },
 
-  backIcon: {
-    fontSize: "30px",
+  forgotPassword: {
+    color: "#d86936",
+    cursor: "pointer",
+    fontSize: "13px",
+    margin: 0,
+  },
+
+  forgotWrapper: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-end",
+    marginTop: "-10px",
+    marginBottom: "10px",
   },
 };
 
