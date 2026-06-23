@@ -14,6 +14,9 @@ const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
 const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
+const [showPopup, setShowPopup] = useState(false);
+const [popupMessage, setPopupMessage] = useState("");
+const [isSuccess, setIsSuccess] = useState(false);
 
 
 const handleSave = async () => {
@@ -36,7 +39,10 @@ if(
   langkahKosong
 ){
 
-  return alert("Isi semua form");
+setPopupMessage("Semua form harus diisi!");
+setIsSuccess(false);
+setShowPopup(true);
+return;
 
 }
 
@@ -70,19 +76,16 @@ if(
       }
     );
 
-    alert("Resep berhasil ditambahkan");
-
-    setTimeout(() => {
-
-      navigate("/dashboardafterlogin");
-
-    }, 1000);
+setPopupMessage("Resep berhasil ditambahkan!");
+setIsSuccess(true);
+setShowPopup(true);
 
   }catch(err){
 
-    console.log(err);
-
-    alert("Gagal tambah resep");
+console.log(err);
+setPopupMessage("Gagal menambahkan resep!");
+setIsSuccess(false);
+setShowPopup(true);
 
   }
 
@@ -142,6 +145,50 @@ const ubahLangkah = (index,value) => {
   return (
     <div style={styles.page}>
     <div style={styles.mapBackground}></div>
+
+
+{showPopup && (
+  <div style={styles.modalOverlay}>
+    <div style={styles.modalBox}>
+
+      <span
+        className="material-symbols-outlined"
+        style={
+          isSuccess
+            ? styles.successIcon
+            : styles.errorIcon
+        }
+      >
+        {isSuccess ? "check_circle" : "error"}
+      </span>
+
+      <h3 style={styles.modalTitle}>
+        Pemberitahuan
+      </h3>
+
+      <p style={styles.modalText}>
+        {popupMessage}
+      </p>
+
+      <button
+        autoFocus
+        style={styles.btnConfirm}
+        onClick={() => {
+          setShowPopup(false);
+
+          if (isSuccess) {
+            navigate("/dashboardafterlogin");
+          }
+        }}
+      >
+        Oke
+      </button>
+
+    </div>
+  </div>
+)}
+
+);
 
       {/* NAVBAR */}
       <div style={styles.navbar}>
@@ -795,6 +842,64 @@ saveBtn:{
 
   boxShadow:"0 6px 15px rgba(228,107,92,0.35)"
 },
+
+modalOverlay: {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0,0,0,0.5)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 99999,
+},
+
+modalBox: {
+  backgroundColor: "#fff",
+  width: "350px",
+  padding: "30px",
+  borderRadius: "20px",
+  textAlign: "center",
+  boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+},
+
+successIcon: {
+  fontSize: "55px",
+  color: "#4CAF50",
+  marginBottom: "10px",
+},
+
+errorIcon: {
+  fontSize: "55px",
+  color: "#E46B5C",
+  marginBottom: "10px",
+},
+
+modalTitle: {
+  margin: "0 0 10px",
+  fontSize: "22px",
+  fontWeight: "700",
+},
+
+modalText: {
+  color: "#666",
+  marginBottom: "20px",
+  lineHeight: "1.5",
+},
+
+btnConfirm: {
+  width: "100%",
+  padding: "12px",
+  border: "none",
+  borderRadius: "25px",
+  backgroundColor: "#E46B5C",
+  color: "#fff",
+  fontWeight: "600",
+  cursor: "pointer",
+  outline: "none",
+}
 };
 
 export default TambahResep;
