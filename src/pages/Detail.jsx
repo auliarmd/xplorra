@@ -298,29 +298,50 @@ function Detail() {
             <div style={styles.commentList}>
               {komentar.map((item, index) => (
                 <div key={index} style={styles.commentCard}>
-                  <div style={styles.commentHeaderRow}>
-                    <div style={styles.commentUserAvatar}>
-                      {item.foto ? (
-                        <img src={`http://localhost:5000/uploads/${item.foto}`} alt="user" style={styles.creatorImg} />
-                      ) : (
-                        <span className="material-symbols-outlined">person</span>
-                      )}
-                    </div>
-                    <div style={styles.commentUserInfo}>
-                      <span style={styles.commentName}>{item.nama}</span>
-                      <span style={styles.commentDate}>Baru saja</span> {/* Sesuaikan date jika dari API ada properti tanggal */}
-                    </div>
-                  </div>
-                  <p style={styles.commentTextContent}>{item.komentar}</p>
-                </div>
-              ))}
+  <div style={styles.commentRow}>
+
+    <div style={styles.commentUserAvatar}>
+      {item.foto ? (
+        <img
+          src={`http://localhost:5000/uploads/${item.foto}`}
+          alt="user"
+          style={styles.creatorImg}
+        />
+      ) : (
+        <span className="material-symbols-outlined">
+          person
+        </span>
+      )}
+    </div>
+
+    <div style={styles.commentContent}>
+
+      <div style={styles.commentTop}>
+        <span style={styles.commentName}>
+          {item.nama}
+        </span>
+
+        <span style={styles.commentDate}>
+          Baru saja
+        </span>
+      </div>
+
+      <p style={styles.commentTextContent}>
+        {item.komentar}
+      </p>
+
+    </div>
+
+  </div>
+</div>              ))}
             </div>
+          </div>
 
           </div>
         </div>
 
       </div>
-    </div>
+
   );
 }
 
@@ -481,10 +502,10 @@ actionBtn: {
     gap: "40px",
   },
  card: {
-  backgroundColor: "#ffffff",
+  backgroundColor: "#F7EBE2",
   borderRadius: "15px",
   padding: "30px",
-  boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+  boxShadow: "0 16px 40px rgba(159, 104, 34, 0.35)",
 },
   creatorHeader: {
     display: "flex",
@@ -650,6 +671,23 @@ actionBtn: {
   overflowY: "auto",
   paddingRight: "8px",
 },
+
+commentRow: {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "15px",
+},
+
+commentContent: {
+  flex: 1,
+},
+commentTop: {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "6px",
+},
+
  commentCard: {
   backgroundColor: "#F7EBE2",
   borderRadius: "15px",
@@ -679,21 +717,21 @@ HeaderRow: {
     alignItems: "center",
   },
   commentName: {
-    fontWeight: "bold",
-    color: "#4A3222",
-    fontSize: "14px",
+  fontWeight: "700",
+  color: "#4A3222",
+  fontSize: "15px",
   },
   commentDate: {
     fontSize: "12px",
     color: "#8E5E41",
   },
   commentTextContent: {
-    margin: 0,
-    fontSize: "14px",
-    color: "#5E4637",
-    lineHeight: "1.5",
-    paddingLeft: "55px", // Sejajar dengan teks di atas, mengabaikan lebar avatar
-  },
+  marginTop: "6px",
+  marginBottom: 0,
+  fontSize: "14px",
+  color: "#5E4637",
+  lineHeight: "1.5",
+},
 };
 
 export default Detail;

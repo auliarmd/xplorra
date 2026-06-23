@@ -14,6 +14,7 @@ const [preview, setPreview] = useState("");
 const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
 const [hoverSave, setHoverSave] = useState(false);
+const [hoverCancel, setHoverCancel] = useState(false);
 
 useEffect(() => {
   getResep();
@@ -200,9 +201,9 @@ const ubahLangkah = (index,value) => {
       Home
     </span>
 
-    <span style={styles.active}>
-      Profil
-    </span>
+    <span onClick={() => navigate("/profil")}>
+  Profil
+</span>
 
     <span onClick={() => navigate("/Notifikasi")}>
       Notifikasi
@@ -439,33 +440,54 @@ const ubahLangkah = (index,value) => {
 
         ))}
 
-        <div style={styles.footerButtons}>
+     <div style={styles.footerButtons}>
 
-</div>  <button
-            type="button"
-            style={styles.addBtn}
-            onClick={tambahLangkah}
-          >
-            + Tambah Langkah
-          </button>
-
-          {/* SAVE */}
-          <button
+  <button
+  type="button"
   style={{
-    ...styles.saveBtn,
-    transform: hoverSave
-      ? "translateY(-2px)"
-      : "translateY(0)",
-    boxShadow: hoverSave
+    ...styles.cancelBtn,
+    background: hoverCancel
+      ? "#E46B5C"
+      : "transparent",
+    color: hoverCancel
+      ? "#fff"
+      : "#b87944",
+    border: hoverCancel
+      ? "1px solid #E46B5C"
+      : "1px solid #b87944",
+    boxShadow: hoverCancel
       ? "0 10px 20px rgba(228,107,92,0.45)"
-      : "0 6px 15px rgba(228,107,92,0.35)"
+      : "none",
+    transform: hoverCancel
+      ? "translateY(-2px)"
+      : "translateY(0)"
   }}
-  onMouseEnter={() => setHoverSave(true)}
-  onMouseLeave={() => setHoverSave(false)}
-  onClick={handleUpdate}
+  onMouseEnter={() => setHoverCancel(true)}
+  onMouseLeave={() => setHoverCancel(false)}
+  onClick={() => navigate("/profil")}
 >
-  Simpan Perubahan
+  Batal
 </button>
+
+  <button
+    type="button"
+    style={{
+      ...styles.saveBtn,
+      transform: hoverSave
+        ? "translateY(-2px)"
+        : "translateY(0)",
+      boxShadow: hoverSave
+        ? "0 10px 20px rgba(228,107,92,0.45)"
+        : "0 6px 15px rgba(228,107,92,0.35)"
+    }}
+    onMouseEnter={() => setHoverSave(true)}
+    onMouseLeave={() => setHoverSave(false)}
+    onClick={handleUpdate}
+  >
+    Simpan Perubahan
+  </button>
+
+</div>
 
         </div>
 
@@ -802,8 +824,6 @@ saveBtn:{
   cursor:"pointer",
   fontSize:"15px",
   fontWeight:"600",
-  alignSelf:"flex-end",
-  marginTop:"20px",
   boxShadow:"0 6px 15px rgba(228,107,92,0.35)",
   transition:"all 0.2s ease"
 },
@@ -918,18 +938,15 @@ saveBtn:{
 
 cancelBtn:{
   background:"transparent",
-
   border:"1px solid #b87944",
-
   color:"#b87944",
-
-  padding:"10px 18px",
-
-  borderRadius:"4px",
-
-  cursor:"pointer"
+  padding:"12px 24px",
+  borderRadius:"8px",
+  cursor:"pointer",
+  fontSize:"15px",
+  fontWeight:"600",
+  transition:"all 0.2s ease"
 },
-
   
 };
 
