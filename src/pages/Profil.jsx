@@ -571,13 +571,26 @@ function Profil() {
                         key={item.id}
                         style={styles.card}
                       >
+                       <div style={styles.cardImgWrapper}>
+                        <img
+                          src={`http://localhost:5000/uploads/${item.gambar}`}
+                          style={styles.cardImg}
+                          alt={item.nama}
+                        />
 
-                        <span
-                          className="material-symbols-outlined"
-                          style={styles.bookmark}
+                        <button
+                          style={styles.deleteFloatingBtn}
+                          onClick={() => {
+                            setDeleteTargetId(item.id);
+                            setShowDeletePopup(true);
+                          }}
                         >
-                          delete
-                        </span>
+                          🗑️
+                        </button>
+                      </div>
+                        
+
+                        
 
                         <div style={styles.cardBody}>
 
@@ -608,6 +621,37 @@ function Profil() {
                             </span>
 
                           </div>
+                          <span style={styles.rating}>
+
+                          <span style={styles.ratingNumber}>
+                            {item.rating}
+                          </span>
+
+                          {[1,2,3,4,5].map((star) => (
+                            <span
+                              key={star}
+                              className="material-symbols-outlined"
+                              style={
+                                star <= Math.round(item.rating)
+                                ? styles.star
+                                : styles.starEmpty
+                              }
+                            >
+                              star
+                            </span>
+                          ))}
+                          <div style={styles.editWrapper}>
+                          <button
+                            style={styles.editBtn}
+                            onClick={() => navigate(`/edit/${item.id}`)}
+                          >
+                            Edit
+                          </button>
+                        </div>
+
+                        </span>
+                         
+
 
                         </div>
 
@@ -1158,6 +1202,8 @@ const styles = {
     borderRadius: "999px",
     cursor: "pointer",
     fontWeight: "700",
+    marginLeft: "10px",
+    height: "30px"
   },
   btnRow: {
     display: 'flex',
