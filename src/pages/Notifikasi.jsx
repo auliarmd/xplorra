@@ -534,7 +534,7 @@ profileCircle:{
 
   /* LIST */
   notifList: {
-    marginTop: "80px",
+    marginTop: "60px",
   },
 
   notifItem: {

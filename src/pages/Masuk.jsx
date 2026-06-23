@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -171,17 +171,19 @@ function Masuk() {
             </span>
             <h3 style={styles.modalTitle}>Pemberitahuan</h3>
             <p style={styles.modalText}>{popupMessage}</p>
-            <button 
-              style={styles.btnConfirm} 
-              onClick={() => {
-                setShowPopup(false);
-                if (popupMessage.includes("berhasil")) {
-                  navigate('/dashboardAfterLogin');
-                }
-              }}
-            >
-              Mengerti
-            </button>
+           <button
+  autoFocus
+  style={styles.btnConfirm}
+  onClick={() => {
+    setShowPopup(false);
+
+    if (popupMessage.includes("berhasil")) {
+      navigate("/dashboardAfterLogin");
+    }
+  }}
+>
+  Mengerti
+</button>
           </div>
         </div>
       )}
