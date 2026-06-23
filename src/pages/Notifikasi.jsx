@@ -367,7 +367,7 @@ headerTitleRow:{
 headerBell:{
   fontSize:"30px",
   color:"#8B5A2B",
-
+  marginLeft: "100px",
   fontVariationSettings:
     "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48"
 },
@@ -375,7 +375,7 @@ headerBell:{
 headerTitle:{
   fontSize:"24px",
   fontWeight:"700",
-  color:"#8B5A2B"
+  color:"#8B5A2B",
 },
 
   logoContainer: {
@@ -438,7 +438,8 @@ menu:{
 
   fontWeight:"600",
 
-  marginRight:"25px"
+  marginRight:"25px",
+  cursor:"pointer",
 },
 
   active: {

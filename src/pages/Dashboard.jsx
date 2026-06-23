@@ -590,6 +590,7 @@ const styles = {
     fontWeight: "500",
     fontWeight: "bold",
     cursor: "pointer",
+    marginRight: "-90px",
   },
 
   active: {
@@ -679,10 +680,6 @@ const styles = {
     marginTop: "50px",
   },
 
-  //trendingTitle: {
-    //fontSize: "16px",
-    //fontWeight: "600",
-  //},
 
   infoRow: {
     display: "flex",

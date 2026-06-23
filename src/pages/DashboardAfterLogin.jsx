@@ -235,30 +235,36 @@ const toggleSave = async (id) => {
                 <div style={styles.overlay}>
                     <p style={styles.trendingText}>Trending Now</p>
 
-                    {/* TOMBOL SIMPAN */}
-                    <button
-                      title={savedRecipes.includes(item.id) ? "Resep Tersimpan" : "Simpan Resep"}
-                      style={styles.bookmarkBtn}
-                      onClick={(e)=>{
-                        e.stopPropagation();
-                        toggleSave(item.id);
-                      }}
-                    >
-                      <span
-                        className="material-symbols-outlined"
-                        style={
+                   {/* TOMBOL SIMPAN */}
+                    {item.creator_id !== user.id && (
+                      <button
+                        title={
                           savedRecipes.includes(item.id)
-                          ? styles.bookmarkActive
-                          : styles.bookmark
+                            ? "Resep Tersimpan"
+                            : "Simpan Resep"
                         }
+                        style={styles.bookmarkBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSave(item.id);
+                        }}
                       >
-                        {
-                          savedRecipes.includes(item.id)
-                          ? "bookmark"
-                          : "bookmark_border"
-                        }
-                      </span>
-                    </button>
+                        <span
+                          className="material-symbols-outlined"
+                          style={
+                            savedRecipes.includes(item.id)
+                              ? styles.bookmarkActive
+                              : styles.bookmark
+                          }
+                        >
+                          {
+                            savedRecipes.includes(item.id)
+                              ? "bookmark"
+                              : "bookmark_border"
+                          }
+                        </span>
+                      </button>
+                    )}
                     </div>
                 </div>
 
@@ -594,6 +600,7 @@ const toggleSave = async (id) => {
 
   {/* WRAPPER GAMBAR */}
   <div style={styles.cardImgWrapper}>
+    {console.log(item)}
         {console.log(item.gambar)}
         {console.log(`${api.defaults.baseURL}/uploads/${item.gambar}`)}
         <img
@@ -603,32 +610,38 @@ const toggleSave = async (id) => {
         />
 
         {/* TOMBOL SIMPAN */}
-        <button
-          title={savedRecipes.includes(item.id) ? "Resep Tersimpan" : "Simpan Resep"}
-          style={styles.bookmarkBtn}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleSave(item.id);
-          }}
-        >
-          <span
-            className="material-symbols-outlined"
-            style={
+        {item.creator_id !== user.id && (
+          <button
+            title={
               savedRecipes.includes(item.id)
-              ? styles.bookmarkActive
-              : styles.bookmark
+                ? "Resep Tersimpan"
+                : "Simpan Resep"
             }
+            style={styles.bookmarkBtn}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSave(item.id);
+            }}
           >
-            {
-              savedRecipes.includes(item.id)
-              ? "bookmark"
-              : "bookmark_border"
-            }
-          </span>
-        </button>
+            <span
+              className="material-symbols-outlined"
+              style={
+                savedRecipes.includes(item.id)
+                  ? styles.bookmarkActive
+                  : styles.bookmark
+              }
+            >
+              {
+                savedRecipes.includes(item.id)
+                  ? "bookmark"
+                  : "bookmark_border"
+              }
+            </span>
+          </button>
+        )}
+        </div>
 
-      </div>
-
+     
               <div style={styles.cardBody}>
                 <h4>{item.nama}</h4>
 
@@ -748,6 +761,7 @@ const styles = {
     fontWeight: "500",
     fontWeight: "bold",
     cursor: "pointer",
+    marginLeft: "100px",
   },
 
   active: {

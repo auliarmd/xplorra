@@ -339,6 +339,8 @@ app.get('/my-recipes', verifyToken,(req,res)=>{
         SELECT COUNT(*)
         FROM ratings r
         WHERE r.food_id = f.id
+        AND r.komentar IS NOT NULL
+        AND r.komentar <> ''
       ) AS total_komentar
     FROM foods f
     WHERE creator_id=?
@@ -372,6 +374,8 @@ app.get('/my-bookmarks', verifyToken,(req,res)=>{
         SELECT COUNT(*)
         FROM ratings r
         WHERE r.food_id = foods.id
+        AND r.komentar IS NOT NULL
+        AND r.komentar <> ''
       ) AS total_komentar
 
     FROM bookmarks
@@ -406,6 +410,7 @@ app.get('/foods', (req, res) => {
     SELECT 
       f.id,
       f.nama,
+      f.creator_id,
       f.kategori,
       f.daerah,
       f.deskripsi,
@@ -417,6 +422,8 @@ app.get('/foods', (req, res) => {
         SELECT COUNT(*)
         FROM ratings r
         WHERE r.food_id = f.id
+        AND r.komentar IS NOT NULL
+        AND r.komentar <> ''
       ) AS total_komentar
     FROM foods f
     WHERE 1=1
@@ -489,10 +496,12 @@ app.get('/foods/trending', (req, res) => {
       f.gambar,
       f.creator,
       (
-        SELECT COUNT(*)
-        FROM ratings r
-        WHERE r.food_id = f.id
-      ) AS total_komentar
+          SELECT COUNT(*)
+          FROM ratings r
+          WHERE r.food_id = f.id
+          AND r.komentar IS NOT NULL
+          AND r.komentar <> ''
+        ) AS total_komentar
     FROM foods f
     ORDER BY f.likes DESC, f.rating DESC
     LIMIT 2
@@ -576,36 +585,31 @@ app.get('/resep/:id', verifyToken, (req,res)=>{
 
         `
         SELECT
-
-        ratings.komentar,
-
-        ratings.star,
-
-        users.nama,
-
-        users.foto
-
+          ratings.komentar,
+          ratings.star,
+          ratings.created_at,
+          users.nama,
+          users.foto
         FROM ratings
-
         JOIN users
         ON ratings.user_id = users.id
-
         WHERE ratings.food_id=?
         AND ratings.komentar IS NOT NULL
         AND ratings.komentar <> ''
-
         ORDER BY ratings.id DESC
         `,
-
+          
         [id],
 
-        (err2,komentar)=>{
+        (err2, komentar) => {
 
           if(err2){
 
             return res.status(500).json(err2);
 
           }
+
+          console.log("HASIL QUERY:", komentar);
 
           res.json({
 
@@ -620,7 +624,6 @@ app.get('/resep/:id', verifyToken, (req,res)=>{
           });
 
         }
-
       );
 
     }
@@ -632,8 +635,25 @@ app.get('/resep/:id', verifyToken, (req,res)=>{
 app.post('/bookmark/:id', verifyToken,(req,res)=>{
 
   const food_id = req.params.id;
-
   const user_id = req.user.id;
+
+  db.query(
+    'SELECT creator_id FROM foods WHERE id=?',
+    [food_id],
+    (errFood, foodRows) => {
+
+      if(errFood){
+        return res.status(500).json(errFood);
+      }
+
+      if(foodRows[0].creator_id === user_id){
+
+        return res.json({
+          status:false,
+          message:'Tidak dapat menyimpan resep sendiri'
+        });
+
+      }
 
   db.query(
 
@@ -706,6 +726,7 @@ app.post('/bookmark/:id', verifyToken,(req,res)=>{
             });
 
           }
+          
 
         );
 
@@ -714,6 +735,10 @@ app.post('/bookmark/:id', verifyToken,(req,res)=>{
     }
 
   );
+
+   } 
+
+  ); 
 
 });
 

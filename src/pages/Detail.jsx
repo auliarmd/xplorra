@@ -39,6 +39,8 @@ function Detail() {
 
     api.get(`/resep/${id}`)
       .then((res) => {
+
+        console.log(res.data.komentar);
         setFood(res.data.resep);
         setKomentar(res.data.komentar);
         
@@ -119,6 +121,27 @@ function Detail() {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const formatWaktu = (tanggal) => {
+
+    if (!tanggal) return "Baru saja";
+
+    const now = new Date();
+    const commentDate = new Date(tanggal);
+
+    const diffMs = now - commentDate;
+
+    const menit = Math.floor(diffMs / 60000);
+    const jam = Math.floor(diffMs / 3600000);
+    const hari = Math.floor(diffMs / 86400000);
+
+    if (menit < 1) return "Baru saja";
+    if (menit < 60) return `${menit} menit lalu`;
+    if (jam < 24) return `${jam} jam lalu`;
+    if (hari < 7) return `${hari} hari lalu`;
+
+    return commentDate.toLocaleDateString("id-ID");
   };
 
   return (
@@ -322,7 +345,7 @@ function Detail() {
         </span>
 
         <span style={styles.commentDate}>
-          Baru saja
+          {formatWaktu(item.created_at)}
         </span>
       </div>
 
