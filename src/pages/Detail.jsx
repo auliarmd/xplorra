@@ -403,7 +403,7 @@ const styles = {
   heroSection: {
     position: "relative",
     width: "100%",
-    height: "400px", // Tinggi hero banner
+    height: "600px", // Tinggi hero banner
   },
   heroImg: {
     width: "100%",
@@ -411,48 +411,54 @@ const styles = {
     objectFit: "cover",
     imageRendering: "high-quality",
   },
-  heroOverlay: {
-    position: "absolute",
-    top: 0, left: 0, right: 0, bottom: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 50%)",
-    display: "flex",
-    alignItems: "flex-end",
-    padding: "40px",
-  },
+ heroOverlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  background:
+    "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%)",
+  display: "flex",
+  alignItems: "flex-end",
+  padding: "50px",
+},
   heroTextContainer: {
-    maxWidth: "1250px",
-    margin: "0 auto",
     width: "100%",
   },
-  heroTitle: {
-    color: "#FFFFFF",
-    fontSize: "40px",
-    fontWeight: "bold",
-    margin: "0 0 5px 0",
-  },
-  heroSubtitle: {
-    color: "#E0E0E0",
-    fontSize: "16px",
-    margin: "0 0 20px 0",
-  },
-  heroActions: {
-    display: "flex",
-    gap: "15px",
-  },
-  actionBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    border: "none",
-    padding: "8px 20px",
-    borderRadius: "20px",
-    color: "#FFF",
-    fontSize: "14px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    backdropFilter: "blur(5px)",
-    transition: "0.3s",
-  },
+
+ heroTitle: {
+  color: "#FFFFFF",
+  fontSize: "58px",
+  fontWeight: "700",
+  margin: "0",
+  lineHeight: "1.1",
+  textShadow: "0 2px 10px rgba(0,0,0,0.4)",
+},
+heroSubtitle: {
+  color: "#FFFFFF",
+  fontSize: "24px",
+  marginTop: "10px",
+  marginBottom: "25px",
+  textShadow: "0 2px 8px rgba(0,0,0,0.4)",
+},
+ heroActions: {
+  display: "flex",
+  gap: "12px",
+},
+actionBtn: {
+  display: "flex",
+  alignItems: "center",
+  gap: "6px",
+  border: "none",
+  padding: "10px 22px",
+  borderRadius: "25px",
+  color: "#FFF",
+  fontSize: "15px",
+  fontWeight: "600",
+  cursor: "pointer",
+  backdropFilter: "blur(5px)",
+},
   btnIcon: {
     fontSize: "18px",
   },
@@ -474,12 +480,12 @@ const styles = {
     flexDirection: "column",
     gap: "40px",
   },
-  card: {
-    backgroundColor: "#F7EBE2", // Warna background card yang hangat
-    borderRadius: "15px",
-    padding: "30px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-  },
+ card: {
+  backgroundColor: "#ffffff",
+  borderRadius: "15px",
+  padding: "30px",
+  boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+},
   creatorHeader: {
     display: "flex",
     alignItems: "center",
@@ -600,15 +606,16 @@ const styles = {
     color: "#4A3222",
     marginBottom: "15px",
   },
-  inputCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: "15px",
-    padding: "20px",
-    marginBottom: "20px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  },
+ inputCard: {
+  backgroundColor: "#FFFFFF",
+  borderRadius: "15px",
+  padding: "20px",
+  marginBottom: "20px",
+  display: "flex",
+  flexDirection: "column",
+  gap: "15px",
+  boxShadow: "0 8px 25px rgba(0,0,0,0.12)",
+},
   inputWrapper: {
     display: "flex",
     alignItems: "center",
@@ -635,17 +642,21 @@ const styles = {
     cursor: "pointer",
     transition: "0.3s",
   },
-  commentList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-  },
-  commentCard: {
-    backgroundColor: "#F7EBE2",
-    borderRadius: "15px",
-    padding: "20px",
-  },
-  commentHeaderRow: {
+ commentList: {
+  display: "flex",
+  flexDirection: "column",
+  gap: "15px",
+  maxHeight: "500px",
+  overflowY: "auto",
+  paddingRight: "8px",
+},
+ commentCard: {
+  backgroundColor: "#F7EBE2",
+  borderRadius: "15px",
+  padding: "20px",
+  boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
+},
+HeaderRow: {
     display: "flex",
     alignItems: "center",
     gap: "15px",
