@@ -414,32 +414,39 @@ const ubahLangkah = (index,value) => {
             Langkah Memasak
           </label>
 
-          {langkah.map((item,index)=>(
+         {langkah.map((item,index)=>(
 
-          <div
-            key={index}
-            style={styles.dynamicRow}
-          >
+  <div
+    key={index}
+    style={styles.dynamicRow}
+  >
 
-            <textarea
-              placeholder={`Langkah ${index+1}`}
-              style={styles.smallTextarea}
-              value={item}
-              onChange={(e)=>ubahLangkah(index,e.target.value)}
-            />
+    <textarea
+      placeholder={`Langkah ${index+1}`}
+      style={styles.smallTextarea}
+      value={item}
+      onChange={(e)=>ubahLangkah(index,e.target.value)}
+    />
 
-            <button
-              type="button"
-              style={styles.deleteBtn}
-              onClick={()=>hapusLangkah(index)}
-            >
-              ✕
-            </button>
+    <button
+      type="button"
+      style={styles.deleteBtn}
+      onClick={()=>hapusLangkah(index)}
+    >
+      ✕
+    </button>
 
-          </div>
+  </div>
 
-        ))}
+))}
 
+<button
+  type="button"
+  style={styles.addBtn}
+  onClick={tambahLangkah}
+>
+  + Tambah Langkah
+</button>
      <div style={styles.footerButtons}>
 
   <button
