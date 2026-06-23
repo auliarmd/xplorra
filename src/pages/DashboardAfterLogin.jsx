@@ -747,6 +747,7 @@ const styles = {
     fontSize: "18px",
     fontWeight: "500",
     fontWeight: "bold",
+    cursor: "pointer",
   },
 
   active: {
