@@ -211,9 +211,28 @@ function Notifikasi() {
 
   {filteredNotifications.length === 0 ? (
 
-    <div style={styles.emptyNotif}>
-      Tidak ada notifikasi yang belum dibaca
-    </div>
+  <div style={styles.emptyNotif}>
+
+  <div style={styles.emptyWrapper}>
+
+    <span
+      className="material-symbols-outlined"
+      style={styles.emptyIcon}
+    >
+      notifications_off
+    </span>
+
+    <p>
+
+      {tabAktif === "belum"
+        ? "Tidak ada notifikasi yang belum dibaca"
+        : "Belum ada notifikasi"}
+
+    </p>
+
+  </div>
+
+</div>
 
   ) : (
 
@@ -397,6 +416,16 @@ emptyNotif:{
   fontWeight:"500",
 
   background:"#fff"
+},
+
+emptyWrapper:{
+  textAlign:"center"
+},
+
+emptyIcon:{
+  fontSize:"60px",
+  color:"#bbb",
+  marginBottom:"10px"
 },
   
 menu:{
