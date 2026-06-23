@@ -174,7 +174,19 @@ const styles = {
   successIcon: { fontSize: "50px", color: "#4CAF50", marginBottom: "10px" },
   modalTitle: { margin: "0 0 10px 0", color: "#111", fontSize: "22px", fontWeight: "bold" },
   modalText: { color: "#666", marginBottom: "25px", fontSize: "15px", lineHeight: "1.5" },
-  btnConfirm: { padding: "12px 30px", border: "none", backgroundColor: "#d86936", color: "#fff", borderRadius: "25px", cursor: "pointer", fontWeight: "bold", fontSize: "15px", width: "100%", boxShadow: "0 4px 10px rgba(216,105,54,0.3)" }
+  btnConfirm: {
+  padding: "12px 30px",
+  border: "none",
+  outline: "none",
+  backgroundColor: "#d86936",
+  color: "#fff",
+  borderRadius: "25px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: "15px",
+  width: "100%",
+  boxShadow: "0 4px 10px rgba(216,105,54,0.3)"
+}
 };
 
 export default Register;
