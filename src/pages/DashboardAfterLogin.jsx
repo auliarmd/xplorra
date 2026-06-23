@@ -237,13 +237,11 @@ const toggleSave = async (id) => {
 
                     {/* TOMBOL SIMPAN */}
                     <button
+                      title={savedRecipes.includes(item.id) ? "Resep Tersimpan" : "Simpan Resep"}
                       style={styles.bookmarkBtn}
                       onClick={(e)=>{
-
                         e.stopPropagation();
-
                         toggleSave(item.id);
-
                       }}
                     >
                       <span
@@ -598,13 +596,11 @@ const toggleSave = async (id) => {
 
         {/* TOMBOL SIMPAN */}
         <button
+          title={savedRecipes.includes(item.id) ? "Resep Tersimpan" : "Simpan Resep"}
           style={styles.bookmarkBtn}
           onClick={(e) => {
-
             e.stopPropagation();
-
             toggleSave(item.id);
-
           }}
         >
           <span
@@ -679,6 +675,7 @@ const toggleSave = async (id) => {
       <div
         style={styles.feedbackBtn}
         onClick={() => navigate("/feedback")}
+        title="Feedback"
       >
         <span className="material-symbols-outlined">chat</span>
       </div>
@@ -887,6 +884,7 @@ bookmark: {
 
 bookmarkActive: {
   color: "#e15b3c",
+  fontVariationSettings: "'FILL' 1",
 },
 
 feedbackBtn: {

@@ -160,19 +160,24 @@ function Detail() {
             <h1 style={styles.heroTitle}>{food.nama}</h1>
             <p style={styles.heroSubtitle}>Berasal dari {food.daerah}</p>
             <div style={styles.heroActions}>
+              {/* BUTTON SUKA */}
               <button 
+                title={liked ? "Batal menyukai" : "Suka resep ini"} 
                 style={{...styles.actionBtn, background: liked ? '#C86B3E' : 'rgba(255,255,255,0.3)'}} 
                 onClick={handleLike}
               >
                 <span className="material-symbols-outlined" style={styles.btnIcon}>thumb_up</span>
-                Suka
+                {liked ? "Suka" : "Suka"}
               </button>
+
+              {/* BUTTON SIMPAN */}
               <button 
+                title={bookmarked ? "Resep Tersimpan" : "Simpan Resep Ini"} 
                 style={{...styles.actionBtn, background: bookmarked ? '#9F6822' : 'rgba(255,255,255,0.3)'}} 
                 onClick={handleBookmark}
               >
                 <span className="material-symbols-outlined" style={styles.btnIcon}>bookmark</span>
-                Simpan
+                {bookmarked ? "Simpan" : "Simpan"}
               </button>
             </div>
           </div>
