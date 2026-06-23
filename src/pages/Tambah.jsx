@@ -12,6 +12,9 @@ const [gambar, setGambar] = useState(null);
 const [preview, setPreview] = useState("");
 const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
+const [hoverSave, setHoverSave] = useState(false);
+const [hoverCancel, setHoverCancel] = useState(false);
+
 
 const handleSave = async () => {
 
@@ -405,19 +408,39 @@ const ubahLangkah = (index,value) => {
 </button>
 
 <div style={styles.footer}>
-  <button
-    style={styles.cancelBtn}
-    onClick={() => navigate(-1)}
-  >
-    Batal
-  </button>
+ <button
+  style={{
+    ...styles.cancelBtn,
+    transform: hoverCancel
+      ? "translateY(-2px)"
+      : "translateY(0)",
+    boxShadow: hoverCancel
+      ? "0 10px 20px rgba(0,0,0,0.18)"
+      : "0 6px 15px rgba(0,0,0,0.12)"
+  }}
+  onMouseEnter={() => setHoverCancel(true)}
+  onMouseLeave={() => setHoverCancel(false)}
+  onClick={() => navigate(-1)}
+>
+  Batal
+</button>
 
-  <button
-    style={styles.saveRecipeBtn}
-    onClick={handleSave}
-  >
-    Simpan Resep
-  </button>
+     <button
+  style={{
+    ...styles.saveBtn,
+    transform: hoverSave
+      ? "translateY(-2px)"
+      : "translateY(0)",
+    boxShadow: hoverSave
+      ? "0 10px 20px rgba(228,107,92,0.45)"
+      : "0 6px 15px rgba(228,107,92,0.35)"
+  }}
+  onMouseEnter={() => setHoverSave(true)}
+  onMouseLeave={() => setHoverSave(false)}
+  onClick={handleSave}
+>
+  Simpan Resep
+</button>
 </div>
     </div>
   </div>
@@ -722,31 +745,56 @@ linkButton:{
 },
 
 footer:{
-  display:'flex',
-  justifyContent:'flex-end',
-  gap:'10px',
-  borderTop:'1px solid #c9a48b',
-  marginTop:'25px',
-  paddingTop:'20px'
+  display:"flex",
+  justifyContent:"flex-end",
+  alignItems:"center",
+  gap:"12px",
+  borderTop:"1px solid #c9a48b",
+  marginTop:"25px",
+  paddingTop:"20px"
 },
 
 cancelBtn:{
-  background:'transparent',
-  border:'1px solid #b87944',
-  color:'#b87944',
-  padding:'10px 18px',
-  borderRadius:'4px',
-  cursor:'pointer'
+  minWidth:"120px",
+  height:"46px",
+
+  background:"#fff",
+
+  border:"1px solid #b87944",
+
+  color:"#b87944",
+
+  borderRadius:"8px",
+
+  cursor:"pointer",
+
+  fontSize:"15px",
+
+  fontWeight:"600",
+
+  boxShadow:"0 4px 10px rgba(0,0,0,0.08)"
 },
 
-saveRecipeBtn:{
-  background:'#E46B5C',
-  color:'#fff',
-  border:'none',
-  padding:'10px 18px',
-  borderRadius:'4px',
-  cursor:'pointer'
-}
+saveBtn:{
+  minWidth:"140px",
+  height:"46px",
+
+  background:"#E46B5C",
+
+  color:"#fff",
+
+  border:"none",
+
+  borderRadius:"8px",
+
+  cursor:"pointer",
+
+  fontSize:"15px",
+
+  fontWeight:"600",
+
+  boxShadow:"0 6px 15px rgba(228,107,92,0.35)"
+},
 };
 
 export default TambahResep;
