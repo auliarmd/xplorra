@@ -12,6 +12,9 @@ const [gambar, setGambar] = useState(null);
 const [preview, setPreview] = useState("");
 const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
+const [hoverSave, setHoverSave] = useState(false);
+const [hoverCancel, setHoverCancel] = useState(false);
+
 
 const handleSave = async () => {
 
@@ -142,656 +145,656 @@ const ubahLangkah = (index,value) => {
 
       {/* NAVBAR */}
       <div style={styles.navbar}>
-        <div style={styles.logoContainer}>
-        <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
-        <span style={styles.logoText}>pLorra</span>
-        </div>
-        <div style={styles.menu}>
-          <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-          <span style={styles.active}>Profil</span>
-          <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
-        </div>
 
-        <div style={styles.rightMenu}>
+  <div style={styles.logoContainer}>
+    <img
+      src="/logo_X.png"
+      alt="logo"
+      style={styles.logoImg}
+    />
+    <span style={styles.logoText}>
+      pLorra
+    </span>
+  </div>
 
-          
-        </div>
-      </div>
+  <div style={styles.headerCenter}>
+    <div style={styles.headerTitle}>
+      Tambah Resep Baru
+    </div>
+
+    <div style={styles.headerSubtitle}>
+      Bagikan kekayaan kuliner nusantara dengan komunitas.
+    </div>
+  </div>
+
+  <div style={styles.rightSection}>
+
+  <div style={styles.menu}>
+    <span onClick={() => navigate("/dashboardafterlogin")}>
+      Home
+    </span>
+
+    <span onClick={() => navigate("/profil")}>
+      Profil
+    </span>
+
+    <span onClick={() => navigate("/Notifikasi")}>
+      Notifikasi
+    </span>
+  </div>
+
+  <div
+    style={styles.profileCircle}
+    onClick={() => navigate("/profil")}
+  >
+    <span className="material-symbols-outlined">
+      person
+    </span>
+  </div>
+
+</div>
+
+</div>
 
       {/* CONTENT */}
       <div style={styles.content}>
 
-        {/* FORM */}
-        <div style={styles.formContainer}>
+       <div style={styles.formContainer}>
 
-          {/* UPLOAD */}
-        <div style={styles.formWrapper}>
+{/* INFORMASI DASAR */}
+<div style={styles.sectionHeader}>
+  Informasi Dasar
+</div>
 
-           <div style={styles.uploadBox}>
+<label style={styles.label}>Judul Resep</label>
+<input
+  type="text"
+  placeholder="Contoh: Rendang Sapi Padang Asli"
+  style={styles.input}
+  value={nama}
+  onChange={(e) => setNama(e.target.value)}
+/>
 
-            {
-              preview ? (
+<textarea
+  placeholder="Tambahkan deskripsi"
+  style={styles.textarea}
+  value={deskripsi}
+  onChange={(e) => setDeskripsi(e.target.value)}
+/>
 
-                <>
+<label style={styles.label}>Kategori Hidangan</label>
+<select
+  style={styles.select}
+  value={kategori}
+  onChange={(e) => setKategori(e.target.value)}
+>
+  <option value="">Pilih Kategori</option>
+  <option value="Makanan utama">Makanan utama</option>
+  <option value="Minuman">Minuman</option>
+  <option value="Dessert">Dessert</option>
+</select>
 
-                  <img
-                    src={preview}
-                    alt="upload"
-                    style={styles.uploadImage}
-                  />
+<label style={styles.label}>Daerah Asal</label>
+<select
+  style={styles.select}
+  value={daerah}
+  onChange={(e) => setDaerah(e.target.value)}
+>
+  <option value="">Pilih Daerah</option>
+  <option value="Sumatera">Sumatera</option>
+  <option value="Kalimantan">Kalimantan</option>
+  <option value="Sulawesi">Sulawesi</option>
+  <option value="Maluku">Maluku</option>
+  <option value="Jawa">Jawa</option>
+</select>
 
-                  <label style={styles.changeImageBtn}>
+{/* MEDIA */}
+<div style={styles.sectionHeader}>
+  Media
+</div>
 
-                    Ganti Gambar
+<div style={styles.uploadBox}>
+ {preview ? (
+  <>
+    <img
+      src={preview}
+      alt="preview"
+      style={styles.uploadImage}
+    />
 
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e)=>{
+    {/* Tombol Hapus */}
+    <button
+      type="button"
+      style={styles.removeImageBtn}
+      onClick={() => {
+        setPreview("");
+        setGambar(null);
+      }}
+    >
+      ✕
+    </button>
 
-                        const file = e.target.files[0];
+  <label style={styles.changeImageBtn}>
+  Ganti Gambar
 
-                        setGambar(file);
+  <input
+    hidden
+    type="file"
+    accept="image/*"
+    onChange={(e) => {
+      const file = e.target.files[0];
 
-                        if(file){
+      if (file) {
+        setGambar(file);
+        setPreview(URL.createObjectURL(file));
+      }
+    }}
+  />
+</label>
+  </>
+) : (
+    <label style={styles.uploadArea}>
+     <span
+  className="material-symbols-outlined"
+  style={styles.cameraIcon}
+>
+  photo_camera
+</span>
 
-                          setPreview(
-                            URL.createObjectURL(file)
-                          );
-
-                        }
-
-                      }}
-                    />
-
-                  </label>
-
-                </>
-
-              ) : (
-
-                <>
-                  <div style={styles.uploadPlaceholder}>
-                    Tambahkan gambar
-                  </div>
-
-                  <label style={styles.uploadButton}>
-
-                    Pilih Gambar
-
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e)=>{
-
-                        const file = e.target.files[0];
-
-                        setGambar(file);
-
-                        if(file){
-
-                          setPreview(URL.createObjectURL(file));
-
-                        }
-
-                      }}
-                    />
-
-                  </label>
-                </>
-
-              )
-            }
-
-          </div>   
-          </div>
-
-          <input
-            type="text"
-            placeholder="Tambah Judul"
-            style={styles.input}
-            value={nama}
-            onChange={(e)=>setNama(e.target.value)}
-          />
-
-          <select
-            style={styles.select}
-            value={kategori}
-            onChange={(e)=>setKategori(e.target.value)}
-          >
-            <option value="">Pilih Kategori</option>
-            <option value="Makanan utama">Makanan utama</option>
-            <option value="Minuman">Minuman</option>
-            <option value="Dessert">Dessert</option>
-          </select>
-          
-          <select
-            style={styles.select}
-            value={daerah}
-            onChange={(e)=>setDaerah(e.target.value)}
-          >
-            <option value="">Pilih Daerah</option>
-            <option value="Sumatera">Sumatera</option>
-            <option value="Kalimantan">Kalimantan</option>
-            <option value="Sulawesi">Sulawesi</option>
-            <option value="Maluku ">Maluku</option>
-            <option value="Irian Jaya">Irian Jaya</option>
-            <option value="Nusa tenggara">Nusa Tenggara</option>
-            <option value="Jawa">Jawa</option>
-          </select>
-
-          <textarea
-            placeholder="Tambah Deskripsi"
-            style={styles.input}
-            value={deskripsi}
-            onChange={(e)=>setDeskripsi(e.target.value)}
-          ></textarea>
-
-          <div style={styles.sectionTitle}>
-            Bahan
-          </div>
-
-          {bahan.map((item,index)=>(
-
-            <div
-              key={index}
-              style={styles.dynamicRow}
-            >
-
-              <input
-                type="text"
-                placeholder={`Bahan ${index+1}`}
-                style={styles.input}
-                value={item}
-                onChange={(e)=>ubahBahan(index,e.target.value)}
-              />
-
-              <button
-                style={styles.deleteBtn}
-                onClick={()=>hapusBahan(index)}
-              >
-                ✕
-              </button>
-
-            </div>
-
-          ))}
-
-          <button
-            type="button"
-            style={styles.addBtn}
-            onClick={tambahBahan}
-          >
-            + Tambah Bahan
-          </button>
-
-          <div style={styles.sectionTitle}>
-            Langkah
-          </div>
-
-          {langkah.map((item,index)=>(
-
-          <div
-            key={index}
-            style={styles.dynamicRow}
-          >
-
-            <textarea
-              placeholder={`Langkah ${index+1}`}
-              style={styles.smallTextarea}
-              value={item}
-              onChange={(e)=>ubahLangkah(index,e.target.value)}
-            />
-
-            <button
-              type="button"
-              style={styles.deleteBtn}
-              onClick={()=>hapusLangkah(index)}
-            >
-              ✕
-            </button>
-
-          </div>
-
-        ))}
-
-          <button
-            type="button"
-            style={styles.addBtn}
-            onClick={tambahLangkah}
-          >
-            + Tambah Langkah
-          </button>
-
-          {/* SAVE */}
-          <button
-            style={styles.saveBtn}
-            onClick={handleSave}
-          >
-            Simpan
-          </button>
-
-        </div>
-
+      <div style={styles.uploadTitle}>
+        Unggah file
       </div>
 
+      <div style={styles.uploadText}>
+        atau tarik dan lepas
+      </div>
+
+      <div style={styles.uploadInfo}>
+        PNG, JPG, GIF up to 10MB
+      </div>
+
+      <input
+        hidden
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files[0];
+
+          setGambar(file);
+
+          if (file) {
+            setPreview(URL.createObjectURL(file));
+          }
+        }}
+      />
+    </label>
+  )}
+</div>
+
+{/* DETAIL RESEP */}
+<div style={styles.sectionHeader}>
+  Detail Resep
+</div>
+
+<label style={styles.label}>
+  Bahan-bahan
+</label>
+
+{bahan.map((item, index) => (
+  <div key={index} style={styles.dynamicRow}>
+    <input
+      type="text"
+      style={styles.input}
+      value={item}
+      onChange={(e) =>
+        ubahBahan(index, e.target.value)
+      }
+    />
+
+    <button
+      type="button"
+      style={styles.deleteBtn}
+      onClick={() => hapusBahan(index)}
+    >
+      🗑
+    </button>
+  </div>
+))}
+
+<button
+  type="button"
+  style={styles.linkButton}
+  onClick={tambahBahan}
+>
+  + Tambah Bahan
+</button>
+
+<label style={styles.label}>
+  Langkah Memasak
+</label>
+
+{langkah.map((item, index) => (
+  <div key={index} style={styles.dynamicRow}>
+    <div style={styles.stepNumber}>
+      {index + 1}
     </div>
+
+    <input
+      type="text"
+      style={styles.input}
+      value={item}
+      placeholder="Jelaskan langkah pembuatan..."
+      onChange={(e) =>
+        ubahLangkah(index, e.target.value)
+      }
+    />
+
+    <button
+      type="button"
+      style={styles.deleteBtn}
+      onClick={() => hapusLangkah(index)}
+    >
+      🗑
+    </button>
+  </div>
+))}
+
+<button
+  type="button"
+  style={styles.linkButton}
+  onClick={tambahLangkah}
+>
+  + Tambah Langkah
+</button>
+
+<div style={styles.footer}>
+ <button
+  style={{
+    ...styles.cancelBtn,
+    transform: hoverCancel
+      ? "translateY(-2px)"
+      : "translateY(0)",
+    boxShadow: hoverCancel
+      ? "0 10px 20px rgba(0,0,0,0.18)"
+      : "0 6px 15px rgba(0,0,0,0.12)"
+  }}
+  onMouseEnter={() => setHoverCancel(true)}
+  onMouseLeave={() => setHoverCancel(false)}
+  onClick={() => navigate(-1)}
+>
+  Batal
+</button>
+
+     <button
+  style={{
+    ...styles.saveBtn,
+    transform: hoverSave
+      ? "translateY(-2px)"
+      : "translateY(0)",
+    boxShadow: hoverSave
+      ? "0 10px 20px rgba(228,107,92,0.45)"
+      : "0 6px 15px rgba(228,107,92,0.35)"
+  }}
+  onMouseEnter={() => setHoverSave(true)}
+  onMouseLeave={() => setHoverSave(false)}
+  onClick={handleSave}
+>
+  Simpan Resep
+</button>
+</div>
+    </div>
+  </div>
+</div>
   );
 }
 
 const styles = {
-  container:{
-    minHeight:'100vh',
-    background:'#D9B29B',
-    display:'flex',
-    justifyContent:'center',
-    padding:'40px 20px'
-  },
-
-  page: {
-    minHeight: "100vh",
-    background: `
-      linear-gradient(
-        to bottom,
-        #F4E9DC 0%,
-        #D49A75 100%
-      )
-    `,
-    position: "relative",
-    overflow: "hidden",
-    fontFamily: "Poppins, sans-serif",
-  paddingTop: "70px",
-  },
-
-  /* NAVBAR */
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-
-    padding: "15px 15px",
-    background: "#fff",
-
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-
-    zIndex: 9999,
-  },
-
-  emptyContainer: {
-    width: "100%",
-    minHeight: "350px",
 
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-
-    flexDirection: "column",
-
-    color: "#c46a3d",
-
-    fontSize: "22px",
-    fontWeight: "700",
-
-    textAlign: "center",
-  },
-
-  emptyIcon: {
-    fontSize: "70px",
-    marginBottom: "15px",
-    color: "#e46b3c",
-  },
-
-  logoContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1px",
-  },
-
-  logoImg: {
-    width: "40px",
-  },
-
-  logoText: {
-      color: "#F28C28",
-      fontWeight: "bold",
-      fontSize: "24px",
-      letterSpacing: "1px",
-      },
-
-  menu: {
-    display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
-  },
-
-  active: {
-    color: "#F28C28",
-    fontWeight: "bold",
-  },
-
-  content: {
-    display: "flex",
-
-    justifyContent: "center",
-
-    padding: "50px 20px 80px",
-
-    position: "relative",
-
-    zIndex: 2,
-  },
-
-  formContainer: {
-    width: "100%",
-    maxWidth: "700px",
-
-    background: "#f6efe8",
-
-    borderRadius: "30px",
-
-    padding: "40px",
-
-    border: "2px solid #E15B3C",
-
-    boxShadow: `
-      0 10px 25px rgba(0,0,0,0.18),
-      0 0 18px rgba(225,91,60,0.18)
-    `,
-
-    display: "flex",
-    flexDirection: "column",
-
-    gap: "22px",
-  },
-
-  uploadBox:{
-    width:'100%',
-    maxWidth:'500px',
-    height:'320px',
-
-    background:'#ECECEC',
-
-    border:'2px dashed #E15B3C',
-
-    borderRadius:'25px',
-
-    display:'flex',
-    flexDirection:'column',
-
-    justifyContent:'center',
-    alignItems:'center',
-
-    overflow:'hidden',
-
-    position:'relative',
-
-    gap:'15px',
-  },
-
-  uploadPlaceholder:{
-    color:'#666',
-    fontSize:'20px',
-    fontWeight:'600',
-  },
-
-  uploadImage:{
-    width:'100%',
-    height:'100%',
-
-    objectFit:'cover',
-
-    display:'block',
-
-    borderRadius:'20px',
-  },
-
-  uploadIcon: {
-    width: "250px",
-    height: "250px",
-    objectFit: "contain",
-    position: "absolute",
-    top: "10px",
-  },
-
-  uploadText: {
-    color: "#666",
-    fontSize: "20px",
-    position: "absolute",
-    bottom: "40px",
-  },
-
-  uploadButton:{
-    background:'#E15B3C',
-    color:'#fff',
-    padding:'10px 18px',
-    borderRadius:'12px',
-    cursor:'pointer',
-    fontWeight:'bold'
-  },
-
-  changeImageBtn:{
-    position:'absolute',
-
-    bottom:'15px',
-
-    left:'50%',
-
-    transform:'translateX(-50%)',
-
-    background:'rgba(0,0,0,0.75)',
-
-    color:'#fff',
-
-    padding:'10px 18px',
-
-    borderRadius:'14px',
-
-    cursor:'pointer',
-
-    fontWeight:'600',
-
-    fontSize:'14px',
-
-    backdropFilter:'blur(6px)',
-
-    boxShadow:'0 4px 10px rgba(0,0,0,0.25)',
-  },
-
-  input:{
-    width:'100%',
-
-    padding:'16px',
-
-    border:'2px solid #E15B3C',
-
-    borderRadius:'14px',
-
-    outline:'none',
-
-    fontSize:'16px',
-
-    background:'#fff',
-
-    boxSizing:'border-box',
-  },
-
-  select: {
-    width: "100%",
-
-    height: "55px",
-
-    border: "2px solid #ef6d4d",
-
-    borderRadius: "14px",
-
-    outline: "none",
-
-    padding: "0 15px",
-
-    fontSize: "16px",
-
-    background: "#fff",
-
-    cursor: "pointer",
-
-    boxSizing: "border-box",
-  },
-
-  buttonRow: {
-    display: "flex",
-    gap: "15px",
-  },
-
-  smallBtn: {
-    width: "175px",
-    height: "40px",
-    border: "2px solid #ef6d4d",
-    borderRadius: "5px",
-    background: "#fff",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-
-  saveBtn:{
-    marginTop:'25px',
-
-    background:'#E15B3C',
-
-    color:'#fff',
-
-    border:'none',
-
-    padding:'16px',
-
-    borderRadius:'18px',
-
-    cursor:'pointer',
-
-    fontSize:'20px',
-
-    fontWeight:'bold',
-
-    width:'240px',
-
-    alignSelf:'center',
-
-    boxShadow:'0 6px 15px rgba(225,91,60,0.35)',
-  },
-
-  addBtn:{
-    alignSelf:'flex-start',
-
-    background:'#E15B3C',
-
-    color:'#fff',
-
-    border:'none',
-
-    padding:'12px 22px',
-
-    borderRadius:'14px',
-
-    cursor:'pointer',
-
-    fontWeight:'bold',
-
-    fontSize:'15px',
-
-    boxShadow:'0 4px 10px rgba(225,91,60,0.25)',
-  },
-
-  sectionTitle:{
-    fontWeight:'700',
-
-    fontSize:'22px',
-
-    color:'#E15B3C',
-
-    marginTop:'10px',
-
-    alignSelf:'flex-start',
-  },
-
-  dynamicRow:{
-    display:'flex',
-    alignItems:'center',
-
-    gap:'12px',
-
-    width:'100%',
-  },
-
-  deleteBtn:{
-    background:'#FF5A5A',
-    color:'#fff',
-    border:'none',
-    width:'38px',
-    height:'38px',
-    borderRadius:'12px',
-    cursor:'pointer',
-    fontWeight:'bold',
-    fontSize:'18px',
-    flexShrink:0
-  },
-
-  smallTextarea:{
-    flex:1,
-
-    minHeight:'120px',
-
-    padding:'15px',
-
-    border:'2px solid #E15B3C',
-
-    borderRadius:'14px',
-
-    resize:'vertical',
-
-    outline:'none',
-
-    fontSize:'15px',
-
-    background:'#fff',
-  },
-
-  formWrapper:{
-    width:'100%',
-
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center',
-
-    flexDirection:'column',
-
-    gap:'18px',
-  },
-
-  mapBackground:{
-    position:'absolute',
-
-    inset:'0',
-
-    backgroundImage:"url('/map.png')",
-
-    backgroundRepeat:'no-repeat',
-
-    backgroundPosition:'center top 90px',
-
-    backgroundSize:'100%',
-
-    opacity:'0.80',
-
-    pointerEvents:'none',
-    
-    zIndex:0,
-  },
+page:{
+  minHeight:"100vh",
+  background:"linear-gradient(to bottom,#F4E9DC,#D49A75)",
+  position:"relative",
+  overflow:"hidden",
+  fontFamily:"Poppins, sans-serif",
+  paddingTop:"80px",
+  zIndex:0
+},
+
+navbar:{
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"space-between",
+  padding:"12px 30px",
+  background:"#fff",
+  position:"fixed",
+  top:0,
+  left:0,
+  right:0,
+  zIndex:999,
+  borderBottom:"1px solid #ccc"
+},
+
+headerCenter:{
+  flex:1,
+  textAlign:"center"
+},
+
+headerTitle:{
+  fontSize:"22px",
+  fontWeight:"700",
+  color:"#8B5A2B",
+  marginBottom:"3px"
+},
+
+headerSubtitle:{
+  fontSize:"12px",
+  color:"#666"
+},
+
+logoContainer:{
+  display:"flex",
+  alignItems:"center"
+},
+
+logoImg:{
+  width:"50px"
+},
+
+logoText:{
+  color:"#F28C28",
+  fontWeight:"bold",
+  fontSize:"28px"
+},
+
+rightSection:{
+  display:"flex",
+  alignItems:"center",
+  gap:"15px"
+},
+
+profileCircle:{
+  width:"42px",
+  height:"42px",
+  borderRadius:"50%",
+  background:"#f5f5f5",
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  cursor:"pointer",
+  flexShrink:0
+},
+menu:{
+  display:"flex",
+  alignItems:"center",
+  gap:"30px",
+  fontWeight:"600",
+  cursor:"pointer"
+},
+
+active:{
+  color:"#F28C28"
+},
+
+content:{
+  display:"flex",
+  justifyContent:"center",
+  padding:"40px 30px",
+  marginTop:"20px"
+},
+
+formContainer:{
+  width:"100%",
+  maxWidth:"1100px",
+  background:"rgba(232,210,194,0.95)",
+  borderRadius:"10px",
+  padding:"35px",
+  position:"relative",
+  zIndex:2,
+  display:"flex",
+  flexDirection:"column",
+  gap:"14px",
+  boxShadow:"0 4px 20px rgba(0,0,0,0.12)"
+},
+
+input:{
+  width:"100%",
+  padding:"12px",
+  border:"1px solid #d89d73",
+  borderRadius:"4px",
+  outline:"none",
+  boxSizing:"border-box"
+},
+
+select:{
+  width:"100%",
+  height:"42px",
+  border:"1px solid #d89d73",
+  borderRadius:"4px",
+  padding:"0 12px",
+  outline:"none"
+},
+
+uploadBox:{
+  width:"100%",
+  height:"400px",
+  background:"#fff",
+  border:"2px dashed #E7A27A",
+  borderRadius:"8px",
+  overflow:"hidden",
+  position:"relative"
+},
+
+uploadImage:{
+  width:"100%",
+  height:"100%",
+  objectFit:"cover",
+  display:"block"
+},
+
+removeImageBtn:{
+  position:"absolute",
+  top:"8px",
+  right:"8px",
+  width:"30px",
+  height:"30px",
+  borderRadius:"50%",
+  border:"3px solid white",
+  background:"#E74C3C",
+  color:"white",
+  fontSize:"24px",
+  cursor:"pointer",
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  fontWeight:"bold",
+  zIndex:10
+},
+
+changeImageBtn:{
+  position:"absolute",
+  bottom:"28px",
+  left:"50%",
+  transform:"translateX(-50%)",
+  display:"inline-block",
+  padding:"10px 30px",
+  background:"#fff",
+  color:"#8B5A2B",
+  border:"2px solid #E7A27A",
+  borderRadius:"6px",
+  fontWeight:"600",
+  fontSize:"14px",
+  cursor:"pointer",
+  boxShadow:"0 2px 6px rgba(0,0,0,0.15)",
+  zIndex:10
+},
+
+dynamicRow:{
+  display:"flex",
+  alignItems:"center",
+  gap:"10px"
+},
+
+deleteBtn:{
+  background:"transparent",
+  border:"none",
+  color:"red",
+  fontSize:"18px",
+  cursor:"pointer"
+},
+
+mapBackground:{
+  position:"fixed",
+  top:0,
+  left:0,
+  right:0,
+  bottom:0,
+
+  backgroundImage:"url('/map.png')",
+  backgroundRepeat:"no-repeat",
+  backgroundPosition:"center",
+  backgroundSize:"100%",
+
+  opacity:0.12,
+
+  zIndex:-999,
+  pointerEvents:"none"
+},
+ pageTitle:{
+  fontSize:'34px',
+  fontWeight:'700',
+  color:'#8B5A2B',
+  textAlign:'center'
+},
+
+pageSubtitle:{
+  textAlign:'center',
+  color:'#777',
+  marginBottom:'20px'
+},
+
+sectionHeader:{
+  fontSize:'26px',
+  color:'#3D2A20',
+  borderBottom:'1px solid #c9a48b',
+  paddingBottom:'10px',
+  marginTop:'15px'
+},
+
+label:{
+  fontSize:'14px',
+  color:'#444'
+},
+
+textarea:{
+  width:"100%",
+  minHeight:"100px",
+  padding:"12px",
+  border:"1px solid #d89d73",
+  borderRadius:"4px",
+  resize:"none",
+  outline:"none",
+  boxSizing:"border-box"
+},
+
+uploadArea:{
+  width:'100%',
+  height:'100%',
+  display:'flex',
+  flexDirection:'column',
+  justifyContent:'center',
+  alignItems:'center',
+  cursor:'pointer'
+},
+
+cameraIcon:{
+  fontSize:"48px",
+  color:"#F26A3D",
+  marginBottom:"10px",
+  fontVariationSettings:
+    "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48"
+},
+
+uploadTitle:{
+  fontWeight:'700',
+  color:'#E36B4E'
+},
+
+uploadInfo:{
+  fontSize:'12px',
+  color:'#777'
+},
+
+stepNumber:{
+  width:'28px',
+  height:'28px',
+  borderRadius:'50%',
+  background:'#D77A35',
+  color:'#fff',
+  display:'flex',
+  alignItems:'center',
+  justifyContent:'center',
+  flexShrink:0
+},
+
+linkButton:{
+  border:'none',
+  background:'transparent',
+  color:'#9B5A2B',
+  cursor:'pointer',
+  alignSelf:'flex-start'
+},
+
+footer:{
+  display:"flex",
+  justifyContent:"flex-end",
+  alignItems:"center",
+  gap:"12px",
+  borderTop:"1px solid #c9a48b",
+  marginTop:"25px",
+  paddingTop:"20px"
+},
+
+cancelBtn:{
+  minWidth:"120px",
+  height:"46px",
+
+  background:"#fff",
+
+  border:"1px solid #b87944",
+
+  color:"#b87944",
+
+  borderRadius:"8px",
+
+  cursor:"pointer",
+
+  fontSize:"15px",
+
+  fontWeight:"600",
+
+  boxShadow:"0 4px 10px rgba(0,0,0,0.08)"
+},
+
+saveBtn:{
+  minWidth:"140px",
+  height:"46px",
+
+  background:"#E46B5C",
+
+  color:"#fff",
+
+  border:"none",
+
+  borderRadius:"8px",
+
+  cursor:"pointer",
+
+  fontSize:"15px",
+
+  fontWeight:"600",
+
+  boxShadow:"0 6px 15px rgba(228,107,92,0.35)"
+},
 };
 
 export default TambahResep;

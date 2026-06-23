@@ -81,76 +81,94 @@ function Notifikasi() {
   return (
     <div style={styles.page}>
 
-      {/* NAVBAR */}
-      <div style={styles.navbar}>
-        <div style={styles.logoContainer}>
-        <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
-        <span style={styles.logoText}>pLorra</span>
-        </div>
-        <div style={styles.menu}>
-          <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-          <span onClick={() => navigate("/profil")}>Profil</span>
-          <span style={styles.active}>Notifikasi</span>
-        </div>
+    <div style={styles.navbar}>
 
-        <div style={styles.rightMenu}>
-          <div
-            style={styles.profileCircle}
-            onClick={() => navigate("/profil")}
-          >
+  {/* LOGO */}
+  <div style={styles.logoContainer}>
+    <img
+      src="/logo_X.png"
+      alt="logo"
+      style={styles.logoImg}
+    />
+    <span style={styles.logoText}>
+      pLorra
+    </span>
+  </div>
 
-            {
-              user?.foto ? (
+  {/* JUDUL HEADER */}
+  <div style={styles.headerCenter}>
 
-                <img
-                  src={`http://localhost:5000/uploads/${user.foto}`}
-                  alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover"
-                  }}
-                />
+    <div style={styles.headerTitleRow}>
 
-              ) : (
+      <span
+        className="material-symbols-outlined"
+        style={styles.headerBell}
+      >
+        notifications
+      </span>
 
-                <span className="material-symbols-outlined">
-                  person
-                </span>
+      <span style={styles.headerTitle}>
+        Notifikasi
+      </span>
 
-              )
-            }
+    </div>
 
-          </div>
-        </div>
-      </div>
+  </div>
 
-      {/* CONTENT */}
-      <div style={styles.content}>
+  {/* MENU + FOTO PROFIL */}
+  <div style={styles.rightSection}>
 
-        {/* TITLE */}
-        <div style={styles.titleRow}>
+    <div style={styles.menu}>
+      <span
+        onClick={() =>
+          navigate("/dashboardafterlogin")
+        }
+      >
+        Home
+      </span>
 
-          <div style={styles.bellWrapper}>
+      <span
+        onClick={() =>
+          navigate("/profil")
+        }
+      >
+        Profil
+      </span>
 
-            <span
-              className="material-symbols-outlined"
-              style={styles.bellIcon}
-            >
-              notifications
-            </span>
+      <span style={styles.active}>
+        Notifikasi
+      </span>
+    </div>
 
-          </div>
+    <div
+      style={styles.profileCircle}
+      onClick={() => navigate("/profil")}
+    >
+      {user?.foto ? (
 
-          <h2 style={styles.title}>
-            Notifikasi
-          </h2>
+        <img
+          src={`http://localhost:5000/uploads/${user.foto}`}
+          alt="Profile"
+          style={{
+            width:"100%",
+            height:"100%",
+            borderRadius:"50%",
+            objectFit:"cover"
+          }}
+        />
 
-        </div>
+      ) : (
 
-      </div>
+        <span className="material-symbols-outlined">
+          person
+        </span>
 
+      )}
+    </div>
+
+  </div>
+
+</div>
       {/* TAB */}
       <div style={styles.tabContainer}>
 
@@ -189,134 +207,157 @@ function Notifikasi() {
       </div>
 
       {/* NOTIFIKASI */}
-      <div style={styles.notifList}>
+     <div style={styles.notifList}>
 
-        {
-          filteredNotifications.map((notif) => (
+  {filteredNotifications.length === 0 ? (
 
-            <div
-              key={notif.id}
-              style={{
-                ...styles.notifItem,
-                cursor: "pointer"
-              }}
-              onClick={async () => {
+    <div style={styles.emptyNotif}>
+      Tidak ada notifikasi yang belum dibaca
+    </div>
 
-                try {
+  ) : (
 
-                  await api.put(
-                    `/notifications/read/${notif.id}`
-                  );
+    filteredNotifications.map((notif) => (
 
-                  setNotifications(prev =>
-                    prev.map(item =>
-                      item.id === notif.id
-                        ? {
-                            ...item,
-                            is_read: 1
-                          }
-                        : item
-                    )
-                  );
+      <div
+        key={notif.id}
+        style={{
+          ...styles.notifItem,
+          cursor: "pointer"
+        }}
+        onClick={async () => {
 
-                  navigate(`/detail/${notif.food_id}`);
+          try {
 
-                } catch(err) {
+            await api.put(
+              `/notifications/read/${notif.id}`
+            );
 
-                  console.log(err);
+            setNotifications(prev =>
+              prev.map(item =>
+                item.id === notif.id
+                  ? {
+                      ...item,
+                      is_read: 1
+                    }
+                  : item
+              )
+            );
 
-                }
+            navigate(`/detail/${notif.food_id}`);
 
-              }}
+          } catch(err) {
+
+            console.log(err);
+
+          }
+
+        }}
+      >
+
+        <div style={styles.leftNotif}>
+
+          {notif.foto ? (
+
+            <img
+              src={`http://localhost:5000/uploads/${notif.foto}`}
+              alt="User"
+              style={styles.userIcon}
+            />
+
+          ) : (
+
+            <span
+              className="material-symbols-outlined"
+              style={styles.defaultNotifIcon}
             >
+              account_circle
+            </span>
 
-              <div style={styles.leftNotif}>
+          )}
 
-                { 
-                  notif.foto ? (
+          <div>
 
-                    <img
-                      src={`http://localhost:5000/uploads/${notif.foto}`}
-                      alt="User"
-                      style={styles.userIcon}
-                    />
-
-                  ) : (
-
-                    <span
-                      className="material-symbols-outlined"
-                      style={styles.defaultNotifIcon}
-                    >
-                      account_circle
-                    </span>
-
-                  )
-                }
-
-                <div>
-
-                  <div style={styles.textNotif}>
-
-                    <b>{notif.from_user}</b>
-
-                    {" "}
-
-                    {notif.message}
-
-                    {" "}
-
-                    <b>{notif.recipe_name}</b>
-
-                  </div>
-
-                  <div style={styles.time}>
-                    {getTimeAgo(notif.created_at)}
-                  </div>
-
-                </div>
-
-              </div>
-
-              {!notif.is_read && (
-                <div style={styles.blueDot}></div>
-              )}
-
+            <div style={styles.textNotif}>
+              <b>{notif.from_user}</b>{" "}
+              {notif.message}{" "}
+              <b>{notif.recipe_name}</b>
             </div>
 
-          ))
-        }
+            <div style={styles.time}>
+              {getTimeAgo(notif.created_at)}
+            </div>
+
+          </div>
+
+        </div>
+
+        {!notif.is_read && (
+          <div style={styles.blueDot}></div>
+        )}
 
       </div>
+
+    ))
+
+  )}
+
+</div>
 
     </div>
   );
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "#f5f5f5",
-    fontFamily: "Segoe UI, sans-serif",
-
-    paddingTop: "70px",
-  },
+  page:{
+  minHeight:"100vh",
+  background:"#f5f5f5",
+  fontFamily:"Segoe UI, sans-serif",
+  paddingTop:"70px",
+},
 
   /* NAVBAR */
   navbar: {
     display: "flex",
+     alignItems: "center",
     justifyContent: "space-between",
-    alignItems: "center",
-
     padding: "15px 15px",
     background: "#fff",
-
     position: "fixed",
     top: 0,
     left: 0,
     right: 0,
-
+    borderBottom:"1px solid #ddd",
     zIndex: 9999,
   },
+
+ headerCenter:{
+  flex:1,
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center"
+},
+
+headerTitleRow:{
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  gap:"10px"
+},
+
+headerBell:{
+  fontSize:"30px",
+  color:"#8B5A2B",
+
+  fontVariationSettings:
+    "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48"
+},
+
+headerTitle:{
+  fontSize:"24px",
+  fontWeight:"700",
+  color:"#8B5A2B"
+},
 
   logoContainer: {
     display: "flex",
@@ -334,31 +375,60 @@ const styles = {
     fontSize: "24px",
     letterSpacing: "1px",
     },
+
+    rightSection:{
+  display:"flex",
+  alignItems:"center",
+  gap:"5px",
+  height:"42px"
+},
+
+emptyNotif:{
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+
+  height:"250px",
+
+  color:"#888",
+
+  fontSize:"18px",
+
+  fontWeight:"500",
+
+  background:"#fff"
+},
   
-  menu: {
-    display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
-  },
+menu:{
+  display:"flex",
+  alignItems:"center",
+
+  gap:"35px",
+
+  fontSize:"15px",
+
+  fontWeight:"600",
+
+  marginRight:"25px"
+},
 
   active: {
     color: "#F28C28",
     fontWeight: "bold",
   },
 
-  profileCircle: {
-    width: "35px",
-    height: "35px",
-    borderRadius: "50%",
-    background: "#f4b8a3",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#fff",
-    marginRight: "15px"
-  },
+profileCircle:{
+  width:"42px",
+  height:"42px",
+  borderRadius:"50%",
+  background:"#f4b8a3",
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  color:"#fff",
+  cursor:"pointer",
+  flexShrink:0
+},
 
   content: {
     padding: "15px 30px 10px",
@@ -393,10 +463,23 @@ const styles = {
   },
 
   /* TAB */
-  tabContainer: {
-    display: "flex",
-    width: "100%",
-  },
+ tabContainer:{
+  position:"fixed",
+
+  top:"70px",
+
+  left:"0",
+  right:"0",
+
+  display:"flex",
+
+  background:"#fff",
+
+  zIndex:"9998",
+
+  borderTop:"1px solid #ddd",
+  borderBottom:"1px solid #ddd"
+},
 
   tabBtn: {
     flex: 1,
@@ -422,7 +505,7 @@ const styles = {
 
   /* LIST */
   notifList: {
-    marginTop: "-10px",
+    marginTop: "80px",
   },
 
   notifItem: {

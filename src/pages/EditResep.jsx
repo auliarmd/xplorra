@@ -13,6 +13,7 @@ const [gambar, setGambar] = useState(null);
 const [preview, setPreview] = useState("");
 const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
+const [hoverSave, setHoverSave] = useState(false);
 
 useEffect(() => {
   getResep();
@@ -175,22 +176,52 @@ const ubahLangkah = (index,value) => {
     <div style={styles.mapBackground}></div>
 
       {/* NAVBAR */}
-      <div style={styles.navbar}>
-        <div style={styles.logoContainer}>
-        <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
-        <span style={styles.logoText}>pLorra</span>
-        </div>
-        <div style={styles.menu}>
-          <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-          <span style={styles.active}>Profil</span>
-          <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
-        </div>
+     <div style={styles.navbar}>
 
-        <div style={styles.rightMenu}>
+  <div style={styles.logoContainer}>
+    <img
+      src="/logo_X.png"
+      alt="logo"
+      style={styles.logoImg}
+    />
+    <span style={styles.logoText}>
+      pLorra
+    </span>
+  </div>
 
-          
-        </div>
-      </div>
+  <div style={styles.headerCenter}>
+    <div style={styles.headerTitle}>
+      Edit Resep
+    </div>
+  </div>
+
+  <div style={styles.menu}>
+    <span onClick={() => navigate("/dashboardafterlogin")}>
+      Home
+    </span>
+
+    <span style={styles.active}>
+      Profil
+    </span>
+
+    <span onClick={() => navigate("/Notifikasi")}>
+      Notifikasi
+    </span>
+    </div>
+
+      <div
+    style={styles.profileCircle}
+    onClick={() => navigate("/profil")}
+  >
+    <span
+      className="material-symbols-outlined"
+      style={{ fontSize: "26px" }}
+    >
+      person
+    </span>
+  </div>
+
+</div>
 
       {/* CONTENT */}
       <div style={styles.content}>
@@ -199,6 +230,9 @@ const ubahLangkah = (index,value) => {
         <div style={styles.formContainer}>
 
           {/* UPLOAD */}
+          <div style={styles.sectionHeader}>
+            Media
+          </div>
         <div style={styles.formWrapper}>
 
            <div style={styles.uploadBox}>
@@ -216,30 +250,35 @@ const ubahLangkah = (index,value) => {
 
                   <label style={styles.changeImageBtn}>
 
-                    Ganti Gambar
+  <span
+    className="material-symbols-outlined"
+    style={{ fontSize:"18px" }}
+  >
+    photo_camera
+  </span>
 
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e)=>{
+  Ganti Gambar
 
-                        const file = e.target.files[0];
+  <input
+    type="file"
+    accept="image/*"
+    hidden
+    onChange={(e)=>{
 
-                        setGambar(file);
+      const file = e.target.files[0];
 
-                        if(file){
+      setGambar(file);
 
-                          setPreview(
-                            URL.createObjectURL(file)
-                          );
+      if(file){
+        setPreview(
+          URL.createObjectURL(file)
+        );
+      }
 
-                        }
+    }}
+  />
 
-                      }}
-                    />
-
-                  </label>
+</label>
 
                 </>
 
@@ -281,7 +320,13 @@ const ubahLangkah = (index,value) => {
 
           </div>   
           </div>
+              <div style={styles.sectionHeader}>
+          Informasi Dasar
+        </div>
 
+        <label style={styles.label}>
+          Judul Resep
+        </label>
           <input
             type="text"
             placeholder="Tambah Judul"
@@ -323,9 +368,12 @@ const ubahLangkah = (index,value) => {
             onChange={(e)=>setDeskripsi(e.target.value)}
           ></textarea>
 
-          <div style={styles.sectionTitle}>
-            Bahan
+          <div style={styles.sectionHeader}>
+            Detail Resep
           </div>
+         <label style={styles.label}>
+            Bahan
+          </label>
 
           {bahan.map((item,index)=>(
 
@@ -361,9 +409,9 @@ const ubahLangkah = (index,value) => {
             + Tambah Bahan
           </button>
 
-          <div style={styles.sectionTitle}>
-            Langkah
-          </div>
+          <label style={styles.label}>
+            Langkah Memasak
+          </label>
 
           {langkah.map((item,index)=>(
 
@@ -391,7 +439,9 @@ const ubahLangkah = (index,value) => {
 
         ))}
 
-          <button
+        <div style={styles.footerButtons}>
+
+</div>  <button
             type="button"
             style={styles.addBtn}
             onClick={tambahLangkah}
@@ -401,11 +451,21 @@ const ubahLangkah = (index,value) => {
 
           {/* SAVE */}
           <button
-            style={styles.saveBtn}
-            onClick={handleUpdate}
-            >
-            Simpan Perubahan
-            </button>
+  style={{
+    ...styles.saveBtn,
+    transform: hoverSave
+      ? "translateY(-2px)"
+      : "translateY(0)",
+    boxShadow: hoverSave
+      ? "0 10px 20px rgba(228,107,92,0.45)"
+      : "0 6px 15px rgba(228,107,92,0.35)"
+  }}
+  onMouseEnter={() => setHoverSave(true)}
+  onMouseLeave={() => setHoverSave(false)}
+  onClick={handleUpdate}
+>
+  Simpan Perubahan
+</button>
 
         </div>
 
@@ -456,6 +516,37 @@ const styles = {
     zIndex: 9999,
   },
 
+  headerCenter:{
+  flex:1,
+  textAlign:"center"
+},
+
+headerTitle:{
+  fontSize:"22px",
+  fontWeight:"700",
+  color:"#8B5A2B"
+},
+
+headerSubtitle:{
+  fontSize:"12px",
+  color:"#666",
+  marginTop:"2px"
+},
+
+sectionHeader:{
+  fontSize:"24px",
+  fontWeight:"500",
+  color:"#3D2A20",
+  borderBottom:"1px solid #c9a48b",
+  paddingBottom:"10px",
+  marginTop:"10px",
+  marginBottom:"10px"
+},
+
+label:{
+  fontSize:"14px",
+  color:"#444"
+},
   emptyContainer: {
     width: "100%",
     minHeight: "350px",
@@ -497,14 +588,15 @@ const styles = {
       letterSpacing: "1px",
       },
 
-  menu: {
-    display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
-  },
+ menu:{
+  display:"flex",
+  alignItems:"center",
+  gap:"30px",
+  fontSize:"15px",
+  fontWeight:"600",
 
+  marginRight:"50px"
+},
   active: {
     color: "#F28C28",
     fontWeight: "bold",
@@ -522,50 +614,29 @@ const styles = {
     zIndex: 2,
   },
 
-  formContainer: {
-    width: "100%",
-    maxWidth: "700px",
-
-    background: "#f6efe8",
-
-    borderRadius: "30px",
-
-    padding: "40px",
-
-    border: "2px solid #E15B3C",
-
-    boxShadow: `
-      0 10px 25px rgba(0,0,0,0.18),
-      0 0 18px rgba(225,91,60,0.18)
-    `,
-
-    display: "flex",
-    flexDirection: "column",
-
-    gap: "22px",
-  },
+ formContainer: {
+  width: "100%",
+  maxWidth: "1100px",
+  background:"rgba(232,210,194,0.92)",
+  borderRadius:"10px",
+  padding:"35px",
+  display:"flex",
+  flexDirection:"column",
+  gap:"15px"
+},
 
   uploadBox:{
     width:'100%',
-    maxWidth:'500px',
-    height:'320px',
-
+    height:'450px',
     background:'#ECECEC',
-
     border:'2px dashed #E15B3C',
-
     borderRadius:'25px',
-
     display:'flex',
     flexDirection:'column',
-
     justifyContent:'center',
     alignItems:'center',
-
     overflow:'hidden',
-
     position:'relative',
-
     gap:'15px',
   },
 
@@ -610,33 +681,62 @@ const styles = {
     fontWeight:'bold'
   },
 
+  rightSection:{
+  display:"flex",
+  alignItems:"center",
+  gap:"18px"
+},
+
+profileCircle:{
+  width:"35px",
+  height:"35px",
+
+  borderRadius:"50%",
+
+  background:"#F5F5F5",
+
+  border:"2px solid #E4E4E4",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+
+  cursor:"pointer",
+
+  flexShrink:0
+},
+
   changeImageBtn:{
-    position:'absolute',
+  position:'absolute',
 
-    bottom:'15px',
+  bottom:'20px',
+  left:'50%',
 
-    left:'50%',
+  transform:'translateX(-50%)',
 
-    transform:'translateX(-50%)',
+  display:'flex',
+  alignItems:'center',
+  gap:'8px',
 
-    background:'rgba(0,0,0,0.75)',
+  background:'#FFFFFF',
 
-    color:'#fff',
+  color:'#8B5A2B',
 
-    padding:'10px 18px',
+  border:'2px solid #E7A27A',
 
-    borderRadius:'14px',
+  padding:'10px 22px',
 
-    cursor:'pointer',
+  borderRadius:'8px',
 
-    fontWeight:'600',
+  fontSize:'14px',
+  fontWeight:'600',
 
-    fontSize:'14px',
+  cursor:'pointer',
 
-    backdropFilter:'blur(6px)',
+  boxShadow:'0 2px 8px rgba(0,0,0,0.12)',
 
-    boxShadow:'0 4px 10px rgba(0,0,0,0.25)',
-  },
+  zIndex:10
+},
 
   input:{
     width:'100%',
@@ -693,53 +793,34 @@ const styles = {
     cursor: "pointer",
   },
 
-  saveBtn:{
-    marginTop:'25px',
-
-    background:'#E15B3C',
-
-    color:'#fff',
-
-    border:'none',
-
-    padding:'16px',
-
-    borderRadius:'18px',
-
-    cursor:'pointer',
-
-    fontSize:'20px',
-
-    fontWeight:'bold',
-
-    width:'240px',
-
-    alignSelf:'center',
-
-    boxShadow:'0 6px 15px rgba(225,91,60,0.35)',
-  },
-
+saveBtn:{
+  background:"#E46B5C",
+  color:"#fff",
+  border:"none",
+  padding:"12px 24px",
+  borderRadius:"8px",
+  cursor:"pointer",
+  fontSize:"15px",
+  fontWeight:"600",
+  alignSelf:"flex-end",
+  marginTop:"20px",
+  boxShadow:"0 6px 15px rgba(228,107,92,0.35)",
+  transition:"all 0.2s ease"
+},
   addBtn:{
-    alignSelf:'flex-start',
+  background:"transparent",
+  border:"none",
+  color:"#9B5A2B",
 
-    background:'#E15B3C',
 
-    color:'#fff',
+  cursor:"pointer",
 
-    border:'none',
+  fontSize:"15px",
 
-    padding:'12px 22px',
+  fontWeight:"600",
 
-    borderRadius:'14px',
-
-    cursor:'pointer',
-
-    fontWeight:'bold',
-
-    fontSize:'15px',
-
-    boxShadow:'0 4px 10px rgba(225,91,60,0.25)',
-  },
+  padding:"0"
+},
 
   sectionTitle:{
     fontWeight:'700',
@@ -797,14 +878,10 @@ const styles = {
 
   formWrapper:{
     width:'100%',
-
     display:'flex',
     justifyContent:'center',
     alignItems:'center',
-
     flexDirection:'column',
-
-    gap:'18px',
   },
 
   mapBackground:{
@@ -826,6 +903,34 @@ const styles = {
     
     zIndex:0,
   },
+
+  footerButtons:{
+  display:"flex",
+  justifyContent:"flex-end",
+  gap:"12px",
+
+  marginTop:"25px",
+
+  paddingTop:"20px",
+
+  borderTop:"1px solid #c9a48b"
+},
+
+cancelBtn:{
+  background:"transparent",
+
+  border:"1px solid #b87944",
+
+  color:"#b87944",
+
+  padding:"10px 18px",
+
+  borderRadius:"4px",
+
+  cursor:"pointer"
+},
+
+  
 };
 
 export default EditResep;
