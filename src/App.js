@@ -27,7 +27,7 @@ function App() {
         <Route path="/notifikasi" element={<Notifikasi />} />
         <Route path="/feedback" element={<Feedback />} />
         <Route path="/edit/:id" element={<EditResep />} />
-        <Route path="/lupa-password" element={<LupaPassword />} />
+        <Route path="/lupapassword" element={<LupaPassword />} />
       
       </Routes>
     </BrowserRouter>
