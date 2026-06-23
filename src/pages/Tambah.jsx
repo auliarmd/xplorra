@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -14,6 +14,23 @@ const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
 const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
+const [user, setUser] = useState(null);
+
+useEffect(() => {
+
+  api.get("/profile")
+    .then((res) => {
+
+      if(res.data.status){
+        setUser(res.data.user);
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+}, []);
 
 
 const handleSave = async () => {
@@ -139,6 +156,7 @@ const ubahLangkah = (index,value) => {
   setLangkah(data);
 
 };
+
   return (
     <div style={styles.page}>
     <div style={styles.mapBackground}></div>
@@ -187,9 +205,22 @@ const ubahLangkah = (index,value) => {
     style={styles.profileCircle}
     onClick={() => navigate("/profil")}
   >
-    <span className="material-symbols-outlined">
-      person
-    </span>
+
+    {user?.foto ? (
+
+      <img
+        src={`${api.defaults.baseURL}/uploads/${user.foto}`}
+        alt="profile"
+        style={styles.profileImage}
+      />
+    ) : (
+
+      <span className="material-symbols-outlined">
+        person
+      </span>
+
+    )}
+
   </div>
 
 </div>
@@ -476,7 +507,9 @@ navbar:{
 
 headerCenter:{
   flex:1,
-  textAlign:"center"
+  textAlign:"center",
+  marginLeft:"100px"
+
 },
 
 headerTitle:{
@@ -794,6 +827,13 @@ saveBtn:{
   fontWeight:"600",
 
   boxShadow:"0 6px 15px rgba(228,107,92,0.35)"
+},
+
+profileImage:{
+  width:"100%",
+  height:"100%",
+  objectFit:"cover",
+  borderRadius:"50%"
 },
 };
 
