@@ -18,48 +18,96 @@ function Profil() {
   const [profileImage, setProfileImage] = useState(null);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false); 
   const fileInputRef = useRef(null);
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+    
   const handleImageChange = async (event) => {
 
   const file = event.target.files[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    try {
+  try {
 
-      const formData = new FormData();
+    const formData = new FormData();
 
-      formData.append("foto", file);
+    formData.append("foto", file);
 
-      const res = await api.post(
-        "/upload-profile",
-        formData,
-        {
-          headers:{
-            "Content-Type":"multipart/form-data"
-          }
+    const res = await api.post(
+      "/upload-profile",
+      formData,
+      {
+        headers:{
+          "Content-Type":"multipart/form-data"
         }
+      }
+    );
+
+    if(res.data.status){
+
+      setProfileImage(
+        `http://localhost:5000/uploads/${res.data.foto}`
       );
 
-      if(res.data.status){
-
-        setProfileImage(
-          `http://localhost:5000/uploads/${res.data.foto}`
-        );
-
-        setUser({
-          ...user,
-          foto:res.data.foto
-        });
-
-      }
-
-    } catch(err){
-
-      console.log(err);
+      setUser({
+        ...user,
+        foto:res.data.foto
+      });
 
     }
 
-  };
+  } catch(err){
+
+    console.log(err);
+
+  }
+
+};
+  
+  const handleChangePassword = async () => {
+
+  if (newPassword !== confirmPassword) {
+    alert("Konfirmasi password tidak cocok");
+    return;
+  }
+
+  try {
+
+    const res = await api.put(
+      "/change-password",
+      {
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      }
+    );
+
+    alert(res.data.message || "Password berhasil diubah");
+
+    setShowPasswordPopup(false);
+
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+
+  } catch (err) {
+
+    alert(
+      err.response?.data?.message ||
+      "Gagal mengubah password"
+    );
+
+  }
+
+};
+
   const handleRemovePhoto = async (e) => {
     e.preventDefault(); 
 
@@ -85,35 +133,40 @@ function Profil() {
   };
   const handleUpdateName = async () => {
 
-    try {
+  try {
 
-      const res = await api.put(
-        "/update-name",
-        {
-          nama: newName
+    const res = await api.put(
+      "/update-name",
+      {
+        nama: newName
+      },
+      {
+        headers: {
+          Authorization:
+            `Bearer ${localStorage.getItem("token")}`
         }
-      );
-
-      if(res.data.status){
-
-        setUser({
-          ...user,
-          nama: newName
-        });
-
-        setIsEditingName(false);
-
-        alert("Nama berhasil diubah");
-
       }
+    );
 
-    } catch(err){
+    if(res.data.status){
 
-      console.log(err);
+      setUser({
+        ...user,
+        nama: newName
+      });
 
+      setIsEditingName(false);
+
+      alert("Nama berhasil diubah");
     }
 
-  };
+  } catch(err){
+
+    console.log(err);
+
+    alert("Gagal mengubah nama");
+  }
+};
   // State untuk Pop Up
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -426,10 +479,28 @@ function Profil() {
 
                     <span
                       className="material-symbols-outlined"
-                      style={styles.editPencil}
+                      style={{
+                        ...styles.editPencil,
+                        color:"green"
+                      }}
                       onClick={handleUpdateName}
                     >
                       check
+                    </span>
+
+                    <span
+                      className="material-symbols-outlined"
+                      style={{
+                        ...styles.editPencil,
+                        marginLeft:"8px",
+                        color:"red"
+                      }}
+                      onClick={()=>{
+                        setIsEditingName(false);
+                        setNewName(user.nama);
+                      }}
+                    >
+                      close
                     </span>
                   </>
 
@@ -497,7 +568,10 @@ function Profil() {
 
             </div>
 
-            <button style={styles.changeBtn}>
+            <button
+              style={styles.changeBtn}
+              onClick={() => setShowPasswordPopup(true)}
+            >
               Change
             </button>
 
@@ -958,6 +1032,66 @@ function Profil() {
           </div>
         </div>
       )}
+
+      {showPasswordPopup && (
+      <div style={styles.modalOverlay}>
+        <div style={styles.modalBox}>
+
+          <h3 style={styles.modalTitle}>
+            Ganti Password
+          </h3>
+
+          <input
+            type="password"
+            placeholder="Password Lama"
+            value={oldPassword}
+            onChange={(e) =>
+              setOldPassword(e.target.value)
+            }
+            style={styles.passwordInput}
+          />
+
+          <input
+            type="password"
+            placeholder="Password Baru"
+            value={newPassword}
+            onChange={(e) =>
+              setNewPassword(e.target.value)
+            }
+            style={styles.passwordInput}
+          />
+
+          <input
+            type="password"
+            placeholder="Konfirmasi Password Baru"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+            style={styles.passwordInput}
+          />
+
+          <div style={styles.modalActions}>
+            <button
+              style={styles.btnCancel}
+              onClick={() => {
+                setShowPasswordPopup(false);
+              }}
+            >
+              Batal
+            </button>
+
+            <button
+              style={styles.btnConfirm}
+              onClick={handleChangePassword}
+            >
+              Simpan
+            </button>
+          </div>
+
+        </div>
+      </div>
+    )}
 
     </div>
   );
@@ -1774,6 +1908,16 @@ nameInput:{
   background:"transparent",
   width:"100%",
   fontSize:"14px",
+},
+
+passwordInput: {
+  width: "100%",
+  padding: "12px",
+  marginBottom: "12px",
+  border: "1px solid #ddd",
+  borderRadius: "8px",
+  boxSizing: "border-box",
+  outline: "none",
 },
 };
 

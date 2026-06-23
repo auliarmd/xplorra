@@ -1785,6 +1785,70 @@ app.put(
 
   }
 );
+
+app.put(
+  "/change-password",
+  verifyToken,
+  (req, res) => {
+
+    console.log("CHANGE PASSWORD DIPANGGIL");
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.json({
+        status: false,
+        message: "Isi semua form"
+      });
+    }
+
+    db.query(
+      "SELECT * FROM users WHERE id=?",
+      [req.user.id],
+      (err, rows) => {
+
+        if (err) {
+          return res.status(500).json(err);
+        }
+
+        if (rows.length === 0) {
+          return res.json({
+            status: false,
+            message: "User tidak ditemukan"
+          });
+        }
+
+        if (rows[0].password !== oldPassword) {
+          return res.json({
+            status: false,
+            message: "Password lama salah"
+          });
+        }
+
+        db.query(
+          "UPDATE users SET password=? WHERE id=?",
+          [newPassword, req.user.id],
+          (err2) => {
+
+            if (err2) {
+              return res.status(500).json(err2);
+            }
+
+            res.json({
+              status: true,
+              message: "Password berhasil diubah"
+            });
+
+          }
+        );
+
+      }
+    );
+
+  }
+);
+
+
 const PORT = 5000;
 app.listen(5000, '0.0.0.0', () => {
   console.log('Server running on port 5000');
