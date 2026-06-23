@@ -1,1111 +1,682 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import { useNavigate } from "react-router-dom";
 
 function Detail() {
-const { id } = useParams();
-const navigate = useNavigate();
-const [food, setFood] = useState(null);
-const [komentar, setKomentar] = useState([]);
-const [isiKomentar, setIsiKomentar] = useState("");
-const [rating, setRating] = useState(0);
-const [liked, setLiked] = useState(false);
-const [bookmarked, setBookmarked] = useState(false);
-const [likedFoods, setLikedFoods] = useState([]);
-const [user, setUser] = useState({});
-const [bookmarkedFoods, setBookmarkedFoods] = useState([]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [food, setFood] = useState(null);
+  const [komentar, setKomentar] = useState([]);
+  const [isiKomentar, setIsiKomentar] = useState("");
+  const [rating, setRating] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [user, setUser] = useState({});
 
-useEffect(()=>{
-
-  api.get(`/my-rating/${id}`)
-    .then((res)=>{
-
-      if(res.data.status){
-
-        setRating(res.data.star);
-
-      }
-
-    })
-    .catch((err)=>console.log(err));
-
-  api.get('/my-bookmarks')
-    .then((res)=>{
-
-      const ids = res.data.map(
-        item => item.id
-      );
-
-      setBookmarked(
-        ids.includes(Number(id))
-      );
-
-    })
-    .catch((err)=>console.log(err));
-
-  api.get('/my-likes')
-  .then((res)=>{
-
-    const likedIds = res.data.map(
-      item => item.food_id
-    );
-
-    if(likedIds.includes(Number(id))){
-
-      setLiked(true);
-
-    }
-
-  })
-  .catch((err)=>console.log(err));
-
-  api.get('/profile')
-    .then((res)=>{
-
-      setUser(res.data.user);
-
-    })
-    .catch((err)=>console.log(err));
-
-  api.get(`/resep/${id}`)
-  .then((res)=>{
-
-    setFood(res.data.resep);
-    
-    setKomentar(res.data.komentar);   
-    api.get('/my-bookmarks')
-      .then((bookmarkRes)=>{
-
-        const bookmarkIds = bookmarkRes.data.map(
-          item => item.id
-        );
-
-        setBookmarkedFoods(bookmarkIds);
-
-        if(bookmarkIds.includes(Number(id))){
-
-          setBookmarked(true);
-
+  useEffect(() => {
+    api.get(`/my-rating/${id}`)
+      .then((res) => {
+        if (res.data.status) {
+          setRating(res.data.star);
         }
-
       })
-      .catch((err)=>console.log(err));
+      .catch((err) => console.log(err));
 
+    api.get('/my-likes')
+      .then((res) => {
+        const likedIds = res.data.map(item => item.food_id);
+        if (likedIds.includes(Number(id))) {
+          setLiked(true);
+        }
       })
-  .catch((err)=>{
+      .catch((err) => console.log(err));
 
-    console.log(err);
+    api.get('/profile')
+      .then((res) => {
+        setUser(res.data.user);
+      })
+      .catch((err) => console.log(err));
 
-  });
+    api.get(`/resep/${id}`)
+      .then((res) => {
+        setFood(res.data.resep);
+        setKomentar(res.data.komentar);
+        
+        api.get('/my-bookmarks')
+          .then((bookmarkRes) => {
+            const bookmarkIds = bookmarkRes.data.map(item => item.id);
+            if (bookmarkIds.includes(Number(id))) {
+              setBookmarked(true);
+            }
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => console.log(err));
 
-},[id]);
+  }, [id]);
 
-if(!food){
-
-  return <div>Loading...</div>;
-
-}
-
-const bahanArray = (() => {
-
-  if(!food?.bahan) return [];
-
-  try {
-
-    return JSON.parse(food.bahan);
-
-  } catch {
-
-    return food.bahan
-      .split('\n')
-      .filter(item => item.trim() !== '');
-
+  if (!food) {
+    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
   }
 
-})();
+  const bahanArray = (() => {
+    if (!food?.bahan) return [];
+    try {
+      return JSON.parse(food.bahan);
+    } catch {
+      return food.bahan.split('\n').filter(item => item.trim() !== '');
+    }
+  })();
 
-const half = Math.ceil(bahanArray.length / 2);
+  const langkahArray = (() => {
+    if (!food?.langkah) return [];
+    try {
+      return JSON.parse(food.langkah);
+    } catch {
+      return food.langkah.split('\n').filter(item => item.trim() !== '');
+    }
+  })();
 
-const leftBahan = bahanArray.slice(0, half);
+  const kirimKomentar = async () => {
+    if (!isiKomentar) {
+      return alert("Tulis komentar dulu");
+    }
+    try {
+      const response = await api.post(`/komentar/${id}`, { komentar: isiKomentar });
+      setKomentar([response.data.komentarBaru, ...komentar]);
+      setIsiKomentar("");
+    } catch (err) {
+      console.log(err);
+      alert("Gagal kirim komentar");
+    }
+  };
 
-const rightBahan = bahanArray.slice(half);
+  const handleLike = async () => {
+    try {
+      const response = await api.post(`/like/${id}`);
+      setLiked(response.data.liked);
+      const resepBaru = await api.get(`/resep/${id}`);
+      setFood(resepBaru.data.resep);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-const kirimKomentar = async () => {
+  const handleBookmark = async () => {
+    try {
+      const response = await api.post(`/bookmark/${id}`);
+      setBookmarked(response.data.bookmarked);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  if(!isiKomentar){
+  const handleRating = async (value) => {
+    try {
+      setRating(value);
+      const response = await api.post(`/rating/${id}`, { star: value });
+      setFood({ ...food, rating: response.data.rating });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-    return alert("Tulis komentar dulu");
-
-  }
-
-  try{
-
-    const response = await api.post(
-      `/komentar/${id}`,
-      {
-        komentar:isiKomentar
-      }
-    );
-
-    setKomentar([
-      response.data.komentarBaru,
-      ...komentar
-    ]);
-
-    setIsiKomentar("");
-
-  }catch(err){
-
-    console.log(err);
-
-    alert("Gagal kirim komentar");
-
-  }
-
-};
-
-const handleLike = async () => {
-
-  try{
-
-    const response = await api.post(`/like/${id}`);
-
-    setLiked(response.data.liked);
-
-    const resepBaru = await api.get(`/resep/${id}`);
-
-    setFood(resepBaru.data.resep);
-
-  }catch(err){
-
-    console.log(err);
-
-  }
-
-};
-
-const handleBookmark = async () => {
-
-  try{
-
-    const response = await api.post(
-      `/bookmark/${id}`
-    );
-
-    // ubah state sesuai response backend
-    setBookmarked(
-      response.data.bookmarked
-    );
-
-  }catch(err){
-
-    console.log(err);
-
-  }
-
-};
-
-const handleRating = async (value) => {
-
-  try{
-
-    // update realtime frontend
-    setRating(value);
-
-    const response = await api.post(
-      `/rating/${id}`,
-      {
-        star:value
-      }
-    );
-
-    // update rating makanan realtime
-    setFood({
-      ...food,
-      rating:response.data.rating
-    });
-
-  }catch(err){
-
-    console.log(err);
-
-  }
-
-};
-
-return (
+  return (
     <div style={styles.page}>
-
       {/* NAVBAR */}
       <div style={styles.navbar}>
-
-        <div style={styles.logoArea}>
+        <div style={styles.logoArea} onClick={() => navigate("/dashboardafterlogin")}>
           <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
           <div style={styles.logoText}>pLorra</div>
         </div>
 
-        <div style={styles.menu}>
-          <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-          <span onClick={() => navigate("/profil")}>Profil</span>
-          <span onClick={() => navigate("/notifikasi")}>Notifikasi</span>
-        </div>
+        {/* JUDUL DI TENGAH */}
+        <div style={styles.headerTitle}>Detail Resep</div>
 
-        <div style={styles.rightMenu}>
+        <div style={styles.menuArea}>
+          <div style={styles.menu}>
+            <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
+            <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
+            <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
+          </div>
           <div
             style={styles.profileCircle}
             onClick={() => navigate("/profil")}
           >
-            {
-              user.foto ? (
-
-                <img
-                  src={`http://localhost:5000/uploads/${user.foto}`}
-                  alt="Profile"
-                  style={styles.profileImg}
-                />
-
-              ) : (
-
-                <span className="material-symbols-outlined">
-                  person
-                </span>
-
-              )
-            }
+            {user.foto ? (
+              <img src={`http://localhost:5000/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
+            )}
           </div>
         </div>
-        </div>
+      </div>
 
-      {/* MIAN WRAPPER */}
-      <div style={styles.mainWrapper}>
-        <div style={styles.container}>
-
-        {/* HERO */}
-        <div style={styles.heroCard}>
-
-          <img
-            src={`http://localhost:5000/uploads/${food.gambar}`}
-            alt="Rendang"
-            style={styles.heroImg}
-          />
-
-          <div style={styles.heroContent}>
-
-            <div style={styles.heroTitle}>
-              <div>
-                <div>{food.nama}</div>
-
-                <div>Berasal dari</div>
-
-                <div>{food.daerah}</div>
-              </div>
-            </div>
-
-            <div style={styles.likeRow}>
-
-              <span
-                className="material-symbols-outlined"
-                style={{
-                  ...styles.iconBlack,
-                  color: liked ? '#E15B3C' : '#111',
-                  transform: liked ? 'scale(1.1)' : 'scale(1)'
-                }}
+      {/* HERO IMAGE SECTION */}
+      <div style={styles.heroSection}>
+        <img src={`http://localhost:5000/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
+        <div style={styles.heroOverlay}>
+          <div style={styles.heroTextContainer}>
+            <h1 style={styles.heroTitle}>{food.nama}</h1>
+            <p style={styles.heroSubtitle}>Berasal dari {food.daerah}</p>
+            <div style={styles.heroActions}>
+              <button 
+                style={{...styles.actionBtn, background: liked ? '#C86B3E' : 'rgba(255,255,255,0.3)'}} 
                 onClick={handleLike}
               >
-                thumb_up
-              </span>
-
-              <span
-                className="material-symbols-outlined"
-                style={{
-                  ...styles.iconBlack,
-                  color: bookmarked ? '#E15B3C' : '#111',
-                }}
+                <span className="material-symbols-outlined" style={styles.btnIcon}>thumb_up</span>
+                Suka
+              </button>
+              <button 
+                style={{...styles.actionBtn, background: bookmarked ? '#9F6822' : 'rgba(255,255,255,0.3)'}} 
                 onClick={handleBookmark}
               >
-                bookmark
-              </span>
-
+                <span className="material-symbols-outlined" style={styles.btnIcon}>bookmark</span>
+                Simpan
+              </button>
             </div>
-
           </div>
-
         </div>
       </div>
 
-        {/* BAHAN */}
-        <div style={styles.section}>
-
-          <h2 style={styles.heading}>
-            Bahan-bahan
-          </h2>
-
-          <div style={styles.ingredients}>
-
-            {/* KOLOM KIRI */}
-            <div style={styles.leftIngredient}>
-              {
-                leftBahan.map((item,index)=>(
-
-                  <div key={index}>
-                    {item}
-                  </div>
-
-                ))
-              }
-            </div>
-
-            {/* KOLOM KANAN */}
-            <div style={styles.rightIngredient}>
-              {
-                rightBahan.map((item,index)=>(
-
-                  <div key={index}>
-                    {item}
-                  </div>
-
-                ))
-              }
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* RESEP */}
-        <div style={styles.section}>
-
-          <h2 style={styles.heading}>Langkah-Langkah</h2>
-
-          <div style={styles.recipeText}>
-          {
-            (() => {
-
-              if(!food?.langkah) return null;
-
-              let langkahArray = [];
-
-              try {
-
-                langkahArray = JSON.parse(food.langkah);
-
-              } catch {
-
-                langkahArray = food.langkah
-                  .split('\n')
-                  .filter(item => item.trim() !== '');
-
-              }
-
-              return langkahArray.map((item,index)=>(
-
-                <div
-                  key={index}
-                  style={{marginBottom:'15px'}}
-                >
-                  {index + 1}. {item}
-                </div>
-
-              ));
-
-            })()
-          }
-        </div>
-
-        </div>
-
-        {/* CREATOR */}
-        <div style={styles.creatorCard}>
-
-          <div style={styles.creatorTop}>
-
-            <div style={styles.creatorAvatar}>
-
-              {
-                food.creator_foto ? (
-
-                  <img
-                    src={`http://localhost:5000/uploads/${food.creator_foto}`}
-                    alt="creator"
-                    style={styles.creatorImg}
-                  />
-
+      {/* MAIN CONTENT GRID */}
+      <div style={styles.mainGrid}>
+        
+        {/* LEFT COLUMN */}
+        <div style={styles.leftColumn}>
+          
+          {/* CREATOR CARD */}
+          <div style={styles.card}>
+            <div style={styles.creatorHeader}>
+              <div style={styles.creatorAvatar}>
+                {food.creator_foto ? (
+                  <img src={`http://localhost:5000/uploads/${food.creator_foto}`} alt="creator" style={styles.creatorImg} />
                 ) : (
-
-                  <span
-                    className="material-symbols-outlined"
-                    style={styles.creatorPlaceholder}
-                  >
-                    person
-                  </span>
-
-                )
-              }
-
-            </div>
-
-            <div style={styles.creatorName}>
-              {food.creator}
-            </div>
-
-          </div>
-
-          <p style={styles.creatorDesc}>
-             {food.deskripsi}
-          </p>
-
-        </div>
-
-        <div style={styles.topLine}></div>
-
-        {/* KOMENTAR */}
-        <div style={styles.commentBox}>
-
-          <h2 style={styles.headingcomment}>
-            Komentar
-          </h2>
-
-        {
-          komentar.map((item,index)=>(
-
-            <div
-              key={index}
-              style={styles.commentItem}
-            >
-
-              <div style={styles.commentHeader}>
-
-                {
-                  item.foto ? (
-
-                    <img
-                      src={`http://localhost:5000/uploads/${item.foto}`}
-                      alt="user"
-                      style={styles.commentAvatar}
-                    />
-
-                  ) : (
-
-                    <span
-                      className="material-symbols-outlined"
-                      style={styles.commentIcon}
-                    >
-                      account_circle
-                    </span>
-
-                  )
-                }
-
-                <b>{item.nama}</b>
-
+                  <span className="material-symbols-outlined">person</span>
+                )}
               </div>
+              <div>
+                <h3 style={styles.creatorName}>{food.creator}</h3>
+                <span style={styles.creatorRole}>Pembuat Resep Asli</span>
+              </div>
+            </div>
+            <p style={styles.creatorDesc}>"{food.deskripsi}"</p>
+          </div>
 
-              <p style={styles.commentText}>
-                {item.komentar}
-              </p>
+          {/* INGREDIENTS CARD */}
+          <div style={styles.card}>
+            <h3 style={styles.cardTitle}>
+              <span className="material-symbols-outlined" style={styles.titleIcon}>restaurant_menu</span>
+              Bahan-bahan
+            </h3>
+            <div style={styles.ingredientList}>
+              {bahanArray.map((item, index) => (
+                <div key={index} style={styles.ingredientItem}>
+                  <span className="material-symbols-outlined" style={styles.bulletIcon}>check_circle</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div style={styles.rightColumn}>
+          
+          {/* STEPS CARD */}
+          <div style={{...styles.card, backgroundColor: "#FFFFFF"}}>
+            <h3 style={styles.cardTitle}>
+              <span className="material-symbols-outlined" style={styles.titleIcon}>local_dining</span>
+              Langkah-langkah Memasak
+            </h3>
+            <div style={styles.stepList}>
+              {langkahArray.map((item, index) => (
+                <div key={index} style={styles.stepItem}>
+                  <div style={styles.stepNumber}>{index + 1}</div>
+                  <div style={styles.stepText}>{item}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RATING CARD */}
+          <div style={{...styles.card, textAlign: "center", padding: "40px 20px"}}>
+            <h3 style={{...styles.cardTitle, justifyContent: "center", marginBottom: "15px", color: "#8E5E41"}}>
+              Seberapa suka anda terhadap resep ini?
+            </h3>
+            <div style={styles.starsContainer}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  onClick={() => handleRating(star)}
+                  style={{
+                    ...styles.starIcon,
+                    color: star <= rating ? '#E28E46' : '#C4A89A',
+                  }}
+                >
+                  {star <= rating ? '★' : '☆'}
+                </span>
+              ))}
+            </div>
+            <p style={styles.ratingSubtext}>Klik untuk memberikan nilai</p>
+          </div>
+
+          {/* COMMENTS SECTION */}
+          <div style={styles.commentsContainer}>
+            <h3 style={styles.commentHeader}>Komentar ({komentar.length})</h3>
+            
+            {/* INPUT CARD */}
+            <div style={styles.inputCard}>
+              <div style={styles.inputWrapper}>
+                <div style={styles.commentUserAvatar}>
+                  {user.foto ? (
+                    <img src={`http://localhost:5000/uploads/${user.foto}`} alt="user" style={styles.creatorImg} />
+                  ) : (
+                    <span className="material-symbols-outlined">person</span>
+                  )}
+                </div>
+                <input 
+                  type="text" 
+                  placeholder="Tulis Komentar..." 
+                  style={styles.commentInput} 
+                  value={isiKomentar}
+                  onChange={(e) => setIsiKomentar(e.target.value)}
+                />
+              </div>
+              <div style={styles.sendBtnWrapper}>
+                <button style={styles.sendBtn} onClick={kirimKomentar}>Kirim</button>
+              </div>
             </div>
 
-          ))
-        }
-
-        </div>
-
-        {/* INPUT */}
-        <div style={styles.inputSection}>
-
-          <h2 style={styles.commentTitle}>
-            Tulis Komentar
-          </h2>
-
-          <div style={styles.inputBox}>
-
-            <textarea
-              placeholder="Sangat bagus"
-              style={styles.textarea}
-              value={isiKomentar}
-              onChange={(e)=>setIsiKomentar(e.target.value)}
-            ></textarea>
-
-            <button
-              type="button"
-              style={styles.sendBtn}
-              onClick={kirimKomentar}
-            >
-              Kirim Komentar
-            </button>
+            {/* COMMENT LIST */}
+            <div style={styles.commentList}>
+              {komentar.map((item, index) => (
+                <div key={index} style={styles.commentCard}>
+                  <div style={styles.commentHeaderRow}>
+                    <div style={styles.commentUserAvatar}>
+                      {item.foto ? (
+                        <img src={`http://localhost:5000/uploads/${item.foto}`} alt="user" style={styles.creatorImg} />
+                      ) : (
+                        <span className="material-symbols-outlined">person</span>
+                      )}
+                    </div>
+                    <div style={styles.commentUserInfo}>
+                      <span style={styles.commentName}>{item.nama}</span>
+                      <span style={styles.commentDate}>Baru saja</span> {/* Sesuaikan date jika dari API ada properti tanggal */}
+                    </div>
+                  </div>
+                  <p style={styles.commentTextContent}>{item.komentar}</p>
+                </div>
+              ))}
+            </div>
 
           </div>
-
-        </div>
-
-        {/* RATING */}
-        <div style={styles.ratingSection}>
-
-          <h3 style={styles.ratingTitle}>
-            Seberapa suka anda terhadap resep ini
-          </h3>
-
-          <div style={styles.stars}>
-
-            {[1,2,3,4,5].map((star)=>(
-
-              <span
-                key={star}
-                onClick={()=>handleRating(star)}
-                style={{
-                  cursor:'pointer',
-                  color: star <= rating
-                    ? '#f0b323'
-                    : '#ddd',
-
-                  transition:'0.3s',
-
-                  transform:
-                    star <= rating
-                    ? 'scale(1.1)'
-                    : 'scale(1)'
-                }}
-              >
-                ★
-              </span>
-
-            ))}
-
-          </div>
-
         </div>
 
       </div>
-
     </div>
   );
 }
 
 const styles = {
   page: {
-    background: `
-    linear-gradient(
-    135deg,
-    #f8ede3 0%,
-    #dfb08c 45%,
-    #b86b4b 100%
-    )
-    `,
+    backgroundColor: "rgba(193, 119, 84, 0.65)",
     minHeight: "100vh",
-    fontFamily: "Poppins, sans-serif",
-    paddingBottom: "60px",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    paddingBottom: "80px",
   },
-
-   navbar: {
+  navbar: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "15px 15px",
-    background: "#fff",
+    padding: "10px 20px",
+    backgroundColor: "#FFFFFF",
     position: "sticky",
     top: 0,
     zIndex: 999,
+    gap: "15px",
+    flexWrap: "wrap",
   },
-
-  logoContainer: {
+  logoArea: {
     display: "flex",
     alignItems: "center",
-    gap: "1px",
-    },
-
-    logoImg: {
-    width: "40px",
-    },
-
-    logoText: {
-    color: "#F28C28",
+    cursor: "pointer",
+    flex: 1,
+  },
+  logoImg: {
+    width: "45px",
+  },
+  logoText: {
+    color: "#E28B36",
     fontWeight: "bold",
     fontSize: "24px",
-    letterSpacing: "1px",
-    },
-
-    logoArea: {
-      display: "flex",
-      alignItems: "center",
-      gap: "5px",
-    },
-    
-
+    marginLeft: "5px",
+  },
+  headerTitle: {
+    fontSize: "24px",
+    fontWeight: "bold",
+    color: "#9F6822",
+    textAlign: "center",
+    whiteSpace: "nowrap", // Warna cokelat/oranye menyesuaikan desain
+  },
+  menuArea: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "30px",
+    flex: 1,
+  },
   menu: {
     display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "500",
+    gap: "25px",
+  },
+  navItem: {
+    fontSize: "15px",
     fontWeight: "bold",
+    color: "#111",
+    cursor: "pointer",
   },
-
-  active: {
-    color: "#F28C28",
-    fontWeight: "bold",
-  },
-
-  profileImg: {
-    width: "100%",
-    height: "100%",
-    borderRadius: "50%",
-    objectFit: "cover",
-  },
-
   profileCircle: {
-    width: "35px",
-    height: "35px",
+    width: "38px",
+    height: "38px",
     borderRadius: "50%",
-    objectFit: 'cover',
-    background: "#f4b8a3",
+    backgroundColor: "#F2AB82",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#fff",
-  },
-
-  container: {
-    padding: "15px",
-  },
-
-  iconBlack:{
-    fontSize:'30px',
-
-    color:'#111',
-
-    cursor:'pointer',
-
-    background:'rgba(255,255,255,0.65)',
-
-    padding:'12px',
-
-    borderRadius:'50%',
-
-    boxShadow:'0 6px 18px rgba(0,0,0,0.12)',
-
-    transition:'0.3s ease',
-  },
-
-  iconImg: {
-  width: "28px",
-  height: "28px",
-
-  objectFit: "contain",
-
-  cursor: "pointer",
-},
-  heroCard: {
-    display: "flex",
-
-    background: "rgba(255,255,255,0.18)",
-
-    backdropFilter: "blur(14px)",
-
-    borderRadius: "32px",
-
+    color: "#FFF",
+    cursor: "pointer",
     overflow: "hidden",
-
-    width: "95%",
-
-    margin: "0 auto",
-
-    minHeight: "340px",
-
-    boxShadow: `
-      0 20px 45px rgba(0,0,0,0.18),
-      inset 0 1px 0 rgba(255,255,255,0.2)
-    `,
-
-    border: "1px solid rgba(255,255,255,0.15)",
   },
-
-  heroImg: {
-    width: "58%",
-    height: "340px",
+  profileImg: {
+    width: "100%",
+    height: "100%",
     objectFit: "cover",
+    imageRendering: "high-quality",
   },
-
-  heroContent: {
-    flex: 1,
-
-    padding: "40px 30px",
-
-    display: "flex",
-    flexDirection: "column",
-
-    justifyContent: "space-between",
-
-    background: "#f8f5f3",
+  heroSection: {
+    position: "relative",
+    width: "100%",
+    height: "400px", // Tinggi hero banner
   },
-
-  heroTitle: {
-    fontSize: "40px",
-
-    fontWeight: "900",
-
-    lineHeight: "1.7",
-
-    color: "#111",
-
-    textAlign: "center",
-
-    letterSpacing: "1px",
-
-  
-
-    marginTop: "10px",
-
-    textShadow: "0 3px 8px rgba(0,0,0,0.08)",
+  heroImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    imageRendering: "high-quality",
   },
-
-  likeRow: {
+  heroOverlay: {
     position: "absolute",
-    bottom: "15px",
-    right: "25px",
-
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 50%)",
     display: "flex",
-    gap: "10px",
+    alignItems: "flex-end",
+    padding: "40px",
+  },
+  heroTextContainer: {
+    maxWidth: "1250px",
+    margin: "0 auto",
+    width: "100%",
+  },
+  heroTitle: {
+    color: "#FFFFFF",
+    fontSize: "40px",
+    fontWeight: "bold",
+    margin: "0 0 5px 0",
+  },
+  heroSubtitle: {
+    color: "#E0E0E0",
+    fontSize: "16px",
+    margin: "0 0 20px 0",
+  },
+  heroActions: {
+    display: "flex",
+    gap: "15px",
+  },
+  actionBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    border: "none",
+    padding: "8px 20px",
+    borderRadius: "20px",
+    color: "#FFF",
+    fontSize: "14px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    backdropFilter: "blur(5px)",
+    transition: "0.3s",
+  },
+  btnIcon: {
     fontSize: "18px",
   },
-
-  actionRow:{
-    display:'flex',
-    gap:'20px',
-  },
-
-  actionIcon:{
-    fontSize:'38px',
-    color:'#E15B3C',
-    cursor:'pointer',
-
-    transition:'0.3s',
-  },
-
-  section: {
-    marginTop: "35px",
-
-    paddingBottom: "35px",
-
-    borderBottom: "2px solid rgba(255,255,255,0.35)",
-  },
-
-  heading: {
-    fontSize: "35px",
-    marginLeft: "40px",
-
-    fontWeight: "790",
-
-    marginBottom: "22px",
-
-    color: "#111",
-
-    letterSpacing: "1px",
-  },
-
-  recipeText: {
-  fontSize: "22px", // ukuran tulisan resep
-  lineHeight: "1.9",
-  textAlign: "justify",
-  width: "88%",
-  marginLeft: "60px",
-},
-
-  ingredients: {
+  mainGrid: {
     display: "grid",
-    marginLeft: "60px",
-    
-    gridTemplateColumns: "1fr 1fr",
-
-    gap: "20px 60px",
-
-    width: "90%",
-
-    margin: "0 auto",
-
-    fontSize: "22px",
-
-    fontWeight: "548",
-
-    lineHeight: "1.8",
-
-    color: "#111",
+    gridTemplateColumns: "1fr 2fr", // Kolom kiri lebih kecil
+    gap: "80px",
+    maxWidth: "1250px",
+    margin: "100px auto 0 auto",
+    padding: "0 20px",
   },
-
-  leftIngredient: {
+  leftColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "40px",
   },
-
-  rightIngredient: {
+  rightColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "40px",
   },
-
-  creatorCard: {
-    marginTop: "35px",
-
-    background: "#ead8cf",
-
-    borderRadius: "25px",
-
+  card: {
+    backgroundColor: "#F7EBE2", // Warna background card yang hangat
+    borderRadius: "15px",
     padding: "30px",
-
-    width: "90%",
-
-    marginLeft: "auto",
-    marginRight: "auto",
-
-    textAlign: "center",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
   },
-
-  creatorTop: {
+  creatorHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    marginBottom: "15px",
+  },
+  creatorAvatar: {
+    width: "60px",
+    height: "60px",
+    borderRadius: "50%",
+    backgroundColor: "#D9D9D9",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  creatorImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    imageRendering: "high-quality",
+  },
+  creatorName: {
+    margin: 0,
+    fontSize: "18px",
+    color: "#4A3222",
+  },
+  creatorRole: {
+    fontSize: "12px",
+    color: "#8E5E41",
+  },
+  creatorDesc: {
+    fontSize: "13px",
+    color: "#5E4637",
+    fontStyle: "italic",
+    lineHeight: "1.6",
+    margin: 0,
+  },
+  cardTitle: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-
-    marginBottom: "10px",
+    margin: "0 0 20px 0",
+    fontSize: "20px",
+    color: "#4A3222",
   },
-
-  creatorAvatar: {
-    width: "50px",
-    height: "50px",
-    marginLeft: "25px",
-    borderRadius: "50%",
-    background: "#ddd",
-    overflow:'hidden',
-    display:'flex',
-    justifyContent:'center',
-    alignItems:'center',
+  titleIcon: {
+    fontSize: "24px",
+    color: "#9F6822",
   },
-
-  creatorImg:{
-    width:'100%',
-    height:'100%',
-    borderRadius:'50%',
-    objectFit:'cover',
-  },
-
-  creatorPlaceholder:{
-    fontSize:'32px',
-    color:'#666',
-  },
-
-  commentAvatar:{
-    width:'42px',
-    height:'42px',
-    minWidth:'42px',
-    minHeight:'42px',
-    borderRadius:'50%',
-    objectFit:'cover',
-    overflow:'hidden',
-    imageRendering:'auto',
-    border:'1px solid rgba(0,0,0,0,0.8)',
-  },
-
-  creatorName: {
-    fontWeight: "700",
-    fontSize: "25px",
-  },
-
-  creatorDesc: {
-    fontSize: "15px",
-    lineHeight: "1.6",
-    color: "#444",
-  },
-
-  headingcomment: {
-    fontSize: "35px",
-    fontWeight: "700",
-    marginLeft: "-5px",
-    marginTop: "-10px",
-    letterSpacing: "1px",
-  },
-
-  commentTitle: {
-    fontSize: "30px",
-    fontWeight: "700",
-
-    marginBottom: "10px",
-    marginLeft: "75px",
-    letterSpacing: "1px",
-  },
-
-  topLine: {
-    width: "99%",
-
-    height: "1.5px",
-
-    background: "rgba(255, 255, 255, 0.36)",
-
-    margin: "10px auto 35px auto",
-    marginTop: "40px",
-
-    borderRadius: "10px",
-  },
-
-  commentBox: {
-    marginTop: "35px",
-
-    background: "#f5f5f5",
-
-    padding: "30px 40px",
-
-    borderRadius: "0px",
-
-    width: "85%",
-
-    marginLeft: "auto",
-    marginRight: "auto",
-
-    boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
-    minHeight: "auto",
+  ingredientList: {
     display: "flex",
     flexDirection: "column",
-    gap: "8px",
+    gap: "15px",
   },
-
-  commentItem: {
-    padding: "0px 0",
-    imageRendering:'auto',
-    
-
-    
-  },
-
-  commentHeader:{
-    display:'flex',
-    alignItems:'center',
-    gap:'12px',
-    fontSize:'18px',
-    minHeight:'45px',
-  },
-
-  commentIcon:{
-    fontSize:'38px',
-    color:'#111',
-  },
-
-  commentText:{
-    marginLeft:'48px',
-
-    marginTop:'0px',
-
-    fontSize:'17px',
-
-    color:'#333',
-  },
-
-  inputBox: {
-    background: "#ead8cf",
-
-    padding: "18px",
-
-    width: "89%",
-
-    marginLeft: "auto",
-    marginRight: "auto",
-
-    position: "relative",
-  },
-
-  textarea: {
-    width: "100%",
-    height: "80px",
-
-    border: "none",
-
-    outline: "none",
-
-    resize: "none",
-
-    fontSize: "18px",
-
-    background: "transparent",
-  },
-
-  sendBtn: {
-    position: "absolute",
-
-    right: "18px",
-
-    bottom: "15px",
-
-    border: "none",
-
-    background: "linear-gradient(135deg,#E15B3C,#B84A2E)",
-
-    color: "#fff",
-
-    padding: "10px 22px",
-
-    borderRadius: "25px",
-
+  ingredientItem: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "10px",
     fontSize: "14px",
-
-    fontWeight: "700",
-
+    color: "#4A3222",
+    lineHeight: "1.5",
+  },
+  bulletIcon: {
+    fontSize: "16px",
+    color: "#9F6822",
+    marginTop: "2px",
+  },
+  stepList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+  },
+  stepItem: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "20px",
+  },
+  stepNumber: {
+    minWidth: "35px",
+    height: "35px",
+    backgroundColor: "#D98857",
+    color: "#FFF",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    fontSize: "16px",
+  },
+  stepText: {
+    fontSize: "14px",
+    color: "#4A3222",
+    lineHeight: "1.6",
+    marginTop: "5px",
+  },
+  starsContainer: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "15px",
+    marginBottom: "10px",
+  },
+  starIcon: {
+    fontSize: "45px",
     cursor: "pointer",
-
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    transition: "0.2s",
   },
-
-  ratingSection: {
-    marginTop: "0px",
-
-    textAlign: "center",
-
-    paddingTop: "0px",
-
-    paddingBottom: "10px",
+  ratingSubtext: {
+    fontSize: "12px",
+    color: "#8E5E41",
+    margin: 0,
   },
-
-  ratingTitle: {
-    marginTop: "50px",
-    fontSize: "35px",
-
-    fontWeight: "700",
-
-    color: "#111",
-    letterSpacing: "1px",
+  commentsContainer: {
+    marginTop: "10px",
   },
-
-  stars: {
-    marginTop: "-25px",
-
-    color: "#f0b323",
-
-    fontSize: "38px",
-
-    letterSpacing: "5px",
-
-    lineHeight: "1",
+  commentHeader: {
+    fontSize: "18px",
+    color: "#4A3222",
+    marginBottom: "15px",
   },
-
-  mainWrapper: {
-    width: "75%",
-    maxWidth: "1300px",
-
-    margin: "35px auto",
-
-    background: "rgba(255,255,255,0.12)",
-
-    backdropFilter: "blur(14px)",
-    WebkitBackdropFilter: "blur(14px)",
-
-    borderRadius: "35px",
-
-    padding: "45px",
-
-    border: "1px solid rgba(255,255,255,0.18)",
-
-    boxShadow: `
-      0 8px 32px rgba(0,0,0,0.18)
-    `,
+  inputCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: "15px",
+    padding: "20px",
+    marginBottom: "20px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  inputWrapper: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+  },
+  commentInput: {
+    flex: 1,
+    border: "none",
+    outline: "none",
+    fontSize: "14px",
+    color: "#4A3222",
+  },
+  sendBtnWrapper: {
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  sendBtn: {
+    backgroundColor: "#9A5D20",
+    color: "#FFF",
+    border: "none",
+    padding: "8px 25px",
+    borderRadius: "20px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "0.3s",
+  },
+  commentList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
+  },
+  commentCard: {
+    backgroundColor: "#F7EBE2",
+    borderRadius: "15px",
+    padding: "20px",
+  },
+  commentHeaderRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    marginBottom: "10px",
+  },
+  commentUserAvatar: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    backgroundColor: "#D9D9D9",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     overflow: "hidden",
-    position: "relative",
+  },
+  commentUserInfo: {
+    display: "flex",
+    justifyContent: "space-between",
+    flex: 1,
+    alignItems: "center",
+  },
+  commentName: {
+    fontWeight: "bold",
+    color: "#4A3222",
+    fontSize: "14px",
+  },
+  commentDate: {
+    fontSize: "12px",
+    color: "#8E5E41",
+  },
+  commentTextContent: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#5E4637",
+    lineHeight: "1.5",
+    paddingLeft: "55px", // Sejajar dengan teks di atas, mengabaikan lebar avatar
   },
 };
 
