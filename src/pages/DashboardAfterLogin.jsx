@@ -963,7 +963,7 @@ feedbackBtn: {
 
     alignSelf: "flex-start",
 
-    height: "fit-content",
+    height: "fit-content", 
   },
 
   title: {
