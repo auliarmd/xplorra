@@ -336,8 +336,11 @@ const toggleSave = async (id) => {
               style={styles.searchInput}
               value={search}
               onChange={(e) => {
+
                 const keyword = e.target.value;
+
                 setSearch(keyword);
+
               }}
             />
 
@@ -348,8 +351,6 @@ const toggleSave = async (id) => {
                 onClick={() => {
                   setKategori("");
                   setDaerah("");
-                  setSearch("");
-                  setNotFound(false);
                 }}
                 title="Hapus Filter"
               >
@@ -1164,7 +1165,6 @@ starEmpty: {
     padding: "10px",
     border: "2px solid #d86936",
     background: "#fff",
-    color: "#d86936",
     borderRadius: "25px",
     cursor: "pointer",
     fontWeight: "bold",

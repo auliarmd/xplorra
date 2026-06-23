@@ -190,22 +190,40 @@ function Dashboard() {
 
           {/* SEARCH */}
           <div style={styles.searchBox}>
-            <span className="material-symbols-outlined" style={styles.searchIcon}>
-              search
-            </span>
-            <input
-              placeholder="Search"
-              style={styles.searchInput}
-              value={search}
-              onChange={(e) => {
+          <span
+            className="material-symbols-outlined"
+            style={styles.searchIcon}
+          >
+            search
+          </span>
 
-                const keyword = e.target.value;
+          <input
+            placeholder="Search"
+            style={styles.searchInput}
+            value={search}
+            onChange={(e) => {
 
-                setSearch(keyword);
+              const keyword = e.target.value;
 
+              setSearch(keyword);
+
+            }}
+          />
+
+          {(kategori || daerah) && (
+            <span
+              className="material-symbols-outlined"
+              style={styles.clearFilterIcon}
+              onClick={() => {
+                setKategori("");
+                setDaerah("");
               }}
-            />
-          </div>
+              title="Hapus Filter"
+            >
+              filter_alt_off
+            </span>
+          )}
+        </div>
 
           {/* TITLE */}
           <h2 style={styles.title}>Kategori</h2>
@@ -433,28 +451,24 @@ function Dashboard() {
           </div>
         </div>
 
-        {
-          notFound && (
-            <h2
-              style={{
-                color:'#d86936',
-                textAlign:'center',
-                width:'100%',
-                marginTop:'200px',
-                fontSize:'20px'
-              }}
-            >
-              Resep tidak ditemukan
-            </h2>
-          )
-        }
+        
 
         {/* GRID */}
-        <div style={styles.cardContainer}>
+          <div style={styles.cardContainer}>
 
-        <div style={styles.grid}>
+            {notFound ? (
 
-          {foods.map((item) => (
+              <div style={styles.emptyResult}>
+                <h2 style={styles.emptyResultText}>
+                  Resep tidak ditemukan
+                </h2>
+              </div>
+
+            ) : (
+
+              <div style={styles.grid}>
+
+                {foods.map((item) => (
 
             <div
               key={item.id}
@@ -524,6 +538,7 @@ function Dashboard() {
             </div>
           ))}
         </div>
+         )}
       </div>
     </div>
 </div>
@@ -832,12 +847,9 @@ trendingText: {
 
   grid: {
     display: "grid",
-
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(260px, 1fr))",
-
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 320px))",
     gap: "25px",
-
+    justifyContent: "start",
     alignContent: "start",
   },
 
@@ -925,6 +937,40 @@ starEmpty: {
  // fontVariationSettings: "'OPSZ' 14",
 },
 
+clearFilterIcon: {
+  color: "#a4a4a4",
+  cursor: "pointer",
+  fontSize: "22px",
+},
+
+  emptyResult: {
+    width: "100%",
+    height: "640px", // samakan dengan tinggi cardContainer
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  emptyResultText: {
+    color: "#393939",
+    fontSize: "28px",
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: "-10px",
+    marginLeft: "-10px",
+  },
+
+  clearFilterBtn: {
+    width: "100%",
+    padding: "10px",
+    border: "2px solid #d86936",
+    background: "#fff",
+    color: "#262424",
+    borderRadius: "25px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginBottom: "15px",
+  },
 };
 
 export default Dashboard;
