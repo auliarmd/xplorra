@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
@@ -15,13 +15,113 @@ function Profil() {
   const [gambar, setGambar] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [fotoPreview, setFotoPreview] = useState(null);
-  
+  const [profileImage, setProfileImage] = useState(null);
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false); 
+  const fileInputRef = useRef(null);
+  const handleImageChange = async (event) => {
+
+  const file = event.target.files[0];
+
+    if (!file) return;
+
+    try {
+
+      const formData = new FormData();
+
+      formData.append("foto", file);
+
+      const res = await api.post(
+        "/upload-profile",
+        formData,
+        {
+          headers:{
+            "Content-Type":"multipart/form-data"
+          }
+        }
+      );
+
+      if(res.data.status){
+
+        setProfileImage(
+          `http://localhost:5000/uploads/${res.data.foto}`
+        );
+
+        setUser({
+          ...user,
+          foto:res.data.foto
+        });
+
+      }
+
+    } catch(err){
+
+      console.log(err);
+
+    }
+
+  };
+  const handleRemovePhoto = async (e) => {
+    e.preventDefault(); 
+
+    try {
+      console.log("Klik hapus foto");
+
+      const res = await api.delete("/profile-photo");
+      console.log("Response:", res.data);
+
+      setProfileImage(null);
+
+      setUser({
+        ...user,
+        foto: null
+      });
+
+      setShowPhotoMenu(false);
+
+    } catch(err){
+      console.log("ERROR HAPUS FOTO:", err.response?.data || err);
+      alert("Gagal menghapus foto: " + (err.response?.data?.message || "Cek console browser untuk detail error"));
+    }
+  };
+  const handleUpdateName = async () => {
+
+    try {
+
+      const res = await api.put(
+        "/update-name",
+        {
+          nama: newName
+        }
+      );
+
+      if(res.data.status){
+
+        setUser({
+          ...user,
+          nama: newName
+        });
+
+        setIsEditingName(false);
+
+        alert("Nama berhasil diubah");
+
+      }
+
+    } catch(err){
+
+      console.log(err);
+
+    }
+
+  };
   // State untuk Pop Up
   const [showLogoutPopup, setShowLogoutPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState(null);
   const [showRemoveBookmarkPopup, setShowRemoveBookmarkPopup] = useState(false);
   const [removeBookmarkTargetId, setRemoveBookmarkTargetId] = useState(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -262,29 +362,29 @@ function Profil() {
         {/* FOTO */}
         <div style={styles.profilePhotoWrapper}>
 
-          {
-            user?.foto ? (
+          {(profileImage || (user?.foto && user.foto !== "null")) ? (
+            <img
+              src={
+                profileImage
+                  ? profileImage
+                  : `http://localhost:5000/uploads/${user.foto}`
+              }
+              alt="profile"
+              style={styles.profilePhoto}
+            />
+          ) : (
+            <span
+              className="material-symbols-outlined"
+              style={styles.profilePlaceholder}
+            >
+              person
+            </span>
+          )}
 
-              <img
-                src={`http://localhost:5000/uploads/${user.foto}`}
-                alt="profile"
-                style={styles.profilePhoto}
-              />
-
-            ) : (
-
-              <span
-                className="material-symbols-outlined"
-                style={styles.profilePlaceholder}
-              >
-                person
-              </span>
-
-            )
-          }
-
-          <label style={styles.cameraBtn}>
-
+          <div
+            style={styles.cameraBtn}
+            onClick={() => setShowPhotoMenu(true)}
+          >
             <span
               className="material-symbols-outlined"
               style={{ fontSize: "18px", color: "#fff" }}
@@ -296,9 +396,10 @@ function Profil() {
               type="file"
               hidden
               accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageChange}
             />
-
-          </label>
+          </div>
 
         </div>
 
@@ -313,14 +414,44 @@ function Profil() {
               </label>
 
               <div style={styles.inputModern}>
-                {user.nama}
 
-                <span
-                  className="material-symbols-outlined"
-                  style={styles.editPencil}
-                >
-                  edit
-                </span>
+                {isEditingName ? (
+
+                  <>
+                    <input
+                      value={newName}
+                      onChange={(e)=>setNewName(e.target.value)}
+                      style={styles.nameInput}
+                    />
+
+                    <span
+                      className="material-symbols-outlined"
+                      style={styles.editPencil}
+                      onClick={handleUpdateName}
+                    >
+                      check
+                    </span>
+                  </>
+
+                ) : (
+
+                  <>
+                    {user.nama}
+
+                    <span
+                      className="material-symbols-outlined"
+                      style={styles.editPencil}
+                      onClick={()=>{
+                        setNewName(user.nama);
+                        setIsEditingName(true);
+                      }}
+                    >
+                      edit
+                    </span>
+                  </>
+
+                )}
+
               </div>
             </div>
 
@@ -378,22 +509,7 @@ function Profil() {
 
             <button
               style={styles.logoutModern}
-              onClick={() => {
-
-                const confirmLogout =
-                  window.confirm(
-                    "Apakah Anda yakin ingin logout?"
-                  );
-
-                if(confirmLogout){
-
-                  localStorage.removeItem("token");
-
-                  navigate("/Masuk");
-
-                }
-
-              }}
+              onClick={() => setShowLogoutPopup(true)}
             >
               <span
                 className="material-symbols-outlined"
@@ -513,11 +629,7 @@ function Profil() {
 
         {/* FAVORIT SECTION */}
         {activeTab === "favorit" && (
-          <div style={styles.rightSection}>
-
-            <h1 style={styles.pageTitle}>
-              Resep Tersimpan
-            </h1>
+          
           <div style={styles.recipeContainer}>
             {myBookmarks.length === 0 ? (
               <div style={styles.emptyContainer}>
@@ -610,10 +722,116 @@ function Profil() {
               </div>
             )}
           </div>
-          </div>
         )}
-        
       </div>
+
+      <input
+        id="galleryInput"
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={handleImageChange}
+      />
+
+      <input
+        id="cameraInput"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={handleImageChange}
+      />
+
+      {showPhotoMenu && (
+
+        <div style={styles.modalOverlay}>
+
+          <div style={styles.photoMenu}>
+
+            {(profileImage || user?.foto) ? (
+              <>
+
+                <button
+                  style={styles.photoOption}
+                  onClick={() => {
+                    document
+                      .getElementById("cameraInput")
+                      .click();
+
+                    setShowPhotoMenu(false);
+                  }}
+                >
+                  📷 Ganti dengan Kamera
+                </button>
+
+                <button
+                  style={styles.photoOption}
+                  onClick={() => {
+                    document
+                      .getElementById("galleryInput")
+                      .click();
+
+                    setShowPhotoMenu(false);
+                  }}
+                >
+                  🖼️ Ganti dari Galeri
+                </button>
+
+                <button
+                  style={{
+                    ...styles.photoOption,
+                    color: "red",
+                  }}
+                  onClick={(e) => handleRemovePhoto(e)}
+                >
+                  🗑️ Hapus Foto
+                </button>
+
+              </>
+            ) : (
+              <>
+
+                <button
+                  style={styles.photoOption}
+                  onClick={() => {
+                    document
+                      .getElementById("cameraInput")
+                      .click();
+
+                    setShowPhotoMenu(false);
+                  }}
+                >
+                  📷 Ambil Foto
+                </button>
+
+                <button
+                  style={styles.photoOption}
+                  onClick={() => {
+                    document
+                      .getElementById("galleryInput")
+                      .click();
+
+                    setShowPhotoMenu(false);
+                  }}
+                >
+                  🖼️ Pilih dari Galeri
+                </button>
+
+              </>
+            )}
+
+            <button
+              style={styles.photoOption}
+              onClick={() => setShowPhotoMenu(false)}
+            >
+              ❌ Batal
+            </button>
+
+          </div>
+
+        </div>
+
+      )}
 
       {/* POP UP LOGOUT */}
       {showLogoutPopup && (
@@ -709,12 +927,9 @@ const styles = {
         linear-gradient(to bottom, rgba(180, 113, 71, 0.9), rgba(245,236,222,0.0)),
         url('/map.png')
     `,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-
-    backgroundSize:"100%",
-
+    backgroundSize:"cover",
+    backgroundPosition:"center",
+    backgroundRepeat:"no-repeat",
     paddingTop:"40px",
   },
   /* NAVBAR */
@@ -800,14 +1015,6 @@ const styles = {
     cursor:"pointer",
     borderRadius:"8px",
     fontSize:"16px",
-  },
-
-  menu: {
-    display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
   },
 
   activeMenu:{
@@ -1104,63 +1311,28 @@ const styles = {
     borderRadius:"10px",
     overflow:"hidden",
     boxShadow:"0 4px 15px rgba(0,0,0,0.15)",
+    position:"relative", // tambahkan ini
   },
 
   profileBanner:{
-    height:"95px",
-    background:
-    "linear-gradient(90deg,#B26D00,#E2856E)",
+    height:"120px",
+    background:"linear-gradient(90deg,#B26D00,#E2856E)",
   },
 
   profilePhotoWrapper:{
-    position:"relative",
-    marginTop:"-45px",
-    marginLeft:"25px",
-    width:"90px",
-  },
-
-  profilePhoto:{
-    width:"95px",
-    height:"95px",
-    borderRadius:"50%",
-    objectFit:"cover",
-    border:"4px solid #fff",
-  },
-
-  profilePlaceholder:{
-    width:"90px",
-    height:"90px",
-    borderRadius:"50%",
-    background:"#ddd",
-    fontSize:"60px",
-  },
-
-  cameraBtn:{
     position:"absolute",
-    right:"0",
-    bottom:"5px",
-
-    width:"30px",
-    height:"30px",
-
-    borderRadius:"50%",
-
-    background:"#a66b09",
-
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"center",
-
-    cursor:"pointer",
+    top:"70px",
+    left:"30px",
+    zIndex:"10",
   },
 
   profileContent:{
-    padding:"15px 30px 30px",
+    padding:"55px 30px 30px",
   },
 
   inputRow:{
     display:"flex",
-    gap:"15px",
+    gap:"20px",
     marginTop:"10px",
   },
 
@@ -1181,20 +1353,24 @@ const styles = {
   },
 
   inputModern:{
-    width:"90%",
-    height:"38px",
-    border:"1px solid #ead3c3",
-    borderRadius:"8px",
-    padding:"0 14px",
-    fontSize:"14px",
-    background:"#fffaf8",
+    display: "flex", // Tambahkan flexbox
+    alignItems: "center", // Pusatkan elemen secara vertikal
+    justifyContent: "space-between", // Dorong ikon pensil ke ujung kanan
+    width: "100%", // Ganti dari 90% menjadi 100%
+    boxSizing: "border-box", // Pastikan padding tidak merusak lebar elemen
+    height: "42px", // Sedikit dipertinggi agar lebih proporsional
+    border: "1px solid #ead3c3",
+    borderRadius: "8px",
+    padding: "0 14px",
+    fontSize: "14px",
+    background: "#fffaf8",
+    color: "#333",
   },
 
   editPencil:{
     color:"#d4b6a4",
     fontSize:"20px",
-    right:"50px",
-    top:"50%",
+    cursor: "pointer",
   },
 
   securityTitle:{
@@ -1365,7 +1541,7 @@ const styles = {
   },
 
   pageTitle:{
-    fontSize:"40px",
+    fontSize:"42px",
     fontWeight:"700",
     color:"#1f1a17",
 
@@ -1395,23 +1571,6 @@ const styles = {
     textAlign:"center",
 
     boxShadow:"0 4px 12px rgba(0,0,0,0.08)",
-  },
-
-  savedRecipeIcon:{
-    width:"80px",
-    height:"80px",
-
-    borderRadius:"50%",
-
-    background:"#f2e5dd",
-
-    display:"flex",
-    justifyContent:"center",
-    alignItems:"center",
-
-    color:"#9d8878",
-
-    marginBottom:"20px",
   },
 
   savedRecipeIcon:{
@@ -1448,7 +1607,128 @@ const styles = {
 
     margin:0,
   },
-  
+
+  profilePhoto: {
+    width: "90px",
+    height: "90px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "4px solid #fff",
+    background: "#ddd",
+  },
+
+profilePlaceholder: {
+  width: "90px",
+  height: "90px",
+  borderRadius: "50%",
+  background: "#ddd",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: "50px",
+},
+
+cameraBtn:{
+  position:"absolute",
+  right:"-5px",
+  bottom:"0px",
+  width:"28px",
+  height:"28px",
+  borderRadius:"50%",
+  background:"#b77700",
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+  cursor:"pointer",
+  border:"2px solid white",
+},
+photoMenu:{
+  position:"fixed",
+  top:"50%",
+  left:"50%",
+  transform:"translate(-50%, -50%)",
+  background:"#fff",
+  borderRadius:"12px",
+  padding:"15px",
+  width:"280px",
+  display:"flex",
+  flexDirection:"column",
+  gap:"10px",
+  zIndex:"99999",
+  boxShadow:"0 5px 20px rgba(0,0,0,0.2)",
+},
+
+photoOption:{
+  border:"none",
+  background:"#f5f5f5",
+  padding:"12px",
+  borderRadius:"8px",
+  cursor:"pointer",
+  textAlign:"left",
+  fontSize:"14px",
+  transition:"0.2s",
+},
+modalOverlay:{
+  position:"fixed",
+  top:0,
+  left:0,
+  right:0,
+  bottom:0,
+  background:"rgba(0,0,0,0.45)",
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+  zIndex:99998,
+},
+modalBox:{
+  background:"#fff",
+  padding:"25px",
+  borderRadius:"12px",
+  width:"350px",
+  textAlign:"center",
+  boxShadow:"0 5px 20px rgba(0,0,0,0.2)",
+},
+
+modalTitle:{
+  margin:"0 0 10px",
+  color:"#333",
+  fontSize:"22px",
+},
+
+modalText:{
+  color:"#666",
+  marginBottom:"20px",
+},
+
+modalActions:{
+  display:"flex",
+  justifyContent:"center",
+  gap:"12px",
+},
+
+btnCancel:{
+  padding:"10px 20px",
+  border:"none",
+  borderRadius:"8px",
+  background:"#ddd",
+  cursor:"pointer",
+},
+
+btnConfirm:{
+  padding:"10px 20px",
+  border:"none",
+  borderRadius:"8px",
+  background:"#c54500",
+  color:"#fff",
+  cursor:"pointer",
+},
+nameInput:{
+  border:"none",
+  outline:"none",
+  background:"transparent",
+  width:"100%",
+  fontSize:"14px",
+},
 };
 
 export default Profil;
