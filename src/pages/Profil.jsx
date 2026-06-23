@@ -112,7 +112,14 @@ function Profil() {
       {/* CONTENT */}
       <div style={styles.container}>
         {/* SIDEBAR */}
+        <div style={styles.leftSection}>
+
         <div style={styles.sidebar}>
+
+          <h2 style={styles.sidebarTitle}>
+            CHEF NUSANTARA
+          </h2>
+
           {/* Profil */}
           <div
             style={
@@ -120,12 +127,22 @@ function Profil() {
                 ? { ...styles.sidebarMenu, ...styles.activeMenu }
                 : styles.sidebarMenu
             }
-            onClick={() => setActiveTab("profil")}
+            onClick={()=>setActiveTab("profil")}
           >
-            <span>Profil</span>
-            <span className="material-symbols-outlined" style={styles.arrowIcon}>
-              chevron_right
-            </span>
+
+            <div style={styles.menuLeft}>
+
+              <span
+                className="material-symbols-outlined"
+                style={styles.menuIcon}
+              >
+                person
+              </span>
+
+              Profil
+
+            </div>
+
           </div>
 
           <div style={styles.line}></div>
@@ -139,13 +156,22 @@ function Profil() {
             }
             onClick={() => setActiveTab("resep")}
           >
-            <span>Resep Saya</span>
-            <span className="material-symbols-outlined" style={styles.arrowIcon}>
-              chevron_right
+            <div style={styles.menuLeft}>
+
+            <span
+              className="material-symbols-outlined"
+              style={styles.menuIcon}
+            >
+              menu_book
             </span>
+
+            Resep Saya
+
+          </div>
           </div>
 
           <div style={styles.line}></div>
+          
 
           {/* Favorit */}
           <div
@@ -156,233 +182,342 @@ function Profil() {
             }
             onClick={() => setActiveTab("favorit")}
           >
-            <span>Favorit Saya</span>
-            <span className="material-symbols-outlined" style={styles.arrowIcon}>
-              chevron_right
-            </span>
+            <div style={styles.menuLeft}>
+              <span
+                className="material-symbols-outlined"
+                style={styles.menuIcon}
+              >
+                bookmark
+              </span>
+
+              Resep Tersimpan
+            </div>
+
           </div>
+
+         {activeTab === "favorit" && (
+          <div
+            style={styles.savedRecipeCard}
+            onClick={() => navigate("/dashboardafterlogin")}
+          >
+
+            <div style={styles.savedRecipeIcon}>
+              <span
+                className="material-symbols-outlined"
+                style={styles.savedRecipeMaterial}
+              >
+                explore
+              </span>
+            </div>
+
+            <p style={styles.savedRecipeText}>
+              Jelajahi resep lainnya untuk disimpan di sini.
+            </p>
+
+          </div>
+        )} 
 
           <div style={styles.line}></div>
+          </div>
 
+          
+        {activeTab === "resep" && (
           <div
-            style={
-              activeTab === "tambah"
-                ? { ...styles.sidebarMenu, ...styles.activeMenu }
-                : styles.sidebarMenu
-            }
+            style={styles.addRecipeCard}
             onClick={() => navigate("/tambah")}
           >
-            <span>Tambah Resep</span>
-            <span className="material-symbols-outlined" style={styles.arrowIcon}>
-              chevron_right
-            </span>
-          </div>
-        </div>
-
-        {/* MAIN CONTENT */}
-        {activeTab === "profil" && (
-          <div style={styles.profileCard}>
-            <div style={styles.profileHeader}>
-              {/* AVATAR */}
-              <div style={styles.avatar}>
-                {user?.foto ? (
-                  <img
-                    src={`http://localhost:5000/uploads/${user.foto}`}
-                    alt="profile"
-                    style={styles.avatarImg}
-                  />
-                ) : (
-                  <span
-                    className="material-symbols-outlined"
-                    style={styles.avatarPlaceholder}
-                  >
-                    person
-                  </span>
-                )}
-                <label style={styles.editIcon}>
-                  ✎
-                  <input
-                    type="file"
-                    hidden
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const file = e.target.files[0];
-                      if (!file) return;
-
-                      const formData = new FormData();
-                      formData.append('foto', file);
-
-                      try {
-                        const res = await api.post(
-                          '/upload-profile',
-                          formData,
-                          {
-                            headers: {
-                              'Content-Type': 'multipart/form-data'
-                            }
-                          }
-                        );
-
-                        setUser((prev) => ({
-                          ...prev,
-                          foto: res.data.foto
-                        }));
-
-                        alert('Foto profile berhasil diubah');
-                      } catch (err) {
-                        console.log(err);
-                        alert('Gagal upload foto');
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-
-              {/* INFO */}
-              <div>
-                <div>
-                  <b>{user?.nama}</b>
-                </div>
-                <small style={styles.smallText}>{user?.email}</small>
-              </div>
+            <div style={styles.addIcon}>
+              <span className="material-symbols-outlined">
+                add
+              </span>
             </div>
 
-            {/* DATA */}
-            <div style={styles.profileField}>
-              <span>Nama</span>
-              <span>{user?.nama}</span>
-            </div>
+            <h3 style={styles.addTitle}>
+              Tambah Resep
+            </h3>
 
-            <div style={styles.profileField}>
-              <span>Email account</span>
-              <span>{user?.email}</span>
-            </div>
+            <p style={styles.addDesc}>
+              Bagikan rahasia dapur keluarga Anda
+              ke seluruh nusantara
+            </p>
 
-            <div style={styles.profileField}>
-              <span>Kata sandi</span>
-              <div style={styles.passwordBox}>
-                <span>
-                  {showPassword ? "mypassword123" : "********"}
-                </span>
-                <span
-                  className="material-symbols-outlined"
-                  style={styles.eyeIcon}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? "visibility" : "visibility_off"}
-                </span>
-              </div>
-            </div>
-
-            <button
-              style={styles.logoutBtn}
-              onClick={() => setShowLogoutPopup(true)}
-            >
-              Keluar
-            </button>
+           
           </div>
         )}
 
-        {/* RECIPE SECTION */}
-        {activeTab === "resep" && (
-          <div style={styles.recipeContainer}>
-            {myRecipes.length === 0 ? (
-              <div style={styles.emptyContainer}>
+         </div>
+
+        
+
+        
+
+        {/* MAIN CONTENT */}
+        {activeTab === "profil" && (
+
+       <div style={styles.profileModern}>      
+
+        {/* HEADER */}
+        <div style={styles.profileBanner}></div>
+
+        {/* FOTO */}
+        <div style={styles.profilePhotoWrapper}>
+
+          {
+            user?.foto ? (
+
+              <img
+                src={`http://localhost:5000/uploads/${user.foto}`}
+                alt="profile"
+                style={styles.profilePhoto}
+              />
+
+            ) : (
+
+              <span
+                className="material-symbols-outlined"
+                style={styles.profilePlaceholder}
+              >
+                person
+              </span>
+
+            )
+          }
+
+          <label style={styles.cameraBtn}>
+
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: "18px", color: "#fff" }}
+            >
+              photo_camera
+            </span>
+
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+            />
+
+          </label>
+
+        </div>
+
+        {/* CONTENT */}
+        <div style={styles.profileContent}>
+
+          <div style={styles.inputRow}>
+
+            <div style={styles.inputGroupModern}>
+              <label style={styles.labelModern}>
+                FULL NAME
+              </label>
+
+              <div style={styles.inputModern}>
+                {user.nama}
+
                 <span
                   className="material-symbols-outlined"
-                  style={styles.emptyIcon}
+                  style={styles.editPencil}
                 >
-                  restaurant
+                  edit
                 </span>
-                <p>Belum ada resep yang dibuat</p>
               </div>
-            ) : (
-              <div style={styles.recipeGrid}>
-                {myRecipes.map((item) => (
-                  <div key={item.id} style={styles.card}>
-                    <div style={styles.cardImgWrapper}>
-                      <img
-                        src={`http://localhost:5000/uploads/${item.gambar}`}
-                        style={styles.cardImg}
-                        alt=""
-                      />
-                      {/* TAMPILKAN POP UP DELETE SAAT DIKLIK */}
-                      <button
-                        style={styles.deleteFloatingBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeleteTargetId(item.id);
-                          setShowDeletePopup(true);
-                        }}
+            </div>
+
+            <div style={styles.inputGroupModern}>
+              <label style={styles.labelModern}>
+                EMAIL ADDRESS
+              </label>
+
+              <div style={styles.inputModern}>
+                {user.email}
+              </div>
+
+            </div>
+
+          </div>
+
+          <div style={styles.securityTitle}>
+            ACCOUNT SECURITY
+          </div>
+
+          <div style={styles.passwordCard}>
+
+            <div style={styles.passwordLeft}>
+
+              <span
+                className="material-symbols-outlined"
+                style={styles.lockIcon}
+              >
+                lock
+              </span>
+
+              <div>
+
+                <div style={styles.passwordLabel}>
+                  Account Password
+                </div>
+
+                <div style={styles.passwordDots}>
+                  ••••••••••••
+                </div>
+
+              </div>
+
+            </div>
+
+            <button style={styles.changeBtn}>
+              Change
+            </button>
+
+          </div>
+
+          <div style={styles.separator}></div>
+
+          <div style={styles.logoutWrapper}>
+
+            <button
+              style={styles.logoutModern}
+              onClick={() => {
+
+                const confirmLogout =
+                  window.confirm(
+                    "Apakah Anda yakin ingin logout?"
+                  );
+
+                if(confirmLogout){
+
+                  localStorage.removeItem("token");
+
+                  navigate("/Masuk");
+
+                }
+
+              }}
+            >
+              <span
+                className="material-symbols-outlined"
+                style={{
+                  fontSize:"18px",
+                  marginRight:"5px"
+                }}
+              >
+                logout
+              </span>
+
+              Log Out
+
+            </button>
+
+
+        </div>
+         </div>
+          </div>
+
+      
+      )}
+
+
+          {/* RECIPE SECTION */}
+          {activeTab === "resep" && (
+
+            <div style={styles.rightSection}>
+
+              <h1 style={styles.pageTitle}>
+                Resep Saya
+              </h1>
+
+            <div style={styles.recipeContainer}>
+
+              {
+                myRecipes.length === 0 ? (
+
+                  <div style={styles.emptyContainer}>
+
+                    <span
+                      className="material-symbols-outlined"
+                      style={styles.emptyIcon}
+                    >
+                      restaurant
+                    </span>
+
+                    <p>Belum ada resep yang dibuat</p>
+
+                  </div>
+
+                ) : (
+
+                  <div style={styles.recipeGrid}>
+
+                    {myRecipes.map((item) => (
+
+                      <div
+                        key={item.id}
+                        style={styles.card}
                       >
+
                         <span
                           className="material-symbols-outlined"
                           style={styles.bookmark}
                         >
                           delete
                         </span>
-                      </button>
-                    </div>
 
-                    <div style={styles.cardBody}>
-                      <h4 style={styles.cardTitle}>{item.nama}</h4>
-                      <div style={styles.infoRow}>
-                        <span style={styles.iconText}>
-                          <span
-                            className="material-symbols-outlined"
-                            style={styles.materialIcon}
-                          >
-                            comment
-                          </span>
-                          {item.total_komentar}
-                        </span>
-                        <span style={styles.iconText}>
-                          <span
-                            className="material-symbols-outlined"
-                            style={styles.materialIcon}
-                          >
-                            thumb_up
-                          </span>
-                          {item.likes}
-                        </span>
-                      </div>
+                        <div style={styles.cardBody}>
 
-                      <div style={styles.bottomRow}>
-                        <div style={styles.rating}>
-                          <span style={styles.ratingNumber}>
-                            {item.rating}
-                          </span>
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <span
-                              key={star}
-                              className="material-symbols-outlined"
-                              style={
-                                star <= Math.round(item.rating)
-                                  ? styles.star
-                                  : styles.starEmpty
-                              }
-                            >
-                              star
+                          <h4 style={styles.cardTitle}>
+                            {item.nama}
+                          </h4>
+
+                          <div style={styles.infoRow}>
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                comment
+                              </span>
+                              {item.total_komentar}
                             </span>
-                          ))}
+
+                            <span style={styles.iconText}>
+                              <span
+                                className="material-symbols-outlined"
+                                style={styles.materialIcon}
+                              >
+                                thumb_up
+                              </span>
+                              {item.likes}
+                            </span>
+
+                          </div>
+
                         </div>
-                        <button
-                          style={styles.btnLihat}
-                          onClick={() => navigate(`/edit/${item.id}`)}
-                        >
-                          Edit
-                        </button>
+
                       </div>
-                    </div>
+
+                    ))}
+
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  
+
+                )
+              }
+
+            </div>
+            </div> 
+
+          )}
+          
 
         {/* FAVORIT SECTION */}
         {activeTab === "favorit" && (
+          <div style={styles.rightSection}>
+
+            <h1 style={styles.pageTitle}>
+              Resep Tersimpan
+            </h1>
           <div style={styles.recipeContainer}>
             {myBookmarks.length === 0 ? (
               <div style={styles.emptyContainer}>
@@ -475,7 +610,9 @@ function Profil() {
               </div>
             )}
           </div>
+          </div>
         )}
+        
       </div>
 
       {/* POP UP LOGOUT */}
@@ -565,11 +702,20 @@ function Profil() {
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "linear-gradient(to bottom, #e8d9c5, #c8845e)",
-    fontFamily: "Segoe UI, sans-serif",
-    paddingTop: "70px",
+  page:{
+    minHeight:"100vh",
+
+    backgroundImage: `
+        linear-gradient(to bottom, rgba(180, 113, 71, 0.9), rgba(245,236,222,0.0)),
+        url('/map.png')
+    `,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+
+    backgroundSize:"100%",
+
+    paddingTop:"40px",
   },
   /* NAVBAR */
   navbar: {
@@ -628,37 +774,45 @@ const styles = {
   },
   /* LAYOUT */
   container: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "50px",
-    paddingTop: "90px",
-    paddingLeft: "40px",
-    paddingRight: "40px",
-    justifyContent: "center",
+    display:"flex",
+    gap:"90px",
+    alignItems:"flex-start",
+    justifyContent:"center",
+    marginTop:"120px",
   },
+
   /* SIDEBAR */
-  sidebar: {
-    width: "300px",
-    background: "#f5f2ef",
-    borderRadius: "22px",
-    padding: "25px 20px",
-    boxShadow: "0 6px 12px rgba(0,0,0,0.25)",
-    height: "220px",
-    alignSelf: "flex-start",
-    marginTop: "120px",
+  sidebar:{
+    width:"290px",
+    background:"#fff",
+    borderRadius:"12px",
+    padding:"22px",
+    boxShadow:"0 4px 15px rgba(0,0,0,0.12)",
+    height:"300px",
+    marginTop:"0px",
   },
-  sidebarMenu: {
+
+  sidebarMenu:{
+    display:"flex",
+    alignItems:"center",
+    padding:"10px 14px",
+    marginBottom:"6px",
+    cursor:"pointer",
+    borderRadius:"8px",
+    fontSize:"16px",
+  },
+
+  menu: {
     display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    gap: "30px",
     fontSize: "18px",
-    fontWeight: "700",
-    color: "#111",
-    padding: "10px 0",
-    cursor: "pointer",
+    fontWeight: "500",
+    fontWeight: "bold",
   },
-  activeMenu: {
-    color: "#e46b3c",
+
+  activeMenu:{
+    background:"#d96a4f",
+    color:"#fff",
   },
   orangeArrow: {
     color: "#e46b3c",
@@ -759,15 +913,21 @@ const styles = {
     fontWeight: "600",
   },
   /* RECIPE */
-  recipeContainer: {
-    width: "840px",
-    height: "500px",
-    background: "#f4ebe2",
-    borderRadius: "28px",
-    padding: "20px",
-    border: "2px solid #e46b3c",
-    overflowY: "auto",
-    overflowX: "hidden",
+  recipeContainer:{
+    width:"800px",
+    minHeight:"400px",
+
+    display:"flex",
+    flexWrap:"wrap",
+
+    gap:"20px",
+
+    alignContent:"flex-start",
+
+    padding:"20px",
+
+    background:"#f8efe8",
+    borderRadius:"25px",
   },
   recipeSection: {
     marginTop: "60px",
@@ -937,62 +1097,358 @@ const styles = {
     color: "#000",
     marginRight: "1px",
   },
-  /* MODAL / POP UP */
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10000,
+
+  profileModern:{
+    width:"700px",
+    background:"#fff",
+    borderRadius:"10px",
+    overflow:"hidden",
+    boxShadow:"0 4px 15px rgba(0,0,0,0.15)",
   },
-  modalBox: {
-    backgroundColor: "#fff",
-    padding: "30px",
-    borderRadius: "20px",
-    width: "350px",
-    textAlign: "center",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
+
+  profileBanner:{
+    height:"95px",
+    background:
+    "linear-gradient(90deg,#B26D00,#E2856E)",
   },
-  modalTitle: {
-    margin: "0 0 10px 0",
-    color: "#111",
-    fontSize: "22px",
-    fontWeight: "bold",
+
+  profilePhotoWrapper:{
+    position:"relative",
+    marginTop:"-45px",
+    marginLeft:"25px",
+    width:"90px",
   },
-  modalText: {
-    color: "#666",
-    marginBottom: "25px",
-    fontSize: "15px",
-    lineHeight: "1.5",
+
+  profilePhoto:{
+    width:"95px",
+    height:"95px",
+    borderRadius:"50%",
+    objectFit:"cover",
+    border:"4px solid #fff",
   },
-  modalActions: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "15px",
+
+  profilePlaceholder:{
+    width:"90px",
+    height:"90px",
+    borderRadius:"50%",
+    background:"#ddd",
+    fontSize:"60px",
   },
-  btnCancel: {
-    padding: "10px 25px",
-    border: "2px solid #ddd",
-    backgroundColor: "#fff",
-    color: "#555",
-    borderRadius: "20px",
-    cursor: "pointer",
-    fontWeight: "bold",
+
+  cameraBtn:{
+    position:"absolute",
+    right:"0",
+    bottom:"5px",
+
+    width:"30px",
+    height:"30px",
+
+    borderRadius:"50%",
+
+    background:"#a66b09",
+
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"center",
+
+    cursor:"pointer",
   },
-  btnConfirm: {
-    padding: "10px 25px",
-    border: "none",
-    backgroundColor: "#e46b3c",
-    color: "#fff",
-    borderRadius: "20px",
-    cursor: "pointer",
-    fontWeight: "bold",
+
+  profileContent:{
+    padding:"15px 30px 30px",
   },
+
+  inputRow:{
+    display:"flex",
+    gap:"15px",
+    marginTop:"10px",
+  },
+
+  inputGroupModern:{
+    flex:1,
+  },
+
+  labelModern:{
+    display:"block",
+    marginBottom:"10px",
+
+    color:"#8d7a68",
+
+    fontSize:"12px",
+    fontWeight:"600",
+
+    letterSpacing:"1px",
+  },
+
+  inputModern:{
+    width:"90%",
+    height:"38px",
+    border:"1px solid #ead3c3",
+    borderRadius:"8px",
+    padding:"0 14px",
+    fontSize:"14px",
+    background:"#fffaf8",
+  },
+
+  editPencil:{
+    color:"#d4b6a4",
+    fontSize:"20px",
+    right:"50px",
+    top:"50%",
+  },
+
+  securityTitle:{
+    marginTop:"25px",
+
+    color:"#8d7a68",
+
+    fontSize:"12px",
+    fontWeight:"600",
+
+    letterSpacing:"1px",
+  },
+
+  passwordCard:{
+    border:"1px solid #ead3c3",
+    borderRadius:"8px",
+    padding:"16px",
+    display:"flex",
+    justifyContent:"space-between",
+    alignItems:"center",
+    marginTop:"12px",
+  },
+
+  passwordLeft:{
+    display:"flex",
+    gap:"15px",
+    alignItems:"center",
+  },
+
+  lockIcon:{
+    color:"#a66b09",
+    fontSize:"28px",
+  },
+
+  passwordLabel:{
+    fontWeight:"500",
+  },
+
+  passwordDots:{
+    color:"#c6b3a8",
+    letterSpacing:"3px",
+  },
+
+  changeBtn:{
+    border:"none",
+    background:"transparent",
+
+    color:"#a66b09",
+
+    fontWeight:"700",
+
+    cursor:"pointer",
+
+    fontSize:"15px",
+  },
+
+  separator:{
+    height:"1px",
+    background:"#eee",
+    marginTop:"25px",
+  },
+
+  logoutWrapper:{
+    display:"flex",
+    justifyContent:"flex-end",
+    marginTop:"30px",
+  },
+
+  logoutModern:{
+    background:
+    "linear-gradient(90deg,#a66300,#c54500)",
+
+    color:"#fff",
+    border:"none",
+
+    padding:"10px 30px",
+
+    borderRadius:"25px",
+
+    fontSize:"14px",
+    fontWeight:"700",
+
+    display:"flex",
+    alignItems:"center",
+    gap:"8px",
+
+    cursor:"pointer",
+
+    boxShadow:"0 4px 10px rgba(0,0,0,0.15)",
+  },
+
+  sidebarTitle:{
+    fontSize:"26px",
+    fontWeight:"700",
+    color:"#9c5b00",
+    marginBottom:"22px",
+  },
+
+  menuLeft:{
+    display:"flex",
+    alignItems:"center",
+    gap:"10px",
+  },
+
+  menuIcon:{
+    fontSize:"20px",
+  },
+
+  addRecipeCard:{
+    width:"290px",
+    background:"#fff",
+    borderRadius:"14px",
+    padding:"25px 20px",
+    marginTop:"25px",
+
+    textAlign:"center",
+
+    cursor:"pointer",
+
+    transition:"0.2s",
+
+    boxShadow:"0 4px 12px rgba(0,0,0,0.08)",
+  },
+
+  addIcon:{
+    width:"50px",
+    height:"50px",
+
+    margin:"0 auto 15px",
+
+    borderRadius:"50%",
+
+    background:"#f2e5dd",
+
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+
+    color:"#6d5545",
+  },
+
+  addTitle:{
+    fontSize:"18px",
+    fontWeight:"700",
+
+    color:"#4d4037",
+
+    marginBottom:"10px",
+  },
+
+  addDesc:{
+    fontSize:"14px",
+
+    color:"#999",
+
+    lineHeight:"1.6",
+  },
+
+  leftSection:{
+    display:"flex",
+    flexDirection:"column",
+    width:"290px",
+  },
+
+  rightSection:{
+    display:"flex",
+    flexDirection:"column",
+  },
+
+  pageTitle:{
+    fontSize:"40px",
+    fontWeight:"700",
+    color:"#1f1a17",
+
+    textShadow:"0 2px 8px rgba(255,255,255,0.9)",
+
+    marginBottom:"25px",
+    marginTop:"-15px",
+  },
+
+  savedRecipeCard:{
+    width:"330px",
+    height:"220px",
+
+    background:"#fff",
+
+    borderRadius:"14px",
+
+    marginTop:"120px",
+    marginLeft:"-18px",
+
+    display:"flex",
+    flexDirection:"column",
+
+    justifyContent:"center",
+    alignItems:"center",
+
+    textAlign:"center",
+
+    boxShadow:"0 4px 12px rgba(0,0,0,0.08)",
+  },
+
+  savedRecipeIcon:{
+    width:"80px",
+    height:"80px",
+
+    borderRadius:"50%",
+
+    background:"#f2e5dd",
+
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+
+    color:"#9d8878",
+
+    marginBottom:"20px",
+  },
+
+  savedRecipeIcon:{
+    width:"52px",
+    height:"52px",
+
+    borderRadius:"50%",
+
+    background:"#f2e5dd",
+
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+
+    color:"#9d8878",
+
+    marginBottom:"18px",
+  },
+
+  savedRecipeMaterial:{
+    fontSize:"26px",
+  },
+
+  savedRecipeText:{
+    width:"140px",
+
+    color:"#a08b7c",
+
+    fontSize:"15px",
+
+    fontWeight:"500",
+
+    lineHeight:"1.6",
+
+    margin:0,
+  },
+  
 };
 
 export default Profil;
