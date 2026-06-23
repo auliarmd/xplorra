@@ -322,32 +322,41 @@ const toggleSave = async (id) => {
 
           {/* SEARCH */}
           <div style={styles.searchBox}>
-            <span className="material-symbols-outlined" style={styles.searchIcon}>
+            <span
+              className="material-symbols-outlined"
+              style={styles.searchIcon}
+            >
               search
             </span>
+
             <input
               placeholder="Search"
               style={styles.searchInput}
               value={search}
               onChange={(e) => {
-
                 const keyword = e.target.value;
-
                 setSearch(keyword);
-
-                if(keyword.trim() === ""){
-
-                  filterFoods(
-                    kategori,
-                    daerah,
-                    ""
-                  );
-
-                }
-
               }}
             />
+
+            {(kategori || daerah) && (
+              <span
+                className="material-symbols-outlined"
+                style={styles.clearFilterIcon}
+                onClick={() => {
+                  setKategori("");
+                  setDaerah("");
+                  setSearch("");
+                  setNotFound(false);
+                }}
+                title="Hapus Filter"
+              >
+                filter_alt_off
+              </span>
+            )}
           </div>
+
+          
 
           {/* TITLE */}
           <h2 style={styles.title}>Kategori</h2>
@@ -560,23 +569,21 @@ const toggleSave = async (id) => {
         </div>
 
         {/* PESAN JIKA RESEP KOSONG */}
-        {notFound && (
-          <h2 style={{
-            color:'#d86936',
-            textAlign:'center',
-            width:'100%',
-            marginTop: '200px',
-            fontSize: '20px'
-          }}>
-            Resep tidak ditemukan
-          </h2>
-        )}
-        {/* GRID */}
         <div style={styles.cardContainer}>
 
-        <div style={styles.grid}>
+          {notFound ? (
 
-          {(Array.isArray(foods) ? foods : []).map((item) => (
+            <div style={styles.emptyResult}>
+              <h2 style={styles.emptyResultText}>
+                Resep tidak ditemukan
+              </h2>
+            </div>
+
+          ) : (
+
+            <div style={styles.grid}>
+
+              {(Array.isArray(foods) ? foods : []).map((item) => (
 
             <div
               key={item.id}
@@ -670,8 +677,17 @@ const toggleSave = async (id) => {
               </div>
             </div>
           ))}
+           
+
+            </div>
+
+          )}
+
         </div>
-      </div>
+        {/* GRID */}
+        
+
+      
       <div
         style={styles.feedbackBtn}
         onClick={() => navigate("/feedback")}
@@ -1027,13 +1043,9 @@ feedbackBtn: {
 
  grid: {
     display: "grid",
-
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(260px, 1fr))",
-
+    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 320px))",
     gap: "25px",
-
-    alignContent: "start",
+    justifyContent: "start",
   },
 
 cardContainer: {
@@ -1127,6 +1139,35 @@ starEmpty: {
   color: "#ddd", // abu
  // fontVariationSettings: "'OPSZ' 14",
 },
+
+  emptyResult: {
+    width: "100%",
+    height: "640px", // samakan dengan tinggi cardContainer
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  emptyResultText: {
+    color: "#a4a4a4",
+    fontSize: "28px",
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: "-10px",
+    marginLeft: "-10px",
+  },
+
+  clearFilterBtn: {
+    width: "100%",
+    padding: "10px",
+    border: "2px solid #d86936",
+    background: "#fff",
+    color: "#d86936",
+    borderRadius: "25px",
+    cursor: "pointer",
+    fontWeight: "bold",
+    marginBottom: "15px",
+  },
 
 };
 
