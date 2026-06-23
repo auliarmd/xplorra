@@ -110,7 +110,7 @@ function Register() {
             <label style={styles.label}>Kata Sandi</label>
             <div style={styles.passwordWrapper}>
               <input type={show ? "text" : "password"} minLength={6} maxLength={6} placeholder="Password harus tepat 6 karakter" style={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} onFocus={(e) => { e.target.style.border = "2px solid #d86936"; e.target.style.boxShadow = "0 0 5px rgba(216, 105, 54, 0.3)"; }} onBlur={(e) => { e.target.style.border = "2px solid #b9b6b6"; e.target.style.boxShadow = "none"; }} />
-              <div style={styles.eye} onClick={() => setShow(!show)}>{show ? <FaEyeSlash /> : <FaEye />}</div>
+              <div style={styles.eye} onClick={() => setShow(!show)}>{show ? <FaEye /> : <FaEyeSlash />}</div>
             </div>
           </div>
 

@@ -126,13 +126,13 @@ function Masuk() {
                 onBlur={(e) => { e.target.style.border = "2px solid #b9b6b6"; e.target.style.boxShadow = "none"; }}
               />
               <div style={styles.eye} onClick={() => setShow(!show)}>
-                {show ? <FaEyeSlash /> : <FaEye />}
+                {show ? <FaEye /> : <FaEyeSlash />}
               </div>
             </div>
           </div>
 
           <div style={styles.forgotWrapper}>
-            <p style={styles.forgotPassword} onClick={() => navigate("/lupa-password")}>Lupa Password?</p>
+            <p style={styles.forgotPassword} onClick={() => navigate("/lupapassword")}>Lupa Password?</p>
           </div>
 
           <button

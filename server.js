@@ -1717,6 +1717,74 @@ app.put(
   }
 );
 
+app.delete(
+  "/profile-photo",
+  verifyToken,
+  (req,res)=>{
+    db.query(
+
+      "UPDATE users SET foto='' WHERE id=?", 
+      [req.user.id],
+      (err)=>{
+        if(err){
+          console.log("Error Hapus Foto:", err); 
+          return res.status(500).json(err);
+        }
+        res.json({
+          status:true,
+          message:"Foto berhasil dihapus"
+        });
+
+      }
+
+    );
+
+  }
+);
+app.put(
+  "/update-name",
+  verifyToken,
+  (req,res)=>{
+
+    const { nama } = req.body;
+
+    if(!nama || nama.trim().length < 3){
+
+      return res.json({
+        status:false,
+        message:"Nama minimal 3 karakter"
+      });
+
+    }
+
+    db.query(
+
+      "UPDATE users SET nama=? WHERE id=?",
+
+      [
+        nama,
+        req.user.id
+      ],
+
+      (err,result)=>{
+
+        if(err){
+
+          return res.status(500).json(err);
+
+        }
+
+        res.json({
+          status:true,
+          message:"Nama berhasil diubah"
+        });
+
+      }
+
+    );
+
+  }
+);
 const PORT = 5000;
 app.listen(5000, '0.0.0.0', () => {
   console.log('Server running on port 5000');
