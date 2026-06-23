@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Profil() {
   const [user, setUser] = useState(null);
@@ -22,20 +23,17 @@ function Profil() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
-    
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [hoverPassword, setHoverPassword] = useState(false);
+  const [hoverLogout, setHoverLogout] = useState(false);
   const handleImageChange = async (event) => {
-
   const file = event.target.files[0];
-
   if (!file) return;
-
   try {
-
     const formData = new FormData();
-
     formData.append("foto", file);
-
     const res = await api.post(
       "/upload-profile",
       formData,
@@ -45,37 +43,25 @@ function Profil() {
         }
       }
     );
-
     if(res.data.status){
-
       setProfileImage(
         `http://localhost:5000/uploads/${res.data.foto}`
       );
-
       setUser({
         ...user,
         foto:res.data.foto
       });
-
     }
-
   } catch(err){
-
     console.log(err);
-
   }
-
 };
-  
   const handleChangePassword = async () => {
-
   if (newPassword !== confirmPassword) {
     alert("Konfirmasi password tidak cocok");
     return;
   }
-
   try {
-
     const res = await api.put(
       "/change-password",
       {
@@ -175,6 +161,9 @@ function Profil() {
   const [removeBookmarkTargetId, setRemoveBookmarkTargetId] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState("");
+  const [hoverCancelLogout, setHoverCancelLogout] = useState(false);
+  const [hoverConfirmLogout, setHoverConfirmLogout] = useState(false);
+  const [hoverPhoto, setHoverPhoto] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -400,10 +389,6 @@ function Profil() {
 
          </div>
 
-        
-
-        
-
         {/* MAIN CONTENT */}
         {activeTab === "profil" && (
 
@@ -463,7 +448,7 @@ function Profil() {
 
             <div style={styles.inputGroupModern}>
               <label style={styles.labelModern}>
-                FULL NAME
+                NAMA
               </label>
 
               <div style={styles.inputModern}>
@@ -528,7 +513,7 @@ function Profil() {
 
             <div style={styles.inputGroupModern}>
               <label style={styles.labelModern}>
-                EMAIL ADDRESS
+                ALAMAT EMAIL
               </label>
 
               <div style={styles.inputModern}>
@@ -540,7 +525,7 @@ function Profil() {
           </div>
 
           <div style={styles.securityTitle}>
-            ACCOUNT SECURITY
+            KEAMANAN AKUN
           </div>
 
           <div style={styles.passwordCard}>
@@ -557,7 +542,7 @@ function Profil() {
               <div>
 
                 <div style={styles.passwordLabel}>
-                  Account Password
+                  Kata Sandi
                 </div>
 
                 <div style={styles.passwordDots}>
@@ -569,10 +554,20 @@ function Profil() {
             </div>
 
             <button
-              style={styles.changeBtn}
+              style={{
+                ...styles.menuButton,
+                backgroundColor: hoverPassword ? "#f3f4f6" : "#fff",
+                transform: hoverPassword ? "translateY(-2px)" : "translateY(0)",
+                boxShadow: hoverPassword
+                  ? "0 4px 12px rgba(0,0,0,0.15)"
+                  : "none",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={() => setHoverPassword(true)}
+              onMouseLeave={() => setHoverPassword(false)}
               onClick={() => setShowPasswordPopup(true)}
             >
-              Change
+              Perbarui Kata Sandi
             </button>
 
           </div>
@@ -582,31 +577,24 @@ function Profil() {
           <div style={styles.logoutWrapper}>
 
             <button
-              style={styles.logoutModern}
+              style={{
+                ...styles.logoutButton,
+                transform: hoverLogout ? "translateY(-2px)" : "translateY(0)",
+                boxShadow: hoverLogout
+                  ? "0 4px 12px rgba(220,38,38,0.25)"
+                  : "none",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={() => setHoverLogout(true)}
+              onMouseLeave={() => setHoverLogout(false)}
               onClick={() => setShowLogoutPopup(true)}
             >
-              <span
-                className="material-symbols-outlined"
-                style={{
-                  fontSize:"18px",
-                  marginRight:"5px"
-                }}
-              >
-                logout
-              </span>
-
-              Log Out
-
+              Keluar
             </button>
-
-
         </div>
          </div>
           </div>
-
-      
       )}
-
 
           {/* RECIPE SECTION */}
           {activeTab === "resep" && (
@@ -659,12 +647,19 @@ function Profil() {
                             setShowDeletePopup(true);
                           }}
                         >
-                          🗑️
+                          <span
+                            className="material-symbols-outlined"
+                            style={{
+                              fontSize: "22px",
+                              color: "#808080",
+                              fontVariationSettings:
+                                "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                            }}
+                          >
+                            delete
+                          </span>
                         </button>
                       </div>
-                        
-
-                        
 
                         <div style={styles.cardBody}>
 
@@ -724,9 +719,7 @@ function Profil() {
                         </div>
 
                         </span>
-                         
-
-
+ 
                         </div>
 
                       </div>
@@ -743,8 +736,7 @@ function Profil() {
             </div> 
 
           )}
-          
-
+  
         {/* FAVORIT SECTION */}
         {activeTab === "favorit" && (
           
@@ -754,6 +746,7 @@ function Profil() {
                 <span
                   className="material-symbols-outlined"
                   style={styles.bookmarkActive}
+    
                 >
                   bookmark
                 </span>
@@ -772,6 +765,7 @@ function Profil() {
                       {/* TAMPILKAN POP UP HAPUS BOOKMARK SAAT DIKLIK */}
                       <button
                         style={styles.bookmarkBtn}
+                        title="Tersimpan"
                         onClick={(e) => {
                           e.stopPropagation();
                           setRemoveBookmarkTargetId(item.id);
@@ -861,94 +855,222 @@ function Profil() {
       />
 
       {showPhotoMenu && (
-
         <div style={styles.modalOverlay}>
 
           <div style={styles.photoMenu}>
 
-            {(profileImage || user?.foto) ? (
-              <>
+            <div style={styles.photoTitle}>
+              Kelola Foto Profil
+            </div>
 
-                <button
-                  style={styles.photoOption}
-                  onClick={() => {
-                    document
-                      .getElementById("cameraInput")
-                      .click();
+            <div style={styles.photoSubtitle}>
+              Pilih tindakan yang ingin Anda lakukan
+            </div>
 
-                    setShowPhotoMenu(false);
-                  }}
-                >
-                  📷 Ganti dengan Kamera
-                </button>
-
-                <button
-                  style={styles.photoOption}
-                  onClick={() => {
-                    document
-                      .getElementById("galleryInput")
-                      .click();
-
-                    setShowPhotoMenu(false);
-                  }}
-                >
-                  🖼️ Ganti dari Galeri
-                </button>
-
-                <button
+            {/* Kamera */}
+            <div
+              style={{
+                ...styles.photoAction,
+                border:
+                  hoverPhoto === "camera"
+                    ? "2px solid #E46B3C"
+                    : "1px solid #e5e7eb",
+                background:
+                  hoverPhoto === "camera"
+                    ? "#FFF7F3"
+                    : "#fff",
+              }}
+              onMouseEnter={() => setHoverPhoto("camera")}
+              onMouseLeave={() => setHoverPhoto("")}
+              onClick={() => {
+                document.getElementById("cameraInput").click();
+                setShowPhotoMenu(false);
+              }}
+            >
+              <div
+                style={{
+                  ...styles.photoIcon,
+                  background: "#fff",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
                   style={{
-                    ...styles.photoOption,
-                    color: "red",
-                  }}
-                  onClick={(e) => handleRemovePhoto(e)}
-                >
-                  🗑️ Hapus Foto
-                </button>
-
-              </>
-            ) : (
-              <>
-
-                <button
-                  style={styles.photoOption}
-                  onClick={() => {
-                    document
-                      .getElementById("cameraInput")
-                      .click();
-
-                    setShowPhotoMenu(false);
+                    fontSize: "28px",
+                    color: "#808080",
+                    fontVariationSettings:
+                      "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
                   }}
                 >
-                  📷 Ambil Foto
-                </button>
+                  photo_camera
+                </span>
+              </div>
 
-                <button
-                  style={styles.photoOption}
-                  onClick={() => {
-                    document
-                      .getElementById("galleryInput")
-                      .click();
+              <div style={styles.photoTextWrapper}>
+                <div style={styles.photoMainText}>
+                  Ganti dengan Kamera
+                </div>
 
-                    setShowPhotoMenu(false);
+                <div style={styles.photoSubText}>
+                  Ambil foto baru menggunakan kamera
+                </div>
+              </div>
+            </div>
+
+            {/* Galeri */}
+            <div
+              style={{
+                ...styles.photoAction,
+                border:
+                  hoverPhoto === "gallery"
+                    ? "2px solid #E46B3C"
+                    : "1px solid #e5e7eb",
+                background:
+                  hoverPhoto === "gallery"
+                    ? "#FFF7F3"
+                    : "#fff",
+              }}
+              onMouseEnter={() => setHoverPhoto("gallery")}
+              onMouseLeave={() => setHoverPhoto("")}
+              onClick={() => {
+                document.getElementById("galleryInput").click();
+                setShowPhotoMenu(false);
+              }}
+            >
+              <div
+                style={{
+                  ...styles.photoIcon,
+                  background: "#fff",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: "28px",
+                    color: "#808080",
+                    fontVariationSettings:
+                      "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
                   }}
                 >
-                  🖼️ Pilih dari Galeri
-                </button>
+                  image
+                </span>
+              </div>
 
-              </>
+              <div style={styles.photoTextWrapper}>
+                <div style={styles.photoMainText}>
+                  Ganti dari Galeri
+                </div>
+
+                <div style={styles.photoSubText}>
+                  Pilih foto dari galeri perangkat
+                </div>
+              </div>
+            </div>
+
+            {/* Hapus Foto */}
+            {(profileImage || user?.foto) && (
+              <div
+                style={{
+                  ...styles.photoAction,
+                  border:
+                    hoverPhoto === "delete"
+                      ? "2px solid #dc2626"
+                      : "1px solid #e5e7eb",
+                  background:
+                    hoverPhoto === "delete"
+                      ? "#fff1f2"
+                      : "#fff",
+                }}
+                onMouseEnter={() => setHoverPhoto("delete")}
+                onMouseLeave={() => setHoverPhoto("")}
+                onClick={(e) => handleRemovePhoto(e)}
+              >
+                <div
+                  style={{
+                    ...styles.photoIcon,
+                    background: "#fff",
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: "28px",
+                      color: "#808080",
+                      fontVariationSettings:
+                        "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                    }}
+                  >
+                    delete
+                  </span>
+                </div>
+
+                <div style={styles.photoTextWrapper}>
+                  <div
+                    style={{
+                      ...styles.photoMainText,
+                      color: "#000",
+                    }}
+                  >
+                    Hapus Foto
+                  </div>
+
+                  <div style={styles.photoSubText}>
+                    Hapus foto profil saat ini
+                  </div>
+                </div>
+              </div>
             )}
 
-            <button
-              style={styles.photoOption}
+            {/* Batal */}
+            <div
+              style={{
+                ...styles.cancelAction,
+                border:
+                  hoverPhoto === "cancel"
+                    ? "2px solid #E46B3C"
+                    : "2px solid transparent",
+                background:
+                  hoverPhoto === "cancel"
+                    ? "#FFF7F3"
+                    : "#f3f4f6",
+              }}
+              onMouseEnter={() => setHoverPhoto("cancel")}
+              onMouseLeave={() => setHoverPhoto("")}
               onClick={() => setShowPhotoMenu(false)}
             >
-              ❌ Batal
-            </button>
+              <div
+                style={{
+                  ...styles.photoIcon,
+                  background: "#fff",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{
+                    fontSize: "28px",
+                    color: "#808080",
+                    fontVariationSettings:
+                      "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                  }}
+                >
+                  close
+                </span>
+              </div>
+
+              <div style={styles.photoTextWrapper}>
+                <div style={styles.photoMainText}>
+                  Batal
+                </div>
+
+                <div style={styles.photoSubText}>
+                  Tutup menu
+                </div>
+              </div>
+            </div>
 
           </div>
 
         </div>
-
       )}
 
       {/* POP UP LOGOUT */}
@@ -959,17 +1081,43 @@ function Profil() {
             <p style={styles.modalText}>Apakah Anda yakin ingin keluar dari akun ini?</p>
             <div style={styles.modalActions}>
               <button
-                style={styles.btnCancel}
+                style={{
+                  ...styles.btnCancel,
+                  backgroundColor: hoverCancelLogout ? "#cfcfcf" : "#ddd",
+                  transform: hoverCancelLogout
+                    ? "translateY(-2px)"
+                    : "translateY(0)",
+                  boxShadow: hoverCancelLogout
+                    ? "0 4px 12px rgba(0,0,0,0.15)"
+                    : "none",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={() => setHoverCancelLogout(true)}
+                onMouseLeave={() => setHoverCancelLogout(false)}
                 onClick={() => setShowLogoutPopup(false)}
               >
                 Batal
               </button>
               <button
-                style={styles.btnConfirm}
+                style={{
+                  ...styles.btnConfirm,
+                  backgroundColor: hoverConfirmLogout
+                    ? "#a63800"
+                    : "#c54500",
+                  transform: hoverConfirmLogout
+                    ? "translateY(-2px)"
+                    : "translateY(0)",
+                  boxShadow: hoverConfirmLogout
+                    ? "0 4px 12px rgba(197,69,0,0.35)"
+                    : "none",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={() => setHoverConfirmLogout(true)}
+                onMouseLeave={() => setHoverConfirmLogout(false)}
                 onClick={() => {
                   localStorage.removeItem("token");
                   setShowLogoutPopup(false);
-                  navigate('/Masuk');
+                  navigate("/Masuk");
                 }}
               >
                 Ya, Keluar
@@ -1034,65 +1182,93 @@ function Profil() {
       )}
 
       {showPasswordPopup && (
-      <div style={styles.modalOverlay}>
-        <div style={styles.modalBox}>
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalBox}>
+            <h3 style={styles.modalTitle}>
+              Ganti Password
+            </h3>
 
-          <h3 style={styles.modalTitle}>
-            Ganti Password
-          </h3>
+            {/* Kata Sandi Lama */}
+            <div style={styles.passwordWrapper}>
+              <input
+                type={showOldPassword ? "text" : "password"}
+                placeholder="Kata Sandi Lama"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                style={styles.passwordInput}
+              />
 
-          <input
-            type="password"
-            placeholder="Password Lama"
-            value={oldPassword}
-            onChange={(e) =>
-              setOldPassword(e.target.value)
-            }
-            style={styles.passwordInput}
-          />
+              <button
+                type="button"
+                onClick={() => setShowOldPassword(!showOldPassword)}
+                style={styles.eyeButton}
+              >
+                {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
 
-          <input
-            type="password"
-            placeholder="Password Baru"
-            value={newPassword}
-            onChange={(e) =>
-              setNewPassword(e.target.value)
-            }
-            style={styles.passwordInput}
-          />
+            {/* Kata Sandi Baru */}
+            <div style={styles.passwordWrapper}>
+              <input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Kata Sandi Baru"
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={styles.passwordInput}
+              />
 
-          <input
-            type="password"
-            placeholder="Konfirmasi Password Baru"
-            value={confirmPassword}
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
-            style={styles.passwordInput}
-          />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                style={styles.eyeButton}
+              >
+                {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
 
-          <div style={styles.modalActions}>
-            <button
-              style={styles.btnCancel}
-              onClick={() => {
-                setShowPasswordPopup(false);
-              }}
-            >
-              Batal
-            </button>
+            {/* Konfirmasi Kata Sandi Baru */}
+            <div style={styles.passwordWrapper}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Konfirmasi Kata Sandi Baru"
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(e.target.value)
+                }
+                style={styles.passwordInput}
+              />
 
-            <button
-              style={styles.btnConfirm}
-              onClick={handleChangePassword}
-            >
-              Simpan
-            </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
+                style={styles.eyeButton}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <div style={styles.buttonGroup}>
+              <button
+                style={styles.btnCancel}
+                onClick={() => setShowPasswordPopup(false)}
+              >
+                Batal
+              </button>
+
+              <button
+                style={styles.btnConfirm}
+                onClick={handleChangePassword}
+              >
+                Simpan
+              </button>
+            </div>
           </div>
-
         </div>
-      </div>
-    )}
-
+      )}
     </div>
   );
 }
@@ -1370,14 +1546,17 @@ const styles = {
     position: "absolute",
     top: "12px",
     right: "12px",
-    width: "32px",
-    height: "32px",
+    width: "38px",
+    height: "38px",
     border: "none",
     borderRadius: "50%",
     background: "#fff",
     cursor: "pointer",
-    fontSize: "18px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    transition: "all 0.2s ease",
   },
   card: {
     background: "#fff",
@@ -1472,12 +1651,12 @@ const styles = {
   bookmark: {
     color: "#555",
   },
-  bookmarkActive: {
-    fontSize: "24px",
-    color: "#E46B3C",
-    fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
-    WebkitTextStroke: "1px #000",
-  },
+ bookmarkActive: {
+  fontSize: "24px",
+  color: "#E46B3C",
+  fontVariationSettings:
+    "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+},
   ratingNumber: {
     fontWeight: "700",
     fontSize: "15px",
@@ -1822,22 +2001,85 @@ cameraBtn:{
   cursor:"pointer",
   border:"2px solid white",
 },
-photoMenu:{
-  position:"fixed",
-  top:"50%",
-  left:"50%",
-  transform:"translate(-50%, -50%)",
-  background:"#fff",
-  borderRadius:"12px",
-  padding:"15px",
-  width:"280px",
-  display:"flex",
-  flexDirection:"column",
-  gap:"10px",
-  zIndex:"99999",
-  boxShadow:"0 5px 20px rgba(0,0,0,0.2)",
+photoMenu: {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  background: "#fff",
+  borderRadius: "20px",
+  padding: "24px",
+  width: "420px",
+  zIndex: "99999",
+  border: "2px solid #E46B3C",
+  boxShadow: `
+    0 10px 30px rgba(0,0,0,0.15),
+    0 0 15px rgba(228,107,60,0.25)
+  `,
+},
+photoTitle: {
+  fontSize: "30px",
+  fontWeight: "700",
+  color: "#1f2937",
+  marginBottom: "8px",
 },
 
+photoSubtitle: {
+  fontSize: "15px",
+  color: "#6b7280",
+  marginBottom: "20px",
+},
+
+photoAction: {
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+  padding: "18px",
+  border: "1px solid #e5e7eb",
+  borderRadius: "16px",
+  cursor: "pointer",
+  marginBottom: "12px",
+  transition: "all 0.25s ease",
+},
+
+photoIcon: {
+  width: "52px",
+  height: "52px",
+  borderRadius: "50%",
+  background: "#fff",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+  flexShrink: 0,
+},
+
+photoTextWrapper: {
+  flex: 1,
+},
+
+photoMainText: {
+  fontSize: "16px",
+  fontWeight: "700",
+  color: "#111827",
+},
+
+photoSubText: {
+  fontSize: "14px",
+  color: "#6b7280",
+  marginTop: "4px",
+},
+
+cancelAction: {
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+  padding: "18px",
+  borderRadius: "16px",
+  background: "#f3f4f6",
+  cursor: "pointer",
+  marginTop: "10px",
+},
 photoOption:{
   border:"none",
   background:"#f5f5f5",
@@ -1849,16 +2091,18 @@ photoOption:{
   transition:"0.2s",
 },
 modalOverlay:{
-  position:"fixed",
-  top:0,
-  left:0,
-  right:0,
-  bottom:0,
-  background:"rgba(0,0,0,0.45)",
-  display:"flex",
-  justifyContent:"center",
-  alignItems:"center",
-  zIndex:99998,
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  backdropFilter: "blur(5px)",
+  WebkitBackdropFilter: "blur(5px)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 9999,
 },
 modalBox:{
   background:"#fff",
@@ -1890,7 +2134,7 @@ btnCancel:{
   padding:"10px 20px",
   border:"none",
   borderRadius:"8px",
-  background:"#ddd",
+  background:"#dddddd",
   cursor:"pointer",
 },
 
@@ -1918,6 +2162,47 @@ passwordInput: {
   borderRadius: "8px",
   boxSizing: "border-box",
   outline: "none",
+},
+passwordWrapper: {
+  position: "relative",
+  width: "100%",
+  marginBottom: "12px",
+},
+
+eyeButton: {
+  position: "absolute",
+  right: "12px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "16px",
+  color: "#666",
+},
+buttonGroup: {
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: "12px",
+  marginTop: "20px",
+},
+menuButton: {
+  border: "1px solid #ddd",
+  background: "#fff",
+  padding: "10px 18px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
+},
+
+logoutButton: {
+  background: "#c54500",
+  color: "#fff",
+  border: "none",
+  padding: "10px 24px",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "600",
 },
 };
 
