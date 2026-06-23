@@ -13,11 +13,27 @@ const [gambar, setGambar] = useState(null);
 const [preview, setPreview] = useState("");
 const [bahan, setBahan] = useState([""]);
 const [langkah, setLangkah] = useState([""]);
+const [user, setUser] = useState(null);
 const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
 
 useEffect(() => {
+
+  
   getResep();
+
+  api.get("/profile")
+    .then((res) => {
+
+      if(res.data.status){
+        setUser(res.data.user);
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
 }, []);
 
 const getResep = async () => {
@@ -172,6 +188,8 @@ const ubahLangkah = (index,value) => {
   setLangkah(data);
 
 };
+
+console.log(user);
   return (
     <div style={styles.page}>
     <div style={styles.mapBackground}></div>
@@ -211,16 +229,26 @@ const ubahLangkah = (index,value) => {
     </div>
 
       <div
-    style={styles.profileCircle}
-    onClick={() => navigate("/profil")}
-  >
+  style={styles.profileCircle}
+  onClick={() => navigate("/profil")}
+>
+
+  {user?.foto ? (
+    <img
+      src={`http://localhost:5000/uploads/${user.foto}`}
+      alt="profile"
+      style={styles.profileImage}
+    />
+  ) : (
     <span
       className="material-symbols-outlined"
       style={{ fontSize: "26px" }}
     >
       person
     </span>
-  </div>
+  )}
+
+</div>
 
 </div>
 
@@ -624,7 +652,7 @@ label:{
   fontSize:"15px",
   fontWeight:"600",
 
-  marginRight:"50px"
+  marginRight:"25px"
 },
   active: {
     color: "#F28C28",
@@ -717,22 +745,22 @@ label:{
 },
 
 profileCircle:{
-  width:"35px",
-  height:"35px",
-
+  width:"42px",
+  height:"42px",
   borderRadius:"50%",
-
-  background:"#F5F5F5",
-
-  border:"2px solid #E4E4E4",
-
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center",
-
+  overflow:"hidden",
   cursor:"pointer",
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+  marginRight: "10px"
+},
 
-  flexShrink:0
+profileImage:{
+  width:"100%",
+  height:"100%",
+  objectFit:"cover",
+  borderRadius:"50%"
 },
 
   changeImageBtn:{

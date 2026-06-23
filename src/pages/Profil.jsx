@@ -631,7 +631,11 @@ function Profil() {
 
                       <div
                         key={item.id}
-                        style={styles.card}
+                        style={{
+                          ...styles.card,
+                          cursor: "pointer"
+                        }}
+                        onClick={() => navigate(`/detail/${item.id}`)}
                       >
                        <div style={styles.cardImgWrapper}>
                         <img
@@ -712,7 +716,10 @@ function Profil() {
                           <div style={styles.editWrapper}>
                           <button
                             style={styles.editBtn}
-                            onClick={() => navigate(`/edit/${item.id}`)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/edit/${item.id}`);
+                            }}
                           >
                             Edit
                           </button>
