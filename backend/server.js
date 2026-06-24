@@ -66,13 +66,10 @@ console.log("DIRNAME:", __dirname);
 console.log("UPLOAD EXISTS:", fs.existsSync(path.join(__dirname, "uploads")));
 
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://xplorra-git-main-asl-team.vercel.app",
-    "https://xplorra.vercel.app"
-  ],
+  origin: true,
   credentials: true
 }));
+  
 
 app.use(
   '/uploads',
