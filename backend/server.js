@@ -41,6 +41,14 @@ const limiter = rateLimit({
 
 });
 
+app.get("/health", (req, res) => {
+  console.log("HEALTHCHECK HIT");
+  res.status(200).json({
+    status: true,
+    message: "OK"
+  });
+});
+
 // app.use(limiter);
 app.use('/register', limiter);
 app.use('/login', limiter);
@@ -1930,13 +1938,6 @@ app.get("/", (req, res) => {
 });
 
 console.log("ABOUT TO LISTEN");
-console.log(`Server running on port ${PORT}`);
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: true,
-    message: "OK"
-  });
-});
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
