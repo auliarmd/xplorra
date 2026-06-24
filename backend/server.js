@@ -36,7 +36,11 @@ const multer = require('multer');
 const path = require('path');
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "https://xplorra-git-main-asl-team.vercel.app",
+    "https://xplorra.vercel.app"
+  ],
   credentials: true
 }));
 
