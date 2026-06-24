@@ -16,6 +16,9 @@ const [langkah, setLangkah] = useState([""]);
 const [user, setUser] = useState(null);
 const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
+const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+const isMobile = window.innerWidth <= 768;
+const [showMobileMenu, setShowMobileMenu] = useState(false);
 
 useEffect(() => {
 
@@ -113,18 +116,22 @@ const handleUpdate = async () => {
     }
 
     await api.put(
-    `/edit-food/${id}`,
-    formData,
-    {
-        headers:{
-        "Content-Type":"multipart/form-data"
-        }
+  `/edit-food/${id}`,
+  formData,
+  {
+    headers:{
+      "Content-Type":"multipart/form-data"
     }
-    );
+  }
+);
 
-    alert("Resep berhasil diupdate");
+// tampilkan popup
+setShowSuccessPopup(true);
 
-    navigate("/dashboardafterlogin");
+// pindah halaman setelah 2 detik
+setTimeout(() => {
+  navigate("/dashboardafterlogin");
+}, 2000);
 
   } catch(err){
 
@@ -194,18 +201,44 @@ console.log(user);
     <div style={styles.mapBackground}></div>
 
       {/* NAVBAR */}
-     <div style={styles.navbar}>
+     <div
+  style={{
+    ...styles.navbar,
+    ...(isMobile ? mobileStyles.navbar : {})
+  }}
+>
 
-  <div style={styles.logoContainer}>
-    <img
-      src="/logo_X.png"
-      alt="logo"
-      style={styles.logoImg}
-    />
-    <span style={styles.logoText}>
-      pLorra
-    </span>
-  </div>
+  {/* Logo / Hamburger */}
+  {isMobile ? (
+
+    <div
+      style={styles.hamburgerBtn}
+      onClick={() =>
+        setShowMobileMenu(!showMobileMenu)
+      }
+    >
+      <span
+        className="material-symbols-outlined"
+        style={{ fontSize: "30px" }}
+      >
+        menu
+      </span>
+    </div>
+
+  ) : (
+
+    <div style={styles.logoContainer}>
+      <img
+        src="/logo_X.png"
+        alt="logo"
+        style={styles.logoImg}
+      />
+      <span style={styles.logoText}>
+        pLorra
+      </span>
+    </div>
+
+  )}
 
   <div style={styles.headerCenter}>
     <div style={styles.headerTitle}>
@@ -213,104 +246,190 @@ console.log(user);
     </div>
   </div>
 
-  <div style={styles.menu}>
-    <span onClick={() => navigate("/dashboardafterlogin")}>
-      Home
-    </span>
+  <div style={styles.rightSection}></div>
 
-    <span onClick={() => navigate("/profil")}>
-  Profil
-</span>
+  {!isMobile && (
 
-    <span onClick={() => navigate("/Notifikasi")}>
-      Notifikasi
-    </span>
+    <div style={styles.menu}>
+
+      <span onClick={() => navigate("/dashboardafterlogin")}>
+        Home
+      </span>
+
+      <span onClick={() => navigate("/profil")}>
+        Profil
+      </span>
+
+      <span onClick={() => navigate("/Notifikasi")}>
+        Notifikasi
+      </span>
+
     </div>
 
-      <div
-  style={styles.profileCircle}
-  onClick={() => navigate("/profil")}
->
-
-  {user?.foto ? (
-    <img
-      src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-      alt="profile"
-      style={styles.profileImage}
-    />
-  ) : (
-    <span
-      className="material-symbols-outlined"
-      style={{ fontSize: "26px" }}
-    >
-      person
-    </span>
   )}
 
-</div>
+  <div
+    style={styles.profileCircle}
+    onClick={() => navigate("/profil")}
+  >
+    {user?.foto ? (
+      <img
+        src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+        alt="profile"
+        style={styles.profileImage}
+      />
+    ) : (
+      <span className="material-symbols-outlined">
+        person
+      </span>
+    )}
+  </div>
 
 </div>
+
+{isMobile && showMobileMenu && (
+
+  <div style={styles.mobileMenu}>
+
+    <div style={styles.mobileMenuHeader}>
+
+      <div
+        style={styles.mobileLogoContainer}
+      >
+        <img
+          src="/logo_X.png"
+          alt="logo"
+          style={styles.mobileLogo}
+        />
+
+        <span style={styles.mobileLogoText}>
+          pLorra
+        </span>
+      </div>
+
+      <span
+        className="material-symbols-outlined"
+        style={styles.mobileMenuIcon}
+        onClick={() =>
+          setShowMobileMenu(false)
+        }
+      >
+        menu
+      </span>
+
+    </div>
+
+    <div
+      style={styles.mobileMenuItem}
+      onClick={() =>
+        navigate("/dashboardafterlogin")
+      }
+    >
+      <span className="material-symbols-outlined">
+        home
+      </span>
+
+      Home
+    </div>
+
+    <div
+      style={styles.mobileMenuItem}
+      onClick={() =>
+        navigate("/profil")
+      }
+    >
+      <span className="material-symbols-outlined">
+        person
+      </span>
+
+      Profil
+    </div>
+
+    <div
+      style={styles.mobileMenuItem}
+      onClick={() =>
+        navigate("/Notifikasi")
+      }
+    >
+      <span className="material-symbols-outlined">
+        notifications
+      </span>
+
+      Notifikasi
+    </div>
+
+  </div>
+
+)}
 
       {/* CONTENT */}
-      <div style={styles.content}>
-
+    <div
+  style={{
+    ...styles.content,
+    ...(isMobile ? mobileStyles.content : {})
+  }}
+>
         {/* FORM */}
-        <div style={styles.formContainer}>
+       <div
+  style={{
+    ...styles.formContainer,
+    ...(isMobile ? mobileStyles.formContainer : {})
+  }}
+>
 
           {/* UPLOAD */}
           <div style={styles.sectionHeader}>
             Media
           </div>
         <div style={styles.formWrapper}>
+<div
+  style={{
+    ...styles.uploadBox,
+    ...(isMobile ? mobileStyles.uploadBox : {})
+  }}
+>
 
-           <div style={styles.uploadBox}>
+  {preview ? (
 
-            {
-              preview ? (
+    <>
+      <img
+        src={preview}
+        alt="upload"
+        style={styles.uploadImage}
+      />
 
-                <>
+      <label style={styles.changeImageBtn}>
 
-                  <img
-                    src={preview}
-                    alt="upload"
-                    style={styles.uploadImage}
-                  />
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: "18px" }}
+        >
+          photo_camera
+        </span>
 
-                  <label style={styles.changeImageBtn}>
+        Ganti Gambar
 
-  <span
-    className="material-symbols-outlined"
-    style={{ fontSize:"18px" }}
-  >
-    photo_camera
-  </span>
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files[0];
+            setGambar(file);
 
-  Ganti Gambar
+            if (file) {
+              setPreview(URL.createObjectURL(file));
+            }
+          }}
+        />
 
-  <input
-    type="file"
-    accept="image/*"
-    hidden
-    onChange={(e)=>{
+      </label>
 
-      const file = e.target.files[0];
+    </>
 
-      setGambar(file);
+  ) : (
 
-      if(file){
-        setPreview(
-          URL.createObjectURL(file)
-        );
-      }
 
-    }}
-  />
-
-</label>
-
-                </>
-
-              ) : (
 
                 <>
                   <div style={styles.uploadPlaceholder}>
@@ -343,8 +462,8 @@ console.log(user);
                   </label>
                 </>
 
-              )
-            }
+              )}
+          
 
           </div>   
           </div>
@@ -407,7 +526,10 @@ console.log(user);
 
             <div
               key={index}
-              style={styles.dynamicRow}
+              style={{
+  ...styles.dynamicRow,
+  ...(isMobile ? mobileStyles.dynamicRow : {})
+}}
             >
 
               <input
@@ -474,7 +596,12 @@ console.log(user);
 >
   + Tambah Langkah
 </button>
-     <div style={styles.footerButtons}>
+    <div
+  style={{
+    ...styles.footerButtons,
+    ...(isMobile ? mobileStyles.footerButtons : {})
+  }}
+>
 
   <button
   type="button"
@@ -523,6 +650,31 @@ console.log(user);
 
 </div>
 
+{showSuccessPopup && (
+  <div style={styles.popupOverlay}>
+
+    <div style={styles.popupBox}>
+
+      <span
+        className="material-symbols-outlined"
+        style={styles.popupIcon}
+      >
+        check_circle
+      </span>
+
+      <h2 style={styles.popupTitle}>
+        Berhasil!
+      </h2>
+
+      <p style={styles.popupText}>
+        Resep berhasil diperbaharui.
+      </p>
+
+    </div>
+
+  </div>
+)}
+
         </div>
 
       </div>
@@ -531,6 +683,75 @@ console.log(user);
   );
 
   }
+
+  const mobileStyles = {
+
+  navbar:{
+    padding:"10px 15px"
+  },
+
+  logoContainer:{
+    display:"none"
+  },
+
+  headerTitle:{
+    fontSize:"18px"
+  },
+
+  menu:{
+    display:"none"
+  },
+
+  profileCircle:{
+    width:"38px",
+    height:"38px",
+    marginRight:"0"
+  },
+
+  content:{
+    padding:"20px 10px 40px"
+  },
+
+  formContainer:{
+    padding:"20px"
+  },
+
+  uploadBox:{
+    height:"250px",
+    borderRadius:"15px"
+  },
+
+  sectionHeader:{
+    fontSize:"20px"
+  },
+
+  dynamicRow:{
+    flexDirection:"column",
+    alignItems:"stretch"
+  },
+
+  deleteBtn:{
+    width:"100%",
+    height:"42px"
+  },
+
+  smallTextarea:{
+    minHeight:"90px"
+  },
+
+  footerButtons:{
+    flexDirection:"column"
+  },
+
+  cancelBtn:{
+    width:"100%"
+  },
+
+  saveBtn:{
+    width:"100%"
+  }
+
+};
 
 const styles = {
   container:{
@@ -980,6 +1201,128 @@ cancelBtn:{
   fontSize:"15px",
   fontWeight:"600",
   transition:"all 0.2s ease"
+},
+
+hamburgerBtn:{
+  width:"40px",
+  height:"40px",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+
+  cursor:"pointer"
+},
+
+mobileMenu:{
+  position:"fixed",
+
+  top:"0",
+  left:"0",
+
+  width:"270px",
+  height:"100vh",
+
+  background:"#fff",
+
+  boxShadow:"3px 0 15px rgba(0,0,0,0.2)",
+
+  zIndex:10000
+},
+
+mobileMenuHeader:{
+  display:"flex",
+  justifyContent:"space-between",
+  alignItems:"center",
+
+  padding:"18px",
+
+  borderBottom:"1px solid #eee"
+},
+
+mobileLogoContainer:{
+  display:"flex",
+  alignItems:"center",
+  gap:"8px"
+},
+
+mobileLogo:{
+  width:"38px"
+},
+
+mobileLogoText:{
+  fontWeight:"700",
+  color:"#F28C28",
+  fontSize:"22px"
+},
+
+mobileMenuIcon:{
+  cursor:"pointer",
+  fontSize:"28px"
+},
+
+mobileMenuItem:{
+  display:"flex",
+  alignItems:"center",
+
+  gap:"12px",
+
+  padding:"18px",
+
+  borderBottom:"1px solid #eee",
+
+  cursor:"pointer",
+
+  fontWeight:"600"
+},
+
+popupOverlay:{
+  position:"fixed",
+  top:0,
+  left:0,
+  right:0,
+  bottom:0,
+
+  background:"rgba(0,0,0,0.35)",
+
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+
+  zIndex:99999
+},
+
+popupBox:{
+  width:"340px",
+
+  background:"#fff",
+
+  borderRadius:"18px",
+
+  padding:"35px 25px",
+
+  textAlign:"center",
+
+  boxShadow:"0 15px 40px rgba(0,0,0,.18)"
+},
+
+popupIcon:{
+  fontSize:"70px",
+  color:"#4CAF50",
+  marginBottom:"10px"
+},
+
+popupTitle:{
+  margin:0,
+  color:"#333",
+  fontSize:"28px"
+},
+
+popupText:{
+  marginTop:"12px",
+  color:"#666",
+  fontSize:"16px",
+  lineHeight:"24px"
 },
   
 };

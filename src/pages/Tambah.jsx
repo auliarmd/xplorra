@@ -15,6 +15,7 @@ const [langkah, setLangkah] = useState([""]);
 const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
 const [user, setUser] = useState(null);
+const [showMobileMenu, setShowMobileMenu] = useState(false);
 
 useEffect(() => {
 
@@ -160,7 +161,64 @@ const ubahLangkah = (index,value) => {
 
 };
 
-  return (
+const isMobile = window.innerWidth <= 768;
+
+const mobileStyles = {
+
+  navbar:{
+    padding:"10px 15px"
+  },
+
+ headerCenter:{
+  flex:1,
+  textAlign:"center",
+  marginLeft:"0"
+},
+
+  headerTitle:{
+    fontSize:"18px"
+  },
+
+  headerSubtitle:{
+    display:"none"
+  },
+
+  menu:{
+    display:"none"
+  },
+
+  content:{
+    padding:"20px 10px"
+  },
+
+  formContainer:{
+    padding:"20px"
+  },
+
+  uploadBox:{
+    height:"250px"
+  },
+
+  dynamicRow:{
+    flexDirection:"column",
+    alignItems:"stretch"
+  },
+
+  footer:{
+    flexDirection:"column"
+  },
+
+  cancelBtn:{
+    width:"100%"
+  },
+
+  saveBtn:{
+    width:"100%"
+  }
+
+};
+
+return (
     <div style={styles.page}>
     <div style={styles.mapBackground}></div>
 
@@ -206,10 +264,127 @@ const ubahLangkah = (index,value) => {
   </div>
 )}
 
-);
 
       {/* NAVBAR */}
-      <div style={styles.navbar}>
+     {isMobile && (
+  <div
+    style={{
+      ...styles.mobileOverlay,
+      left: showMobileMenu ? "0" : "-100%"
+    }}
+  >
+
+    <div style={styles.mobileMenuHeader}>
+
+  <div style={styles.mobileLogoContainer}>
+    <img
+      src="/logo_X.png"
+      alt="logo"
+      style={styles.mobileLogo}
+    />
+
+    <span style={styles.mobileLogoText}>
+      pLorra
+    </span>
+  </div>
+
+  <div
+    style={styles.mobileHamburgerInside}
+    onClick={() =>
+      setShowMobileMenu(false)
+    }
+  >
+    <span
+      className="material-symbols-outlined"
+      style={{
+        fontSize:"28px",
+        color:"#8B5A2B"
+      }}
+    >
+      menu
+    </span>
+  </div>
+
+</div>
+
+    <div
+      style={styles.mobileMenuItem}
+      onClick={() => navigate("/dashboardafterlogin")}
+    >
+      <span
+        className="material-symbols-outlined"
+        style={styles.mobileMenuIcon}
+      >
+        home
+      </span>
+
+      Home
+    </div>
+
+    <div
+      style={{
+        ...styles.mobileMenuItem,
+        color:"#000000",
+        fontWeight:"700"
+      }}
+      onClick={() => navigate("/Notifikasi")}
+    >
+      <span
+        className="material-symbols-outlined"
+        style={styles.mobileMenuIcon}
+      >
+        notifications
+      </span>
+
+      Notifikasi
+    </div>
+
+    <div
+      style={styles.mobileMenuItem}
+      onClick={() => navigate("/profil")}
+    >
+      <span
+        className="material-symbols-outlined"
+        style={styles.mobileMenuIcon}
+      >
+        person
+      </span>
+
+      Profil
+    </div>
+
+  </div>
+)}
+
+<div
+  style={{
+    ...styles.navbar,
+    ...(isMobile ? mobileStyles.navbar : {})
+  }}
+>
+
+  {isMobile ? (
+
+  !showMobileMenu && (
+    <div
+      style={styles.hamburgerBtn}
+      onClick={() =>
+        setShowMobileMenu(true)
+      }
+    >
+     <span
+      className="material-symbols-outlined"
+      style={{
+        fontSize:"28px",
+        color:"#8B5A2B"
+      }}
+    >
+      menu
+    </span>
+    </div>
+  )
+
+) : (
 
   <div style={styles.logoContainer}>
     <img
@@ -217,40 +392,75 @@ const ubahLangkah = (index,value) => {
       alt="logo"
       style={styles.logoImg}
     />
+
     <span style={styles.logoText}>
       pLorra
     </span>
   </div>
 
-  <div style={styles.headerCenter}>
+)}
+
+  <div
+    style={{
+      ...styles.headerCenter,
+      ...(isMobile ? mobileStyles.headerCenter : {})
+    }}
+  >
+
     <div style={styles.headerTitle}>
       Tambah Resep Baru
     </div>
 
-    <div style={styles.headerSubtitle}>
-      Bagikan kekayaan kuliner nusantara dengan komunitas.
-    </div>
+    {!isMobile && (
+      <div style={styles.headerSubtitle}>
+        Bagikan kekayaan kuliner nusantara dengan komunitas.
+      </div>
+    )}
+
   </div>
+
+
+  
 
   <div style={styles.rightSection}>
 
-  <div style={styles.menu}>
-    <span onClick={() => navigate("/dashboardafterlogin")}>
-      Home
-    </span>
+  {!isMobile && (
 
-    <span onClick={() => navigate("/profil")}>
-      Profil
-    </span>
+    <div style={styles.menu}>
 
-    <span onClick={() => navigate("/Notifikasi")}>
-      Notifikasi
-    </span>
-  </div>
+      <span
+        onClick={() =>
+          navigate("/dashboardafterlogin")
+        }
+      >
+        Home
+      </span>
+
+      <span
+        onClick={() =>
+          navigate("/profil")
+        }
+      >
+        Profil
+      </span>
+
+      <span
+        onClick={() =>
+          navigate("/Notifikasi")
+        }
+      >
+        Notifikasi
+      </span>
+
+    </div>
+
+  )}
 
   <div
     style={styles.profileCircle}
-    onClick={() => navigate("/profil")}
+    onClick={() =>
+      navigate("/profil")
+    }
   >
 
     {user?.foto ? (
@@ -260,9 +470,16 @@ const ubahLangkah = (index,value) => {
         alt="profile"
         style={styles.profileImage}
       />
+
     ) : (
 
-      <span className="material-symbols-outlined">
+      <span
+        className="material-symbols-outlined"
+        style={{
+          fontSize:"24px",
+          color:"#666"
+        }}
+      >
         person
       </span>
 
@@ -273,6 +490,7 @@ const ubahLangkah = (index,value) => {
 </div>
 
 </div>
+
 
       {/* CONTENT */}
       <div style={styles.content}>
@@ -551,6 +769,8 @@ navbar:{
   zIndex:999,
   borderBottom:"1px solid #ccc"
 },
+
+
 
 headerCenter:{
   flex:1,
@@ -938,8 +1158,130 @@ btnConfirm: {
   fontWeight: "600",
   cursor: "pointer",
   outline: "none",
-}
-};
+},
 
+hamburgerBtn:{
+  width:"40px",
+  height:"40px",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+  cursor:"pointer",
+  marginLeft:"5px"
+},
+
+mobileMenu:{
+  position:"fixed",
+
+  top:"70px",
+  left:0,
+
+  width:"240px",
+  height:"100vh",
+
+  background:"#fff",
+
+  boxShadow:"2px 0 10px rgba(0,0,0,0.15)",
+
+  zIndex:9999
+},
+
+mobileMenuItem:{
+  display:"flex",
+  alignItems:"center",
+
+  gap:"12px",
+
+  padding:"18px 20px",
+
+  borderBottom:"1px solid #eee",
+
+  fontWeight:"600",
+
+  cursor:"pointer"
+},
+mobileOverlay:{
+  position:"fixed",
+  top:"0",
+  left:"-100%",
+  width:"270px",
+  height:"100vh",
+
+  background:"#fff",
+
+  transition:"0.3s ease",
+
+  zIndex:99999,
+
+  boxShadow:"3px 0 15px rgba(0,0,0,0.15)"
+},
+
+mobileMenuHeader:{
+  display:"flex",
+  alignItems:"center",
+
+  gap:"8px",
+
+  padding:"20px",
+
+  borderBottom:"1px solid #eee"
+},
+
+mobileLogo:{
+  width:"45px"
+},
+
+mobileLogoText:{
+  color:"#F28C28",
+  fontWeight:"700",
+  fontSize:"28px"
+},
+
+mobileMenuTitle:{
+  padding:"20px",
+  fontWeight:"700",
+  color:"#444"
+},
+
+mobileMenuIcon:{
+  fontSize:"22px",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center",
+
+  width:"24px",
+  height:"24px",
+
+  flexShrink:0
+},
+
+mobileLogoContainer:{
+  display:"flex",
+  alignItems:"center",
+  gap:"8px"
+},
+
+mobileMenuHeader:{
+  display:"flex",
+  justifyContent:"space-between",
+  alignItems:"center",
+
+  padding:"18px 20px",
+
+  borderBottom:"1px solid #eee"
+},
+
+mobileHamburgerInside:{
+  cursor:"pointer",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"center"
+}
+
+
+};
 export default TambahResep;
 
