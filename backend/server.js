@@ -313,16 +313,16 @@ app.post('/login',(req,res)=>{
 
        const token = jwt.sign(
         {
-          id:rows[0].id,
-          nama:rows[0].nama,
-          email:rows[0].email,
-          foto:rows[0].foto
+          id: rows[0].id,
+          nama: rows[0].nama,
+          email: rows[0].email,
+          foto: rows[0].foto
         },
-        'SECRET_KEY_XPLORRA',
+        process.env.JWT_SECRET,
         {
-          expiresIn:'2h'
+          expiresIn: "2h"
         }
-        );
+      );
 
         return res.json({
         status:true,
