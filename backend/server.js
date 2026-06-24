@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require('express');
 const mysql = require('mysql2');
 const helmet = require('helmet');
@@ -124,10 +126,11 @@ function verifyToken(req,res,next){
 
 //database sql
 const db = mysql.createConnection({
-  host:'localhost',
-  user:'root',
-  password:'',
-  database:'xplorra'
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
 });
 
 db.connect(err=>{
