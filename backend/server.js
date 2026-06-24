@@ -7,6 +7,14 @@ const cors = require("cors");
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+});
+
 const app = express();
 
 const limiter = rateLimit({
@@ -1899,6 +1907,13 @@ app.put(
 const PORT = process.env.PORT || 5000;
 app.get("/", (req, res) => {
   res.send("XpLorra Backend Running 🚀");
+});
+
+app.get("/health", (req, res) => {
+  res.json({
+    status: true,
+    message: "Server OK"
+  });
 });
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
