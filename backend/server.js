@@ -124,7 +124,7 @@ function verifyToken(req,res,next){
 
   const token = authHeader.split(' ')[1];
 
-  jwt.verify(token,'SECRET_KEY_XPLORRA',(err,decoded)=>{
+  jwt.verify(token, process.env.JWT_SECRET,(err,decoded)=>{
 
     if(err){
       return res.status(403).json({
@@ -151,6 +151,10 @@ const db = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
+});
+
+db.on("error", (err) => {
+  console.error("MYSQL POOL ERROR:", err);
 });
 
 db.getConnection((err, connection) => {
