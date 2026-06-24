@@ -1929,15 +1929,14 @@ app.get("/", (req, res) => {
   res.send("XpLorra Backend Running 🚀");
 });
 
-app.get("/health", (req, res) => {
-  res.json({
-    status: true,
-    message: "Server OK"
-  });
-});
-
 console.log("ABOUT TO LISTEN");
 console.log(`Server running on port ${PORT}`);
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: true,
+    message: "OK"
+  });
+});
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
