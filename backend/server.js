@@ -1,4 +1,14 @@
+console.log("SERVER FILE LOADED");
 require("dotenv").config();
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:");
+  console.error(err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("UNHANDLED REJECTION:");
+  console.error(reason);
+});
 
 const express = require('express');
 const mysql = require('mysql2');
@@ -1921,6 +1931,9 @@ app.get("/health", (req, res) => {
     message: "Server OK"
   });
 });
+
+console.log("ABOUT TO LISTEN");
+console.log(`Server running on port ${PORT}`);
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
