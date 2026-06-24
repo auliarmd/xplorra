@@ -25,6 +25,10 @@ process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
 });
 
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 const app = express();
 
 const limiter = rateLimit({
