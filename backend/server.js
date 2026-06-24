@@ -25,11 +25,19 @@ process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
 });
 
+const app = express();
+
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-const app = express();
+app.get("/health", (req, res) => {
+  console.log("HEALTHCHECK HIT");
+  res.status(200).json({
+    status: true,
+    message: "OK"
+  });
+});
 
 const limiter = rateLimit({
 
@@ -39,14 +47,6 @@ const limiter = rateLimit({
 
   message: 'Terlalu banyak request, coba lagi nanti'
 
-});
-
-app.get("/health", (req, res) => {
-  console.log("HEALTHCHECK HIT");
-  res.status(200).json({
-    status: true,
-    message: "OK"
-  });
 });
 
 // app.use(limiter);
