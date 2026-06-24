@@ -141,6 +141,11 @@ function verifyToken(req,res,next){
 
 }
 
+console.log("MYSQLHOST:", process.env.MYSQLHOST);
+console.log("MYSQLDATABASE:", process.env.MYSQLDATABASE);
+console.log("MYSQLPORT:", process.env.MYSQLPORT);
+console.log("MYSQLUSER:", process.env.MYSQLUSER);
+
 //database sql
 const db = mysql.createPool({
   host: process.env.MYSQLHOST,
@@ -153,9 +158,6 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
-db.on("error", (err) => {
-  console.error("MYSQL POOL ERROR:", err);
-});
 
 db.getConnection((err, connection) => {
   if (err) {
