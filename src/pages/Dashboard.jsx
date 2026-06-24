@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://xplorra-production.up.railway.app";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ function Dashboard() {
             <div key={item.id} style={styles.trendingCard} onClick={requireLogin}>
                 <div style={styles.imageWrapper}>
                 <img
-                  src={`http://localhost:5000/uploads/${item.gambar}`}
+                  src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
                   style={styles.trendingImg}
                   alt={item.nama}
                   onError={(e) => {

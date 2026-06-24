@@ -38,7 +38,7 @@ useEffect(() => {
       setLangkah(JSON.parse(data.langkah));
 
       setPreview(
-        `http://localhost:5000/uploads/${data.gambar}`
+        `https://xplorra-production.up.railway.app/uploads/${data.gambar}`
       );
 
     } catch(err) {
@@ -234,7 +234,7 @@ console.log(user);
 
   {user?.foto ? (
     <img
-      src={`http://localhost:5000/uploads/${user.foto}`}
+      src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
       alt="profile"
       style={styles.profileImage}
     />

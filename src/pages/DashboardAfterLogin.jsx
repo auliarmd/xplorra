@@ -188,7 +188,7 @@ const toggleSave = async (id) => {
             {
               user.foto ? (
                 <img
-                  src={`http://localhost:5000/uploads/${user.foto}`}
+                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
                   alt="Profile"
                   style={styles.profileImg}
                 />
@@ -214,7 +214,7 @@ const toggleSave = async (id) => {
             <div key={item.id} style={styles.trendingCard} onClick={() => navigate(`/detail/${item.id}`)}>
                 <div style={styles.imageWrapper}>
                 <img
-                  src={`http://localhost:5000/uploads/${item.gambar}`}
+                  src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
                   style={styles.trendingImg}
                   alt={item.nama}
                   onError={(e) => {

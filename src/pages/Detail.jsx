@@ -167,7 +167,7 @@ function Detail() {
             onClick={() => navigate("/profil")}
           >
             {user.foto ? (
-              <img src={`http://localhost:5000/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
             ) : (
               <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
             )}
@@ -177,7 +177,7 @@ function Detail() {
 
       {/* HERO IMAGE SECTION */}
       <div style={styles.heroSection}>
-        <img src={`http://localhost:5000/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
+        <img src={`https://xplorra-production.up.railway.app/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
         <div style={styles.heroOverlay}>
           <div style={styles.heroTextContainer}>
             <h1 style={styles.heroTitle}>{food.nama}</h1>
@@ -218,7 +218,7 @@ function Detail() {
             <div style={styles.creatorHeader}>
               <div style={styles.creatorAvatar}>
                 {food.creator_foto ? (
-                  <img src={`http://localhost:5000/uploads/${food.creator_foto}`} alt="creator" style={styles.creatorImg} />
+                  <img src={`https://xplorra-production.up.railway.app/uploads/${food.creator_foto}`} alt="creator" style={styles.creatorImg} />
                 ) : (
                   <span className="material-symbols-outlined">person</span>
                 )}
@@ -299,7 +299,7 @@ function Detail() {
               <div style={styles.inputWrapper}>
                 <div style={styles.commentUserAvatar}>
                   {user.foto ? (
-                    <img src={`http://localhost:5000/uploads/${user.foto}`} alt="user" style={styles.creatorImg} />
+                    <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="user" style={styles.creatorImg} />
                   ) : (
                     <span className="material-symbols-outlined">person</span>
                   )}
@@ -326,7 +326,7 @@ function Detail() {
     <div style={styles.commentUserAvatar}>
       {item.foto ? (
         <img
-          src={`http://localhost:5000/uploads/${item.foto}`}
+          src={`https://xplorra-production.up.railway.app/uploads/${item.foto}`}
           alt="user"
           style={styles.creatorImg}
         />

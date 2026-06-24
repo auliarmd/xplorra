@@ -144,7 +144,7 @@ function Notifikasi() {
       {user?.foto ? (
 
         <img
-          src={`http://localhost:5000/uploads/${user.foto}`}
+          src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
           alt="Profile"
           style={{
             width:"100%",
@@ -276,7 +276,7 @@ function Notifikasi() {
           {notif.foto ? (
 
             <img
-              src={`http://localhost:5000/uploads/${notif.foto}`}
+              src={`https://xplorra-production.up.railway.app/uploads/${notif.foto}`}
               alt="User"
               style={styles.userIcon}
             />

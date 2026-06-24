@@ -38,7 +38,7 @@ function Profil() {
     );
     if(res.data.status){
       setProfileImage(
-        `http://localhost:5000/uploads/${res.data.foto}`
+        `https://xplorra-production.up.railway.app/uploads/${res.data.foto}`
       );
       setUser({
         ...user,
@@ -398,7 +398,7 @@ function Profil() {
               src={
                 profileImage
                   ? profileImage
-                  : `http://localhost:5000/uploads/${user.foto}`
+                  : `https://xplorra-production.up.railway.app/uploads/${user.foto}`
               }
               alt="profile"
               style={styles.profilePhoto}
@@ -632,7 +632,7 @@ function Profil() {
                       >
                        <div style={styles.cardImgWrapper}>
                         <img
-                          src={`http://localhost:5000/uploads/${item.gambar}`}
+                          src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
                           style={styles.cardImg}
                           alt={item.nama}
                         />
@@ -758,7 +758,7 @@ function Profil() {
                   <div key={item.id} style={styles.card}>
                     <div style={styles.cardImgWrapper}>
                       <img
-                        src={`http://localhost:5000/uploads/${item.gambar}`}
+                        src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
                         style={styles.cardImg}
                         alt=""
                       />
