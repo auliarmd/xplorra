@@ -35,6 +35,11 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
 
+const fs = require("fs");
+
+console.log("DIRNAME:", __dirname);
+console.log("UPLOAD EXISTS:", fs.existsSync(path.join(__dirname, "uploads")));
+
 app.use(cors({
   origin: [
     "http://localhost:3000",
@@ -418,6 +423,8 @@ app.get('/my-bookmarks', verifyToken,(req,res)=>{
 });
 
 app.get('/foods', (req, res) => {
+
+  console.log("=== FOODS HIT ===");
 
   const { kategori, daerah, search } = req.query;
 
