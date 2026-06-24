@@ -1274,169 +1274,49 @@ function Profil() {
 }
 
 const styles = {
-  page:{
-    minHeight:"100vh",
-
-    backgroundImage: `
-        linear-gradient(to bottom, rgba(180, 113, 71, 0.9), rgba(245,236,222,0.0)),
-        url('/map.png')
-    `,
-    backgroundSize:"cover",
-    backgroundPosition:"center",
-    backgroundRepeat:"no-repeat",
-    paddingTop:"40px",
-  },
+  page:{ minHeight:"100vh",backgroundImage: `linear-gradient(to bottom, rgba(180, 113, 71, 0.9), rgba(245,236,222,0.0)), url('/map.png')`,backgroundSize:"cover",backgroundPosition:"center",backgroundRepeat:"no-repeat",paddingTop:"40px",},
   /* NAVBAR */
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px 15px",
-    background: "#fff",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 9999,
-  },
-  emptyContainer: {
-    width: "100%",
-    minHeight: "350px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "column",
-    color: "#c46a3d",
-    fontSize: "22px",
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  emptyIcon: {
-    fontSize: "70px",
-    marginBottom: "15px",
-    color: "#e46b3c",
-  },
-  logoContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1px",
-  },
-  logoImg: {
-    width: "40px",
-  },
-  logoText: {
-    color: "#F28C28",
-    fontWeight: "bold",
-    fontSize: "24px",
-    letterSpacing: "1px",
-  },
+  navbar: {display: "flex",justifyContent: "space-between",alignItems: "center", padding: "15px 15px", background: "#fff", position: "fixed", top: 0,  left: 0,  right: 0,  zIndex: 9999, },
+  emptyContainer: { width: "100%", minHeight: "350px", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", color: "#c46a3d", fontSize: "22px",fontWeight: "700", textAlign: "center",},
+  emptyIcon: {fontSize: "70px",marginBottom: "15px", color: "#e46b3c" },
+  logoContainer: { display: "flex",alignItems: "center", gap: "1px" },
+  logoImg: { width: "40px" },
+  logoText: {color: "#F28C28",fontWeight: "bold",fontSize: "24px",letterSpacing: "1px",},
   menu: {
-    display: "flex",
-    gap: "30px",
-    fontSize: "18px",
-    fontWeight: "700",
-  },
-  active: {
-    color: "#F28C28",
-    fontWeight: "bold",
-  },
+    display: "flex",gap: "30px",fontSize: "18px",fontWeight: "700",},
+  active: {color: "#F28C28",fontWeight: "bold",},
   /* LAYOUT */
   container: {
-    display:"flex",
-    gap:"90px",
-    alignItems:"flex-start",
-    justifyContent:"center",
-    marginTop:"120px",
-  },
+    display:"flex",gap:"90px",alignItems:"flex-start",justifyContent:"center",marginTop:"120px",},
 
   /* SIDEBAR */
   sidebar:{
-    width:"290px",
-    background:"#fff",
-    borderRadius:"12px",
-    padding:"22px",
-    boxShadow:"0 4px 15px rgba(0,0,0,0.12)",
-    height:"300px",
-    marginTop:"0px",
-  },
-
+    width:"290px", background:"#fff", borderRadius:"12px", padding:"22px",boxShadow:"0 4px 15px rgba(0,0,0,0.12)", height:"300px", marginTop:"0px",},
   sidebarMenu:{
-    display:"flex",
-    alignItems:"center",
-    padding:"10px 14px",
-    marginBottom:"6px",
-    cursor:"pointer",
-    borderRadius:"8px",
-    fontSize:"16px",
-  },
-
+    display:"flex",alignItems:"center", padding:"10px 14px", marginBottom:"6px", cursor:"pointer", borderRadius:"8px",fontSize:"16px", },
   activeMenu:{
-    background:"#d96a4f",
-    color:"#fff",
-  },
+    background:"#d96a4f", color:"#fff",},
   orangeArrow: {
-    color: "#e46b3c",
-  },
+    color: "#e46b3c",},
   line: {
-    width: "100%",
-    height: "1px",
-    background: "#ddd",
-    margin: "2px 0 8px",
-  },
+    width: "100%", height: "1px",background: "#ddd", margin: "2px 0 8px", },
   arrowIcon: {
-    fontSize: "24px",
-  },
+    fontSize: "24px", },
   arrow: {
-    fontSize: "16px",
-    color: "#777",
-  },
+    fontSize: "16px", color: "#777",},
   /* MAIN */
   mainContent: {
-    flex: 1,
-    maxWidth: "850px",
-  },
+    flex: 1, maxWidth: "850px", },
   /* PROFILE */
   profileCard: {
-    width: "650px",
-    background: "#f4ebe2",
-    borderRadius: "25px",
-    padding: "35px",
-    border: "2px solid #e46b3c",
-    boxShadow: `
-      0 8px 20px rgba(0,0,0,0.18),
-      0 0 15px rgba(228,107,60,0.35),
-      0 0 35px rgba(228,107,60,0.18)
-    `,
-    transition: "0.3s",
-    marginTop: "60px",
-  },
+    width: "650px", background: "#f4ebe2", borderRadius: "25px", padding: "35px", border: "2px solid #e46b3c", boxShadow: ` 0 8px 20px rgba(0,0,0,0.18), 0 0 15px rgba(228,107,60,0.35),   0 0 35px rgba(228,107,60,0.18)`,transition: "0.3s",marginTop: "60px" },
   passwordBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  eyeIcon: {
-    cursor: "pointer",
-    color: "#e46b3c",
-    fontSize: "22px",
-  },
+    display: "flex",alignItems: "center", gap: "10px", },
+  eyeIcon: {cursor: "pointer",color: "#e46b3c",fontSize: "22px", },
   profileHeader: {
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    marginBottom: "20px",
-  },
+    display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px",},
   avatar: {
-    width: "80px",
-    height: "80px",
-    borderRadius: "50%",
-    background: "#ddd",
-    position: "relative",
-    overflow: 'hidden',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    width: "80px",height: "80px", borderRadius: "50%", background: "#ddd",position: "relative", overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center',},
   editIcon: {
     position: "absolute",
     bottom: "-2px",

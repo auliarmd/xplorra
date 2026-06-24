@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import api from "../api/axios";
 
 function Notifikasi() {
@@ -12,6 +11,27 @@ function Notifikasi() {
   const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
+
+  const [isMobile, setIsMobile] = useState(
+  window.innerWidth <= 768
+);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener(
+    "resize",
+    handleResize
+  );
+
+  return () =>
+    window.removeEventListener(
+      "resize",
+      handleResize
+    );
+}, []);
 
   const getTimeAgo = (dateString) => {
 
@@ -78,9 +98,30 @@ function Notifikasi() {
   return (
     <div style={styles.page}>
 
-    <div style={styles.navbar}>
+    <div
+        style={
+          isMobile
+            ? styles.mobileNavbar
+            : styles.navbar
+        }
+      >
+      
+      {isMobile && (
+
+        <div style={styles.hamburger}>
+
+          <span
+            className="material-symbols-outlined"
+          >
+            menu
+          </span>
+
+        </div>
+
+        )}
 
   {/* LOGO */}
+  {!isMobile && (
   <div style={styles.logoContainer}>
     <img
       src="/logo_X.png"
@@ -91,20 +132,35 @@ function Notifikasi() {
       pLorra
     </span>
   </div>
+  )}
 
   {/* JUDUL HEADER */}
-  <div style={styles.headerCenter}>
+  <div
+  style={
+    isMobile
+      ? styles.mobileHeaderCenter
+      : styles.headerCenter
+  }
+>
 
     <div style={styles.headerTitleRow}>
 
       <span
         className="material-symbols-outlined"
-        style={styles.headerBell}
-      >
+        style={
+          isMobile
+            ? styles.mobileBell
+            : styles.headerBell
+        }
+              >
         notifications
       </span>
 
-      <span style={styles.headerTitle}>
+      <span style={
+          isMobile
+            ? styles.mobileTitle
+            : styles.headerTitle
+        }>
         Notifikasi
       </span>
 
@@ -115,32 +171,36 @@ function Notifikasi() {
   {/* MENU + FOTO PROFIL */}
   <div style={styles.rightSection}>
 
-    <div style={styles.menu}>
-      <span
-        onClick={() =>
-          navigate("/dashboardafterlogin")
-        }
-      >
-        Home
-      </span>
+  {!isMobile && (
 
-      <span
-        onClick={() =>
-          navigate("/profil")
-        }
-      >
-        Profil
-      </span>
-
-      <span style={styles.active}>
-        Notifikasi
-      </span>
-    </div>
-
-    <div
-      style={styles.profileCircle}
-      onClick={() => navigate("/profil")}
+  <div style={styles.menu}>
+    <span
+      onClick={() =>
+        navigate("/dashboardafterlogin")
+      }
     >
+      Home
+    </span>
+
+    <span
+      onClick={() =>
+        navigate("/profil")
+      }
+    >
+      Profil
+    </span>
+
+    <span style={styles.active}>
+      Notifikasi
+    </span>
+  </div>
+
+  )}
+
+  <div
+    style={styles.profileCircle}
+    onClick={() => navigate("/profil")}
+  >
       {user?.foto ? (
 
         <img
@@ -171,14 +231,14 @@ function Notifikasi() {
 
         {/* TAB SEMUA */}
         <button
-          onClick={() => setTabAktif("semua")}
-          style={{
-            ...styles.tabBtn,
-            ...(tabAktif === "semua"
-              ? styles.activeTab
-              : {})
-          }}
-        >
+            onClick={() => setTabAktif("semua")}
+            style={{
+              ...styles.tabBtn,
+              ...(tabAktif === "semua"
+                ? styles.activeTab
+                : {})
+            }}
+          >
           Semua
         </button>
 
@@ -492,19 +552,12 @@ profileCircle:{
   /* TAB */
  tabContainer:{
   position:"fixed",
-
   top:"70px",
-
   left:"0",
   right:"0",
-
   display:"flex",
-
   background:"#fff",
-
   zIndex:"9998",
-
-  borderTop:"1px solid #ddd",
   borderBottom:"1px solid #ddd"
 },
 
@@ -571,16 +624,139 @@ profileCircle:{
   },
 
   blueDot: {
-    width: "14px",
-    height: "14px",
-    borderRadius: "50%",
-    background: "#4c4cff",
-  },
+  width: "12px",
+  height: "12px",
+  borderRadius: "50%",
+  background: "#4c4cff",
+
+  marginLeft: "20px",
+  marginRight: "10px",
+
+  flexShrink: 0,
+},
 
   defaultNotifIcon:{
     fontSize:'60px',
     color:'#777',
   },
+
+
+  /* MOBILE */
+mobileContainer:{
+  maxWidth:"430px",
+  margin:"0 auto",
+  background:"#fff",
+  minHeight:"100vh",
+},
+
+mobileNavbar:{
+  position:"fixed",
+  top:0,
+  left:0,
+  right:0,
+
+  height:"70px",
+
+  background:"#fff",
+
+  display:"flex",
+  alignItems:"center",
+  justifyContent:"space-between",
+
+  padding:"0 20px",
+
+  boxShadow:"0 4px 12px rgba(0,0,0,0.08)",
+
+  zIndex:9999,
+},
+
+hamburger:{
+  fontSize:"34px",
+  color:"#9A5B12",
+  cursor:"pointer",
+},
+
+mobileTitle:{
+  display:"flex",
+  alignItems:"center",
+  gap:"10px",
+
+  color:"#9A5B12",
+  fontWeight:"700",
+  fontSize:"18px",
+},
+
+mobileBell:{
+  fontSize:"28px",
+  color:"#9A5B12",
+  fontVariationSettings:
+  "'FILL' 1,'wght' 500",
+},
+
+mobileProfile:{
+  width:"46px",
+  height:"46px",
+  borderRadius:"50%",
+  overflow:"hidden",
+  flexShrink:0,
+},
+
+/* TAB */
+mobileTabWrapper:{
+  marginTop:"85px",
+  padding:"0 12px",
+},
+
+/* LIST */
+mobileNotifList:{
+  padding:"10px 12px 30px",
+},
+
+mobileNotifItem:{
+  display:"flex",
+  justifyContent:"space-between",
+  alignItems:"center",
+
+  background:"#fff",
+
+  borderRadius:"18px",
+
+  padding:"16px",
+
+  marginBottom:"14px",
+
+  boxShadow:"0 2px 10px rgba(0,0,0,0.06)",
+},
+
+mobileLeftNotif:{
+  display:"flex",
+  gap:"14px",
+  flex:1,
+},
+
+mobileUserIcon:{
+  width:"58px",
+  height:"58px",
+
+  borderRadius:"50%",
+
+  objectFit:"cover",
+
+  flexShrink:0,
+},
+
+mobileTextNotif:{
+  fontSize:"16px",
+  lineHeight:"1.3",
+  color:"#222",
+},
+
+mobileTime:{
+  marginTop:"6px",
+  color:"#666",
+  fontSize:"13px",
+},
+
 };
 
 export default Notifikasi;
