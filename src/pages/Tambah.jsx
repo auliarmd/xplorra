@@ -83,7 +83,7 @@ return;
     );
     formData.append("gambar", gambar);
 
-    const response = await api.post(
+    await api.post(
       '/add-food',
       formData,
       {

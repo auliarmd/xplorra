@@ -7,9 +7,6 @@ function Notifikasi() {
 
   const [tabAktif, setTabAktif] = useState("semua");
 
-  const [notifDibaca, setNotifDibaca] =
-    useState(false);
-
   const [notifications, setNotifications] =
   useState([]);
   const [user, setUser] = useState(null);

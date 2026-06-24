@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, {useState, useEffect} from "react";
 import api from "../api/axios";
 
 function DashboardAfterLogin() {
@@ -13,11 +13,8 @@ function DashboardAfterLogin() {
   const [user, setUser] = useState({});
   const [daerah, setDaerah] = useState("");
 
-  const filterFoods = (
-    newKategori,
-    newDaerah,
-    newSearch
-  ) => {
+  const filterFoods = React.useCallback(
+  (newKategori, newDaerah, newSearch) => {
 
     const kategoriValue =
       newKategori ?? kategori;
@@ -49,7 +46,10 @@ function DashboardAfterLogin() {
 
     });
 
-  };
+},
+  [kategori, daerah, search]
+);
+
   useEffect(() => {
 
     const token = localStorage.getItem("token");
@@ -111,19 +111,13 @@ function DashboardAfterLogin() {
 
       }, []);
 
-  }, []);
+ }, [navigate]);
 
   useEffect(() => {
 
-        filterFoods();
-        console.log(
-          "FILTER",
-          kategori,
-          daerah,
-          search
-        );
+    filterFoods();
 
-      }, [kategori, daerah, search]);
+  }, [kategori, daerah, search, filterFoods]);
 
 const toggleSave = async (id) => {
 
@@ -758,8 +752,7 @@ const styles = {
     display: "flex",
     gap: "30px",
     fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
+    fontWeight: "700",
     cursor: "pointer",
     marginLeft: "100px",
   },

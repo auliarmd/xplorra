@@ -9,13 +9,6 @@ function Profil() {
   const [activeTab, setActiveTab] = useState("profil");
   const [myRecipes, setMyRecipes] = useState([]);
   const [myBookmarks, setMyBookmarks] = useState([]);
-  const [nama, setNama] = useState("");
-  const [kategori, setKategori] = useState("");
-  const [daerah, setDaerah] = useState("");
-  const [deskripsi, setDeskripsi] = useState("");
-  const [gambar, setGambar] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [fotoPreview, setFotoPreview] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false); 
   const fileInputRef = useRef(null);
@@ -198,7 +191,7 @@ function Profil() {
         localStorage.removeItem("token");
         navigate('/Masuk');
       });
-  }, []);
+  }, [navigate]);
 
   // Handler Hapus Resep
   const confirmDeleteRecipe = async () => {
@@ -1341,8 +1334,7 @@ const styles = {
     display: "flex",
     gap: "30px",
     fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
+    fontWeight: "700",
   },
   active: {
     color: "#F28C28",

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 
@@ -19,7 +19,36 @@ const [hoverCancel, setHoverCancel] = useState(false);
 
 useEffect(() => {
 
-  
+  const getResep = async () => {
+
+    try {
+
+      const response = await api.get(
+        `/foods/${id}`
+      );
+
+      const data = response.data;
+
+      setNama(data.nama);
+      setDeskripsi(data.deskripsi);
+      setDaerah(data.daerah);
+      setKategori(data.kategori);
+
+      setBahan(JSON.parse(data.bahan));
+      setLangkah(JSON.parse(data.langkah));
+
+      setPreview(
+        `http://localhost:5000/uploads/${data.gambar}`
+      );
+
+    } catch(err) {
+
+      console.log(err);
+
+    }
+
+  };
+
   getResep();
 
   api.get("/profile")
@@ -34,37 +63,7 @@ useEffect(() => {
       console.log(err);
     });
 
-}, []);
-
-const getResep = async () => {
-
-  try {
-
-    const response = await api.get(
-      `/foods/${id}`
-    );
-
-    const data = response.data;
-
-    setNama(data.nama);
-    setDeskripsi(data.deskripsi);
-    setDaerah(data.daerah);
-    setKategori(data.kategori);
-
-    setBahan(JSON.parse(data.bahan));
-    setLangkah(JSON.parse(data.langkah));
-
-    setPreview(
-      `http://localhost:5000/uploads/${data.gambar}`
-    );
-
-  } catch(err) {
-
-    console.log(err);
-
-  }
-
-};
+}, [id]);
 
 const handleUpdate = async () => {
 

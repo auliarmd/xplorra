@@ -587,8 +587,7 @@ const styles = {
     display: "flex",
     gap: "30px",
     fontSize: "18px",
-    fontWeight: "500",
-    fontWeight: "bold",
+    fontWeight: "700",
     cursor: "pointer",
     marginRight: "-90px",
   },
@@ -680,19 +679,13 @@ const styles = {
     marginTop: "50px",
   },
 
-
-  infoRow: {
-    display: "flex",
-    gap: "15px",
-    fontSize: "12px",
-  },
-
   bottomRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: "10px",
-  },
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  margin: "0",
+  marginTop: "10px",
+},
 
   btnLihat: {
     background: "#d86936",
@@ -895,13 +888,6 @@ infoRow: {
   color: "#555",
   margin: "0",
   marginTop: "-10px",
-},
-
-bottomRow: {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  margin: "0",
 },
 
 iconText: {
