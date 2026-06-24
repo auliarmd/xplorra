@@ -1933,6 +1933,6 @@ app.get("/", (req, res) => {
 });
 
 console.log("ABOUT TO LISTEN");
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
