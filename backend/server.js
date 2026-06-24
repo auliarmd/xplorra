@@ -5,11 +5,6 @@ process.on("uncaughtException", (err) => {
   console.error(err);
 });
 
-process.on("unhandledRejection", (reason) => {
-  console.error("UNHANDLED REJECTION:");
-  console.error(reason);
-});
-
 const express = require('express');
 const mysql = require('mysql2');
 const helmet = require('helmet');
