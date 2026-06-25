@@ -22,6 +22,8 @@ process.on('unhandledRejection', (err) => {
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
