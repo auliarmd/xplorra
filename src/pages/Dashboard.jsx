@@ -11,6 +11,8 @@ function Dashboard() {
   const [kategori, setKategori] = useState("");
   const [daerah, setDaerah] = useState("");
   const [trendingFoods, setTrendingFoods] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
 
   const goToRegister = () => {
     navigate("/Register");
@@ -24,52 +26,49 @@ function Dashboard() {
     navigate("/Masuk");
   };
 
-  useEffect(() => {
+// Trending
+useEffect(() => {
+  fetch(`${BASE_URL}/foods/trending`)
+    .then((res) => {
+  if (!res.ok) {
+    throw new Error("Gagal mengambil data");
+  }
+  return res.json();
+})
+.then((data) => {
+      setTrendingFoods(Array.isArray(data) ? data : []);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}, []);
 
-    fetch(`${BASE_URL}/foods/trending`)
-      .then((res) => res.json())
-      .then((data) => {
+ useEffect(() => {
 
-        setTrendingFoods(
-          Array.isArray(data)
-            ? data
-            : []
-        );
+  setLoading(true);
 
-      })
-      .catch((err) => {
-
-        console.log(err);
-
-      });
-
-  }, []);
-
-  useEffect(()=>{
-
-    fetch(
-      `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
-    )
-
-    .then((res)=>res.json())
-
-    .then((data)=>{
-
-      console.log(data);
+  fetch(
+    `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
+  )
+    .then((res) => res.json())
+    .then((data) => {
 
       setFoods(data);
 
-      setNotFound(
-        data.length === 0
-      );
+      setNotFound(data.length === 0);
+
+      setLoading(false);
 
     })
+    .catch((err) => {
 
-    .catch((err)=>{
       console.log(err);
+
+      setLoading(false);
+
     });
 
-  },[kategori, daerah, search]);
+}, [kategori, daerah, search]);
   return (
     <div style={styles.container}>
       {/* NAVBAR */}
@@ -454,17 +453,32 @@ function Dashboard() {
         
 
         {/* GRID */}
-          <div style={styles.cardContainer}>
+        <div style={styles.cardContainer}>
 
-            {notFound ? (
+  {loading ? (
 
-              <div style={styles.emptyResult}>
-                <h2 style={styles.emptyResultText}>
-                  Resep tidak ditemukan
-                </h2>
-              </div>
+    <div style={styles.loadingContainer}>
+      <span
+        className="material-symbols-outlined"
+        style={styles.loadingIcon}
+      >
+        progress_activity
+      </span>
 
-            ) : (
+      <p style={styles.loadingText}>
+        Memuat resep...
+      </p>
+    </div>
+
+  ) : notFound ? (
+
+    <div style={styles.emptyResult}>
+      <h2 style={styles.emptyResultText}>
+        Resep tidak ditemukan
+      </h2>
+    </div>
+
+  ) : (
 
               <div style={styles.grid}>
 
@@ -478,8 +492,6 @@ function Dashboard() {
 
   {/* WRAPPER GAMBAR */}
   <div style={styles.cardImgWrapper}>
-        {console.log(item.gambar)}
-        {console.log(`${BASE_URL}/uploads/${item.gambar}`)}
         <img
           src={`${BASE_URL}/uploads/${item.gambar}`}
           style={styles.cardImg}
@@ -955,6 +967,27 @@ clearFilterIcon: {
     fontWeight: "bold",
     marginBottom: "15px",
   },
+
+  loadingContainer: {
+  width: "100%",
+  height: "600px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+loadingIcon: {
+  fontSize: "60px",
+  color: "#E46B5C",
+},
+
+loadingText: {
+  marginTop: "15px",
+  color: "#8B5A2B",
+  fontWeight: "600",
+  fontSize: "18px",
+},
 };
 
 export default Dashboard;
