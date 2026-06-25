@@ -14,11 +14,10 @@ function DashboardAfterLogin() {
   const [daerah, setDaerah] = useState("");
   const trendingRef = useRef(null);
   
-  // State Responsif & Menu Mobile
+  // State Responsive & Menu Mobile
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
-  const [loading, setLoading] = useState(true);
 
   // Perubahan Ukuran Layar Listener
   useEffect(() => {
@@ -29,31 +28,36 @@ function DashboardAfterLogin() {
 
   const isMobile = windowWidth <= 768;
 
+  // CARA OTOMATIS RESPONSIF: Menyuntikkan meta viewport jika tidak ada index.html
+  useEffect(() => {
+    let metaViewport = document.querySelector('meta[name="viewport"]');
+    if (!metaViewport) {
+      metaViewport = document.createElement('meta');
+      metaViewport.name = 'viewport';
+      document.head.appendChild(metaViewport);
+    }
+    metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+  }, []);
+
   // Fungsi Filter Resep dengan useCallback
-  const filterFoods = useCallback(
-    (newKategori, newDaerah, newSearch) => {
-      setLoading(true);
+  const filterFoods = useCallback(async () => {
+    try {
+      const res = await api.get("/foods", {
+        params: {
+          kategori,
+          daerah,
+          search,
+        },
+      });
 
-      const kategoriValue = newKategori ?? kategori;
-      const daerahValue = newDaerah ?? daerah;
-      const searchValue = newSearch ?? search;
-
-      api.get(`/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`)
-        .then((res) => {
-          const data = Array.isArray(res.data) ? res.data : [];
-          setFoods(data);
-          setNotFound(data.length === 0);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setFoods([]);
-          setNotFound(true);
-          setLoading(false);
-        });
-    },
-    [kategori, daerah, search]
-  );
+      setFoods(Array.isArray(res.data) ? res.data : []);
+      setNotFound(res.data.length === 0);
+    } catch (err) {
+      console.log(err);
+      setFoods([]);
+      setNotFound(true);
+    }
+  }, [kategori, daerah, search]);
 
   // Auto-Scroll untuk Card Trending di Mobile
   useEffect(() => {
@@ -114,7 +118,7 @@ function DashboardAfterLogin() {
 
   useEffect(() => {
     filterFoods();
-  }, [kategori, daerah, search, filterFoods]);
+  }, [filterFoods]);
 
   const toggleSave = async (id) => {
     try {
@@ -186,8 +190,8 @@ function DashboardAfterLogin() {
           </div>
           <div style={styles.menu}>
             <span style={styles.active}>Home</span>
-            <span onClick={() => navigate("/profil")}>Profil</span>
-            <span onClick={() => navigate("/notifikasi")}>Notifikasi</span>
+            <span onClick={() => navigate("/profil")} style={{ cursor: "pointer" }}>Profil</span>
+            <span onClick={() => navigate("/notifikasi")} style={{ cursor: "pointer" }}>Notifikasi</span>
           </div>
           <div style={styles.rightMenu}>
             <button style={styles.btnTambah} onClick={() => navigate("/tambah")}>+ Tambah resep</button>
@@ -216,9 +220,12 @@ function DashboardAfterLogin() {
             </div>
             <div style={styles.mobileMenuTitle}></div>
             <div className="hover-sidebar-item" style={activeMenu === "Dashboard" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Dashboard"); navigate("/dashboardafterlogin"); setShowMenu(false); }}>Dashboard</div>
-            <div className="hover-sidebar-item" style={activeMenu === "Tambah Resep" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Tambah Resep"); navigate("/tambah"); setShowMenu(false); }}>Tambah Resep</div>
             <div className="hover-sidebar-item" style={activeMenu === "Notifikasi" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Notifikasi"); navigate("/notifikasi"); setShowMenu(false); }}>Notifikasi</div>
             <div className="hover-sidebar-item" style={activeMenu === "Profil" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Profil"); navigate("/profil"); setShowMenu(false); }}>Profil</div>
+            
+            <div style={{ padding: "15px 14px", marginTop: "20px" }}>
+              <button style={{ ...styles.btnTambah, width: "100%", background: "#e15b3c", color: "#fff" }} onClick={() => navigate("/tambah")}>+ Tambah resep</button>
+            </div>
           </div>
         </>
       )}
@@ -230,21 +237,27 @@ function DashboardAfterLogin() {
       <div style={{
         maxWidth: "1400px",
         margin: "0 auto",
-        padding: isMobile ? "0 15px" : "0 50px",
+        padding: isMobile ? "0px" : "0 50px", 
         marginTop: isMobile ? "0px" : "-460px", 
         position: "relative",
         zIndex: 10,
+        width: "100%",
+        boxSizing: "border-box"
       }}>
 
         {/* 1. SECTION TRENDING */}
-        <div style={{ marginBottom: isMobile ? "20px" : "60px" }}>
-          <div style={{ height: "25px" }}></div> 
+        <div
+          style={{
+            marginBottom: isMobile ? "25px" : "70px",
+          }}
+        >
+          <div style={{ height: "10px" }}></div> 
           
           <div ref={trendingRef} style={isMobile ? styles.trendingMobileScroll : styles.trendingDesktopGrid}>
             {Array.isArray(trendingFoods) && trendingFoods.map((item) => (
               <div 
                 key={item.id} 
-                style={{ ...styles.trendingCard, minWidth: isMobile ? "85vw" : "auto" }} 
+                style={{ ...styles.trendingCard, minWidth: isMobile ? "85vw" : "auto", cursor: "pointer" }} 
                 onClick={() => navigate(`/detail/${item.id}`)}
               >
                 <div style={styles.imageWrapper}>
@@ -258,11 +271,7 @@ function DashboardAfterLogin() {
                     <span style={styles.trendingTextBlack}>Trending Now</span>
                     
                     {item.creator_id !== user.id && (
-                      <button 
-                        style={styles.bookmarkBtn} 
-                        onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
-                        title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
-                      >
+                      <button style={styles.bookmarkBtn} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
                         <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActive : styles.bookmark}>
                           {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                         </span>
@@ -286,26 +295,11 @@ function DashboardAfterLogin() {
                   <div style={styles.bottomRow}>
                     <span style={styles.rating}>
                       {item.rating}
-                      {[1,2,3,4,5].map((star)=>(
-                        <span
-                          key={star}
-                          className="material-symbols-outlined"
-                          style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}
-                        >
-                          star
-                        </span>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
                       ))}
                     </span>
-
-                    <button
-                      style={styles.btnLihat}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/detail/${item.id}`)
-                      }}
-                    >
-                      Lihat
-                    </button>
+                    <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
                   </div>
                 </div>
               </div>
@@ -313,12 +307,14 @@ function DashboardAfterLogin() {
           </div>
         </div>
 
-        {/* 2. SEARCH BOX & FILTER (PINDAH KE SINI KHUSUS MOBILE) */}
+        {/* SEARCH BOX & FILTER MOBILE */}
         {isMobile && (
           <div style={styles.mobileSearchWrapper}>
-            <div style={styles.searchBoxMobile}>
-              <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
-              <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
+            <div style={styles.mobileSearchContainer}>
+              <div style={styles.searchBoxMobile}>
+                <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
+                <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
+              </div>
             </div>
             <div style={styles.scrollFilterContainer}>
               <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
@@ -326,7 +322,7 @@ function DashboardAfterLogin() {
                 <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
               ))}
             </div>
-            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px" }}>
+            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px" }}>
               <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
               {daftarDaerah.map((dae) => (
                 <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
@@ -335,15 +331,18 @@ function DashboardAfterLogin() {
           </div>
         )}
 
-        {/* 3. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
-        <div style={{ 
-          display: "flex", 
-          flexDirection: isMobile ? "column" : "row", 
-          gap: isMobile ? "20px" : "40px",
-          alignItems: "flex-start"
-        }}>
+        {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: isMobile ? "column" : "row",
+            gap: isMobile ? "20px" : "40px",
+            alignItems: "flex-start",
+            marginTop: isMobile ? "0px" : "35px",
+          }}
+        >
           
-          {/* SIDEBAR FILTER (DESKTOP) */}
+          {/* SIDEBAR FILTER DESKTOP */}
           {!isMobile && (
             <div style={styles.sidebar}>
               <div style={styles.searchBoxContainerSidebar}>
@@ -359,6 +358,7 @@ function DashboardAfterLogin() {
               </div>
 
               <h2 style={styles.title}>Kategori</h2>
+
               <p style={styles.sectionTitle}>Jenis hidangan</p>
               {daftarKategori.map((kat) => (
                 <div key={kat} style={styles.optionRow} onClick={() => setKategori(kat)}>
@@ -383,24 +383,22 @@ function DashboardAfterLogin() {
             </div>
           )}
 
-          {/* MAIN LIST CONTAINER (LOADING & GRID STATE) */}
+          {/* REKOMENDASI UNTUKMU / MAIN LIST */}
           <div style={isMobile ? { flex: 1, width: "100%" } : styles.mainListContainer}>
-            <h3 style={{ 
-              ...styles.mobileSectionHeading, 
-              fontSize: isMobile ? "18px" : "24px", 
-              margin: "0 0 5px 0",
-              display: isMobile ? "block" : "none" 
-            }}>
-              Rekomendasi Untukmu
-            </h3>
+            {isMobile && (
+              <h3
+                style={{
+                  ...styles.mobileSectionHeading,
+                  fontSize: "18px",
+                  margin: "0 0 15px 0",
+                }}
+              >
+                Rekomendasi Untukmu
+              </h3>
+            )}
             
             <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
-              {loading ? (
-                <div style={styles.loadingContainer}>
-                  <span className="material-symbols-outlined" style={styles.loadingIcon}>hourglass_top</span>
-                  <p style={styles.loadingText}>Memuat resep...</p>
-                </div>
-              ) : notFound ? (
+              {notFound ? (
                 <div style={styles.emptyResult}>
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
                 </div>
@@ -416,11 +414,7 @@ function DashboardAfterLogin() {
                           alt=""
                         />
                         {!isMobile && item.creator_id !== user.id && (
-                          <button 
-                            style={styles.bookmarkBtnCard} 
-                            onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
-                            title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
-                          >
+                          <button style={styles.bookmarkBtnCard} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
                             <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActiveCard : styles.bookmarkCard}>
                               {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                             </span>
@@ -436,7 +430,6 @@ function DashboardAfterLogin() {
                               className="material-symbols-outlined" 
                               style={savedRecipes.includes(item.id) ? styles.bookmarkActiveCard : styles.bookmarkCard}
                               onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
-                              title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
                             >
                               {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                             </span>
@@ -480,8 +473,23 @@ function DashboardAfterLogin() {
 }
 
 const styles = {
-  container: { fontFamily: "sans-serif", background: "#f7f1ec", minHeight: "100vh", fontWeight: "bold" },
-  navbar: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 50px", background: "#fff", position: "sticky", top: 0, zIndex: 999, boxShadow: "0 2px 10px rgba(0,0,0,0.03)" },
+  container: {
+    fontFamily: "sans-serif",
+    background: "#f7f1ec",
+    minHeight: "100vh",
+    fontWeight: "bold",
+  },
+  navbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "15px 50px",
+    background: "#fff",
+    position: "sticky",
+    top: 0,
+    zIndex: 999,
+    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+  },
   logoContainer: { display: "flex", alignItems: "center", gap: "1px" },
   logoImg: { width: "40px" },
   logoText: { color: "#F28C28", fontWeight: "bold", fontSize: "24px", letterSpacing: "1px" },
@@ -489,20 +497,28 @@ const styles = {
   active: { color: "#F28C28", fontWeight: "bold" },
   rightMenu: { display: "flex", alignItems: "center", gap: "15px" },
   btnTambah: { border: "1.5px solid #e15b3c", color: "#e15b3c", background: "transparent", padding: "6px 15px", borderRadius: "20px", cursor: "pointer", fontWeight: "600" },
-  topBg: { height: "520px", backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')", backgroundSize: "cover", backgroundPosition: "center", width: "100%" },
+  topBg: {
+    height: "520px",
+    backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    width: "100%",
+  },
   searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
   sidebar: {
     width: "260px",
     background: "transparent", 
     padding: "0px 10px 25px 0px", 
-    borderRadius: "0px",
-    boxShadow: "none",
     position: "sticky",
     top: "90px",
-    marginLeft: "0px",
-    marginTop: "-5px" 
+    marginLeft: "-30px", 
+    marginTop: "0px"
   },
-  mainListContainer: { flex: 1, width: "100%", paddingTop: "66px" },
+  mainListContainer: {
+    flex: 1,
+    width: "100%",
+    paddingTop: "50px",
+  },
   searchBox: {
     display: "flex",
     alignItems: "center",
@@ -511,12 +527,34 @@ const styles = {
     borderRadius: "30px",
     padding: "10px 20px",
     background: "#fff8f6", 
-    marginLeft: "-12px",
-    width: "calc(100% + 12px)",
+    width: "105%", 
     boxSizing: "border-box",
   },
-  mobileSearchWrapper: { padding: "15px 0px 25px 0px", background: "transparent" },
-  searchBoxMobile: { display: "flex", alignItems: "center", gap: "10px", border: "1px solid rgba(0, 0, 0, 0.1)", borderRadius: "25px", padding: "10px 15px", background: "rgba(255, 255, 255, 0.4)", backdropFilter: "blur(8px)" },
+  // PERBAIKAN: Dikurangi ke 5px agar kotak search mobile naik proporsional mendekati navbar seperti image_84a637.png
+  mobileSearchWrapper: { 
+    padding: "5px 15px 5px 15px", 
+    background: "transparent", 
+    width: "100%", 
+    boxSizing: "border-box" 
+  },
+  mobileSearchContainer: {
+    display: "flex",
+    justifyContent: "center", 
+    width: "100%",
+    marginBottom: "15px" 
+  },
+  searchBoxMobile: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "10px", 
+    border: "1px solid rgba(0, 0, 0, 0.1)", 
+    borderRadius: "25px", 
+    padding: "12px 15px", 
+    background: "rgba(255, 255, 255, 0.4)", 
+    backdropFilter: "blur(8px)",
+    width: "100%",
+    boxSizing: "border-box"
+  },
   searchIcon: { fontSize: "22px", color: "#e15b3c" },
   searchIconMobile: { fontSize: "18px", color: "#F28C28" },
   searchInput: { border: "none", outline: "none", fontSize: "16px", color: "#e15b3c", width: "100%", background: "transparent" },
@@ -533,7 +571,7 @@ const styles = {
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
-  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "70px", width: "100%" },
+  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "45px", width: "100%" },
   trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none" },
   trendingCard: { width: "100%", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
   imageWrapper: { position: "relative" },
@@ -541,7 +579,7 @@ const styles = {
   overlay: { position: "absolute", top: "20px", left: "20px", right: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   trendingTextBlack: { 
     color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
-    textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff, -2px -4px 0 #fff, 2px -4px 0 #fff, -2px 4px 0 #fff, 2px 4px 0 #fff`
+    textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff`
   },
   trendingOverlay: { padding: "15px 24px", minHeight: "130px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxSizing: "border-box", gap: "10px" },
   trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
@@ -560,10 +598,10 @@ const styles = {
   bookmarkCard: { color: "#555", fontSize: "24px" },
   bookmarkActiveCard: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "24px" },
   cardContainer: { width: "100%" },
-  cardContainerMobile: { marginTop: "5px" },
+  cardContainerMobile: { marginTop: "5px", padding: "0 15px", boxSizing: "border-box" },
   grid: { display: "grid", gap: "25px" },
-  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
-  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px" },
+  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18 rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
+  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
   btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
@@ -585,11 +623,7 @@ const styles = {
   emptyResultText: { color: "#a4a4a4", fontSize: "22px", fontWeight: "700" },
   mobileNavbarLeft: { flex: 1, display: "flex", justifyContent: "flex-start", alignItems: "center" },
   mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "#9F6822", fontWeight: "700", fontSize: "18px", whiteSpace: "nowrap" },
-  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" },
-  clearFilterBtn: { width: "100%", padding: "10px", border: "2px solid #d86936", background: "#fff", borderRadius: "25px", cursor: "pointer", fontWeight: "bold", marginBottom: "15px" },
-  loadingContainer: { width: "100%", height: "300px", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" },
-  loadingIcon: { fontSize: "55px", color: "#E46B5C" },
-  loadingText: { marginTop: "12px", fontSize: "18px", fontWeight: "600", color: "#8B5A2B" }
+  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" }
 };
 
 export default DashboardAfterLogin;

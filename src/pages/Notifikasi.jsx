@@ -308,7 +308,7 @@ function Notifikasi() {
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "#f5f5f5",
+    background: "#fff",
     fontFamily: "Segoe UI, sans-serif",
     paddingTop: "70px",
   },
@@ -466,15 +466,19 @@ const styles = {
   /* LIST */
   notifList: {
     marginTop: "60px",
-  },
-  notifItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "14px 18px",
-    borderBottom: "1px solid #eee",
+    paddingBottom: "50px",
+    minHeight: "calc(100vh - 130px)",
     background: "#fff",
   },
+notifItem: {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "18px",
+  borderBottom: "1px solid #eee",
+  background: "#fff",
+  minHeight: "80px",
+},
   leftNotif: {
     display: "flex",
     alignItems: "flex-start",
@@ -687,6 +691,22 @@ const styles = {
     fontSize: "30px",
     color: "#9A5B12",
     cursor: "pointer",
+  },
+  // HANYA BAGIAN INI YANG PERLU DIUBAH / DIGANTI di dalam const styles
+  contentCard: { 
+    flex: 1, 
+    background: "#fff", 
+    padding: "40px", 
+    borderRadius: "24px", 
+    boxShadow: "0 4px 20px rgba(0,0,0,0.02)", 
+    minHeight: "75vh" // Ditambahkan agar memanjang ke bawah di desktop
+  },
+  mobileContentArea: { 
+    width: "100%", 
+    padding: "20px", 
+    boxSizing: "border-box", 
+    background: "#fff", 
+    minHeight: "75vh" // Ditambahkan agar memanjang ke bawah di mobile
   },
 };
 
