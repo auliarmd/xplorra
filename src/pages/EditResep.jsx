@@ -18,10 +18,6 @@ function EditResep() {
   const [hoverCancel, setHoverCancel] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
-  // Perbaikan: isMobile hanya dideklarasikan sekali menggunakan state
  const getIsMobile = () =>
   window.matchMedia("(max-width: 768px)").matches;
  const [isMobile, setIsMobile] = useState(getIsMobile);
