@@ -12,7 +12,7 @@ function Detail() {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [user, setUser] = useState({});
-  const [showMenu, setShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false); // State untuk Sidebar Mobile
 
   useEffect(() => {
     api.get(`/my-rating/${id}`)
@@ -69,7 +69,7 @@ function Detail() {
   const isDesktop = screenWidth >= 1024;
 
   if (!food) {
-    return <div style={{ textAlign: "center", padding: "50px", fontWeight: "bold", color: "#9F6822", fontSize: "20px" }}>Memuat Resep...</div>;
+    return <div style={{ textAlign: "center", padding: "50px", fontWeight: "bold", color: "#9F6822" }}>Memuat Resep...</div>;
   }
 
   const bahanArray = (() => {
@@ -153,40 +153,58 @@ function Detail() {
       
       {/* NAVBAR */}
       {isMobile ? (
+        // HEADER MOBILE (Sesuai Gambar Referensi)
         <div style={styles.mobileNavbar}>
-          <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
+          <span
+            className="material-symbols-outlined"
+            style={styles.mobileMenuIcon}
+            onClick={() => setShowMenu(true)}
+          >
             menu
           </span>
+
           <div style={styles.mobileHeaderTitle}>
-            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>menu_book</span>
+            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>
+              menu_book
+            </span>
             Detail Resep
           </div>
+
           <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
             {user.foto ? (
-              <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              <img
+                src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+                alt="Profile"
+                style={styles.profileImg}
+              />
             ) : (
-              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>person</span>
+              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                person
+              </span>
             )}
           </div>
         </div>
       ) : (
+        // HEADER DESKTOP / TABLET
         <div style={styles.desktopNavbar}>
           <div style={styles.logoArea} onClick={() => navigate("/dashboardafterlogin")}>
             <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
             <div style={styles.logoText}>pLorra</div>
           </div>
+
           <div style={styles.desktopHeaderTitle}>Detail Resep</div>
+
           <div style={styles.menuArea}>
             <div style={styles.menu}>
               <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
               <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
               <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
             </div>
-            <div style={{...styles.profileCircle, width: "45px", height: "45px"}} onClick={() => navigate("/profil")}>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
               {user.foto ? (
                 <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
               ) : (
-                <span className="material-symbols-outlined" style={{ fontSize: "24px" }}>person</span>
+                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
               )}
             </div>
           </div>
@@ -198,14 +216,34 @@ function Detail() {
         <>
           <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
           <div style={styles.mobileSidebar}>
+            
+            {/* AREA LOGO & TOMBOL SILANG */}
             <div style={styles.mobileLogoSection}>
-              <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
-              <span style={styles.mobileLogoText}>pLorra</span>
+              <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
+                <span style={styles.mobileLogoText}>pLorra</span>
+              </div>
+              
+              {/* ICON SILANG UNTUK MENUTUP MENU */}
+              <span 
+                className="material-symbols-outlined" 
+                style={styles.mobileCloseIcon}
+                onClick={() => setShowMenu(false)}
+              >
+                close
+              </span>
             </div>
+            
             <div style={styles.mobileMenuTitle}>MENU</div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}>Dashboard</div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/notifikasi"); setShowMenu(false); }}>Notifikasi</div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/profil"); setShowMenu(false); }}>Profil</div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}>
+              Dashboard
+            </div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/notifikasi"); setShowMenu(false); }}>
+              Notifikasi
+            </div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/profil"); setShowMenu(false); }}>
+              Profil
+            </div>
           </div>
         </>
       )}
@@ -214,22 +252,21 @@ function Detail() {
       <div
         style={{
           ...styles.heroSection,
-          height: isMobile ? "300px" : isTablet ? "450px" : "650px",
+          height: isMobile ? "300px" : isTablet ? "450px" : "550px",
         }}
       >
         <img src={`https://xplorra-production.up.railway.app/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
         <div
           style={{
             ...styles.heroOverlay,
-            padding: isMobile ? "20px" : isTablet ? "40px" : "60px",
+            padding: isMobile ? "20px" : isTablet ? "40px" : "50px",
           }}
         >
           <div style={styles.heroTextContainer}>
            <h1
               style={{
                 ...styles.heroTitle,
-                // Judul diperbesar jadi 72px di Desktop
-                fontSize: isMobile ? "32px" : isTablet ? "48px" : "72px", 
+                fontSize: isMobile ? "32px" : isTablet ? "48px" : "58px",
               }}
             >
               {food.nama}
@@ -237,22 +274,22 @@ function Detail() {
             <p
               style={{
                 ...styles.heroSubtitle,
-                fontSize: isMobile ? "16px" : isTablet ? "20px" : "28px", 
-                marginBottom: isMobile ? "15px" : "30px"
+                fontSize: isMobile ? "16px" : isTablet ? "20px" : "24px",
+                marginBottom: isMobile ? "15px" : "25px"
               }}
             >Berasal dari {food.daerah}</p>
-            <div style={{ ...styles.heroActions, flexWrap: "wrap", gap: "15px" }}>
+            <div style={{ ...styles.heroActions, flexWrap: "wrap" }}>
               <button 
                 title={liked ? "Batal menyukai" : "Suka resep ini"} 
                 style={{
                   ...styles.actionBtn,
                   background: liked ? "#C86B3E" : "rgba(255,255,255,0.3)",
-                  padding: isMobile ? "8px 16px" : "12px 28px",
-                  fontSize: isMobile ? "13px" : "18px", 
+                  padding: isMobile ? "8px 16px" : "10px 22px",
+                  fontSize: isMobile ? "13px" : "15px",
                 }} 
                 onClick={handleLike}
               >
-                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "22px"}}>thumb_up</span>
+                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "18px"}}>thumb_up</span>
                 {liked ? "Suka" : "Suka"}
               </button>
 
@@ -261,12 +298,12 @@ function Detail() {
                 style={{
                   ...styles.actionBtn, 
                   background: bookmarked ? '#9F6822' : 'rgba(255,255,255,0.3)',
-                  padding: isMobile ? "8px 16px" : "12px 28px",
-                  fontSize: isMobile ? "13px" : "18px",
+                  padding: isMobile ? "8px 16px" : "10px 22px",
+                  fontSize: isMobile ? "13px" : "15px",
                 }} 
                 onClick={handleBookmark}
               >
-                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "22px"}}>bookmark</span>
+                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "18px"}}>bookmark</span>
                 {bookmarked ? "Simpan" : "Simpan"}
               </button>
             </div>
@@ -279,44 +316,47 @@ function Detail() {
         style={{
           ...styles.mainGrid,
           gridTemplateColumns: isDesktop ? "1fr 2fr" : "1fr",
-          gap: isMobile ? "20px" : isTablet ? "40px" : "60px",
-          marginTop: isMobile ? "30px" : "60px",
-          padding: isMobile ? "0 15px" : "0 30px",
+          gap: isMobile ? "20px" : isTablet ? "40px" : "90px",
+          marginTop: isMobile ? "30px" : "50px",
+          padding: isMobile ? "0 15px" : "0 20px",
+          maxWidth: isDesktop ? "1450px" : "1200px",
         }}
       >
         {/* LEFT COLUMN */}
         <div style={styles.leftColumn}>
           {/* CREATOR CARD */}
-          <div style={{ ...styles.card, padding: isMobile ? "20px" : "40px" }}>
-            <div style={{...styles.creatorHeader, gap: isMobile ? "10px" : "20px"}}>
-              <div style={{...styles.creatorAvatar, width: isMobile ? "50px" : "80px", height: isMobile ? "50px" : "80px"}}>
+          <div style={{ ...styles.card, padding: isMobile ? "20px" : "30px" }}>
+            <div style={{...styles.creatorHeader, gap: isMobile ? "10px" : "15px"}}>
+              <div style={{...styles.creatorAvatar, width: isMobile ? "50px" : "60px", height: isMobile ? "50px" : "60px"}}>
                 {food.creator_foto ? (
                   <img src={`https://xplorra-production.up.railway.app/uploads/${food.creator_foto}`} alt="creator" style={styles.creatorImg} />
                 ) : (
-                  <span className="material-symbols-outlined" style={{fontSize: isDesktop ? "35px" : "24px"}}>person</span>
+                  <span className="material-symbols-outlined">person</span>
                 )}
               </div>
               <div>
-                {/* Nama Pembuat diperbesar jadi 26px di Desktop */}
-                <h3 style={{...styles.creatorName, fontSize: isDesktop ? "26px" : isTablet ? "20px" : "16px"}}>{food.creator}</h3>
-                <span style={{...styles.creatorRole, fontSize: isDesktop ? "14px" : "12px"}}>Pembuat Resep Asli</span>
+                <h3 style={{...styles.creatorName, fontSize: isMobile ? "16px" : "18px"}}>{food.creator}</h3>
+                <span style={styles.creatorRole}>Pembuat Resep Asli</span>
               </div>
             </div>
-            <p style={{...styles.creatorDesc, fontSize: isDesktop ? "16px" : "13px"}}>{food.deskripsi ? `"${food.deskripsi}"` : "Tidak ada deskripsi"}</p>
+            <p style={{...styles.creatorDesc, fontSize: isMobile ? "12px" : "13px"}}>{food.deskripsi ? `"${food.deskripsi}"` : "Tidak ada deskripsi"}</p>
           </div>
 
           {/* INGREDIENTS CARD */}
-          <div style={{ ...styles.card, padding: isMobile ? "20px" : "40px" }}>
-            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : "24px"}}>
-              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "28px"}}>restaurant_menu</span>
+          <div style={{ ...styles.card, padding: isMobile ? "20px" : "30px" }}>
+            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : "20px"}}>
+              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "24px"}}>restaurant_menu</span>
               Bahan-bahan
             </h3>
             <div style={styles.ingredientList}>
               {bahanArray.map((item, index) => (
                 <div key={index} style={styles.ingredientItem}>
-                  <span className="material-symbols-outlined" style={{...styles.bulletIcon, fontSize: isDesktop ? "22px" : "16px"}}>check_circle</span>
-                  {/* Bahan-bahan diperbesar jadi 18px di Desktop */}
-                  <span style={{fontSize: isDesktop ? "18px" : isTablet ? "16px" : "13px"}}>{item}</span>
+                  <span className="material-symbols-outlined" style={styles.bulletIcon}>check_circle</span>
+                  <span style={{
+                    fontSize: isMobile ? "13px" : isDesktop ? "17px" : "14px" // Ditambah ke 17px di desktop
+                  }}>
+                    {item}
+                  </span>
                 </div>
               ))}
             </div>
@@ -324,31 +364,48 @@ function Detail() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div style={{...styles.rightColumn, gap: isMobile ? "25px" : "40px"}}>
+        <div 
+          style={{
+            ...styles.rightColumn, 
+            gap: isMobile ? "25px" : "40px",
+            paddingLeft: isDesktop ? "20px" : "0px" 
+          }}
+        >
           
           {/* STEPS CARD */}
-          <div style={{...styles.card, backgroundColor: "#FFFFFF", padding: isMobile ? "20px" : "40px"}}>
-            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : "24px"}}>
-              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "28px"}}>local_dining</span>
+          <div style={{...styles.card, backgroundColor: "#FFFFFF", padding: isMobile ? "20px" : "30px"}}>
+            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : isDesktop ? "24px" : "20px"}}>
+              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "24px"}}>local_dining</span>
               Langkah-langkah Memasak
             </h3>
             <div style={styles.stepList}>
               {langkahArray.map((item, index) => (
-                <div key={index} style={{...styles.stepItem, gap: isMobile ? "15px" : "25px"}}>
-                  <div style={{...styles.stepNumber, minWidth: isDesktop ? "50px" : isTablet ? "40px" : "30px", height: isDesktop ? "50px" : isTablet ? "40px" : "30px", fontSize: isDesktop ? "20px" : "14px"}}>{index + 1}</div>
-                  {/* Langkah Memasak diperbesar jadi 18px di Desktop */}
-                  <div style={{...styles.stepText, fontSize: isDesktop ? "18px" : isTablet ? "16px" : "13px", marginTop: isDesktop ? "8px" : "2px"}}>{item}</div>
+                <div key={index} style={{...styles.stepItem, gap: isMobile ? "15px" : "20px"}}>
+                  <div style={{
+                    ...styles.stepNumber, 
+                    minWidth: isMobile ? "30px" : isDesktop ? "40px" : "35px", // Wadah angka diperbesar sedikit
+                    height: isMobile ? "30px" : isDesktop ? "40px" : "35px",
+                    fontSize: isMobile ? "14px" : isDesktop ? "18px" : "16px"
+                  }}>
+                    {index + 1}
+                  </div>
+                  <div style={{
+                    ...styles.stepText, 
+                    fontSize: isMobile ? "13px" : isDesktop ? "17px" : "14px" // Isi teks ditambah ke 17px di desktop
+                  }}>
+                    {item}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* RATING CARD */}
-          <div style={{...styles.card, textAlign: "center", padding: isMobile ? "25px 15px" : "50px 20px"}}>
-            <h3 style={{...styles.cardTitle, justifyContent: "center", marginBottom: "15px", color: "#8E5E41", fontSize: isMobile ? "16px" : "24px"}}>
+          <div style={{...styles.card, textAlign: "center", padding: isMobile ? "25px 15px" : "40px 20px"}}>
+            <h3 style={{...styles.cardTitle, justifyContent: "center", marginBottom: "15px", color: "#8E5E41", fontSize: isMobile ? "16px" : "20px"}}>
               Seberapa suka anda terhadap resep ini?
             </h3>
-            <div style={{...styles.starsContainer, gap: isDesktop ? "20px" : "10px"}}>
+            <div style={styles.starsContainer}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
@@ -356,49 +413,49 @@ function Detail() {
                   style={{
                     ...styles.starIcon,
                     color: star <= rating ? '#E28E46' : '#C4A89A',
-                    fontSize: isMobile ? "35px" : "55px" 
+                    fontSize: isMobile ? "35px" : "45px"
                   }}
                 >
                   {star <= rating ? '★' : '☆'}
                 </span>
               ))}
             </div>
-            <p style={{...styles.ratingSubtext, fontSize: isDesktop ? "15px" : "12px"}}>Klik untuk memberikan nilai</p>
+            <p style={styles.ratingSubtext}>Klik untuk memberikan nilai</p>
           </div>
 
           {/* COMMENTS SECTION */}
           <div style={styles.commentsContainer}>
-            <h3 style={{...styles.commentHeader, fontSize: isMobile ? "16px" : "22px"}}>Komentar ({komentar.length})</h3>
+            <h3 style={{...styles.commentHeader, fontSize: isMobile ? "16px" : "18px"}}>Komentar ({komentar.length})</h3>
             
             {/* INPUT CARD */}
-            <div style={{...styles.inputCard, padding: isMobile ? "15px" : "25px"}}>
+            <div style={{...styles.inputCard, padding: isMobile ? "15px" : "20px"}}>
               <div style={styles.inputWrapper}>
-                <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "50px", height: isMobile ? "35px" : "50px"}}>
+                <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "40px", height: isMobile ? "35px" : "40px"}}>
                   {user.foto ? (
                     <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="user" style={styles.creatorImg} />
                   ) : (
-                    <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "28px"}}>person</span>
+                    <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "24px"}}>person</span>
                   )}
                 </div>
                 <input 
                   type="text" 
                   placeholder="Tulis Komentar..." 
-                  style={{...styles.commentInput, fontSize: isMobile ? "13px" : "16px"}} 
+                  style={{...styles.commentInput, fontSize: isMobile ? "13px" : "14px"}} 
                   value={isiKomentar}
                   onChange={(e) => setIsiKomentar(e.target.value)}
                 />
               </div>
               <div style={styles.sendBtnWrapper}>
-                <button style={{...styles.sendBtn, padding: isMobile ? "6px 20px" : "10px 30px", fontSize: isMobile ? "13px" : "16px"}} onClick={kirimKomentar}>Kirim</button>
+                <button style={{...styles.sendBtn, padding: isMobile ? "6px 20px" : "8px 25px", fontSize: isMobile ? "13px" : "14px"}} onClick={kirimKomentar}>Kirim</button>
               </div>
             </div>
 
             {/* COMMENT LIST */}
             <div style={styles.commentList}>
               {komentar.map((item, index) => (
-                <div key={index} style={{...styles.commentCard, padding: isMobile ? "15px" : "25px"}}>
-                  <div style={{...styles.commentRow, gap: isMobile ? "10px" : "20px"}}>
-                    <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "50px", height: isMobile ? "35px" : "50px"}}>
+                <div key={index} style={{...styles.commentCard, padding: isMobile ? "15px" : "20px"}}>
+                  <div style={{...styles.commentRow, gap: isMobile ? "10px" : "15px"}}>
+                    <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "40px", height: isMobile ? "35px" : "40px"}}>
                       {item.foto ? (
                         <img
                           src={`https://xplorra-production.up.railway.app/uploads/${item.foto}`}
@@ -406,21 +463,21 @@ function Detail() {
                           style={styles.creatorImg}
                         />
                       ) : (
-                        <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "28px"}}>
+                        <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "24px"}}>
                           person
                         </span>
                       )}
                     </div>
                     <div style={styles.commentContent}>
                       <div style={styles.commentTop}>
-                        <span style={{...styles.commentName, fontSize: isMobile ? "14px" : "18px"}}>
+                        <span style={{...styles.commentName, fontSize: isMobile ? "14px" : "15px"}}>
                           {item.nama}
                         </span>
-                        <span style={{...styles.commentDate, fontSize: isMobile ? "10px" : "14px"}}>
+                        <span style={{...styles.commentDate, fontSize: isMobile ? "10px" : "12px"}}>
                           {formatWaktu(item.created_at)}
                         </span>
                       </div>
-                      <p style={{...styles.commentTextContent, fontSize: isMobile ? "13px" : "16px", marginTop: isDesktop ? "8px" : "4px"}}>
+                      <p style={{...styles.commentTextContent, fontSize: isMobile ? "13px" : "14px"}}>
                         {item.komentar}
                       </p>
                     </div>
@@ -447,7 +504,7 @@ const styles = {
     boxSizing: "border-box",
   },
 
-  /* --- HEADER MOBILE --- */
+  /* --- HEADER MOBILE (Sesuai Gambar) --- */
   mobileNavbar: {
     display: "flex",
     alignItems: "center",
@@ -484,7 +541,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
-    padding: "15px 40px",
+    padding: "12px 30px",
     position: "sticky",
     top: 0,
     zIndex: 999,
@@ -498,16 +555,16 @@ const styles = {
     cursor: "pointer",
   },
   logoImg: {
-    width: "50px", 
+    width: "40px",
   },
   logoText: {
     color: "#E28B36",
     fontWeight: "bold",
-    fontSize: "28px", 
-    marginLeft: "8px",
+    fontSize: "22px",
+    marginLeft: "5px",
   },
   desktopHeaderTitle: {
-    fontSize: "26px", 
+    fontSize: "22px",
     fontWeight: "bold",
     color: "#9F6822",
     textAlign: "center",
@@ -515,20 +572,23 @@ const styles = {
   menuArea: {
     display: "flex",
     alignItems: "center",
-    gap: "35px",
+    gap: "25px",
   },
   menu: {
     display: "flex",
-    gap: "30px",
+    gap: "25px",
   },
   navItem: {
     fontWeight: "bold",
     color: "#111",
     cursor: "pointer",
-    fontSize: "17px", 
+    fontSize: "15px",
   },
   
+  /* --- PROFILE CIRCLE (Digunakan Desktop & Mobile) --- */
   profileCircle: {
+    width: "35px",
+    height: "35px",
     borderRadius: "50%",
     backgroundColor: "#F2AB82",
     display: "flex",
@@ -629,17 +689,19 @@ const styles = {
   },
   heroSubtitle: {
     color: "#FFFFFF",
+    marginTop: "8px",
     textShadow: "0 2px 8px rgba(0,0,0,0.5)",
   },
   heroActions: {
     display: "flex",
+    gap: "10px",
   },
   actionBtn: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
+    gap: "6px",
     border: "none",
-    borderRadius: "30px",
+    borderRadius: "25px",
     color: "#FFF",
     fontWeight: "600",
     cursor: "pointer",
@@ -648,7 +710,7 @@ const styles = {
   btnIcon: {},
   mainGrid:{
     display:"grid",
-    maxWidth:"1350px", 
+    maxWidth:"1200px",
     margin:"0 auto",
     width: "100%",
     boxSizing: "border-box", 
@@ -694,22 +756,22 @@ const styles = {
   creatorName: {
     margin: 0,
     color: "#4A3222",
-    fontWeight: "bold",
   },
   creatorRole: {
+    fontSize: "12px",
     color: "#8E5E41",
   },
   creatorDesc: {
     color: "#5E4637",
     fontStyle: "italic",
-    lineHeight: "1.6",
+    lineHeight: "1.5",
     margin: 0,
   },
   cardTitle: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
-    margin: "0 0 20px 0",
+    gap: "8px",
+    margin: "0 0 15px 0",
     color: "#4A3222",
   },
   titleIcon: {
@@ -718,16 +780,17 @@ const styles = {
   ingredientList: {
     display: "flex",
     flexDirection: "column",
-    gap: "15px",
+    gap: "12px",
   },
   ingredientItem: {
     display: "flex",
     alignItems: "flex-start",
-    gap: "12px",
+    gap: "10px",
     color: "#4A3222",
-    lineHeight: "1.5",
+    lineHeight: "1.4",
   },
   bulletIcon: {
+    fontSize: "16px",
     color: "#9F6822",
     marginTop: "2px",
   },
@@ -746,23 +809,26 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: "10px",
+    borderRadius: "8px",
     fontWeight: "bold",
   },
   stepText: {
     color: "#4A3222",
-    lineHeight: "1.6",
+    lineHeight: "1.5",
+    marginTop: "2px",
   },
   starsContainer: {
     display: "flex",
     justifyContent: "center",
-    marginBottom: "10px",
+    gap: "10px",
+    marginBottom: "8px",
   },
   starIcon: {
     cursor: "pointer",
     transition: "0.2s",
   },
   ratingSubtext: {
+    fontSize: "12px",
     color: "#8E5E41",
     margin: 0,
   },
@@ -771,16 +837,15 @@ const styles = {
   },
   commentHeader: {
     color: "#4A3222",
-    marginBottom: "15px",
-    fontWeight: "bold",
+    marginBottom: "12px",
   },
   inputCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: "15px",
-    marginBottom: "20px",
+    marginBottom: "15px",
     display: "flex",
     flexDirection: "column",
-    gap: "15px",
+    gap: "12px",
     boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
     width: "100%",
     boxSizing: "border-box", 
@@ -788,7 +853,7 @@ const styles = {
   inputWrapper: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
+    gap: "12px",
   },
   commentInput: {
     flex: 1,
@@ -813,10 +878,10 @@ const styles = {
   commentList: {
     display: "flex",
     flexDirection: "column",
-    gap: "15px",
-    maxHeight: "500px",
+    gap: "12px",
+    maxHeight: "400px",
     overflowY: "auto",
-    paddingRight: "8px",
+    paddingRight: "5px",
   },
   commentRow: {
     display: "flex",
@@ -829,7 +894,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "6px",
+    marginBottom: "4px",
   },
   commentCard: {
     backgroundColor: "#F7EBE2",
@@ -858,7 +923,13 @@ const styles = {
     marginTop: "4px",
     marginBottom: 0,
     color: "#5E4637",
-    lineHeight: "1.5",
+    lineHeight: "1.4",
+  },
+  mobileCloseIcon: {
+    fontSize: "28px",
+    color: "#9F6822",
+    cursor: "pointer",
+    padding: "4px",
   },
 };
 
