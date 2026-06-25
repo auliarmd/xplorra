@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../api/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -16,6 +16,22 @@ function Masuk() {
   // State untuk Pop Up Pemberitahuan/Validasi
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+    useEffect(() => {
+      const handleResize = () => {
+        setScreenWidth(window.innerWidth);
+      };
+
+      window.addEventListener("resize", handleResize);
+
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+
+    const isMobile = screenWidth < 768;
+    const isTablet = screenWidth >= 768 && screenWidth < 1024;
+    const isDesktop = screenWidth >= 1024;
 
   const handleLogin = async (e) => {
     if (e) e.preventDefault();
@@ -69,34 +85,123 @@ function Masuk() {
   };
 
   return (
-    <div style={styles.container}>
+    <div
+      style={{
+        ...styles.container,
+        flexDirection: isDesktop ? "row" : "column",
+        overflowY: !isDesktop ? "auto" : "hidden",
+      }}
+    >
       {/* LEFT */}
-      <div style={styles.left}>
+      <div
+        style={{
+          ...styles.left,
+
+          width: isDesktop ? "55%" : "100%",
+
+          minHeight: isMobile
+            ? "280px"
+            : isTablet
+            ? "280px"
+            : "100%",
+
+          paddingTop: isMobile
+            ? "60px"
+            : isTablet
+            ? "50px"
+            : "0",
+        }}
+      >
         <div
           style={{
             ...styles.backButton,
             color: backHover ? "#d86936" : "#e46b3c",
             transform: backHover ? "translateX(5px)" : "translateX(0)",
-            background: backHover ? "rgba(255,255,255,0.15)" : "transparent",
+            background: backHover ? "rgba(255,255,255,0.15)" : "transparent",top: isMobile ? "10px" : "20px",left: isMobile ? "10px" : "20px",
           }}
           onMouseEnter={() => setBackHover(true)}
           onMouseLeave={() => setBackHover(false)}
           onClick={() => navigate("/dashboard")}
         >
           <span className="material-symbols-outlined" style={{ ...styles.backIcon, transform: backHover ? "translateX(-4px)" : "translateX(0)" }}>arrow_back</span>
-          <span>KEMBALI KE DASHBOARD</span>
+          {!isMobile && <span>KEMBALI KE DASHBOARD</span>}
         </div>
 
-        <div style={{ textAlign: "center" }}>
-          <img src="/logo_X.png" alt="logo" style={styles.logo} />
-          <h1 style={styles.brand}>XpLorra</h1>
+        <div style={styles.logoWrapper}>
+          <img
+            src="/logo_X.png"
+            alt="logo"
+            style={{
+              ...styles.logo,
+              width: isMobile
+                ? "110px"
+                : isTablet
+                ? "120px"
+                : "200px",
+            }}
+          />
+          <h1
+            style={{
+              ...styles.brand,
+              fontSize: isMobile
+                ? "35px"
+                : isTablet
+                ? "36px"
+                : "60px",
+            }}
+          >
+            XpLorra
+          </h1>
         </div>
       </div>
 
       {/* RIGHT */}
-      <div style={styles.right}>
+      <div
+        style={{
+          ...styles.right,
+
+          width: isDesktop
+            ? "45%"
+            : "100%",
+
+          marginLeft: isDesktop
+            ? "-40px"
+            : "0",
+
+          marginTop: !isDesktop
+            ? "-45px"
+            : "0",
+
+          borderTopLeftRadius: !isDesktop
+            ? "55px"
+            : "50px",
+
+          borderTopRightRadius: !isDesktop
+            ? "55px"
+            : "0",
+
+          borderBottomLeftRadius: isDesktop
+            ? "50px"
+            : "0",
+
+          minHeight: !isDesktop
+            ? "auto"
+            : "100%",
+
+          paddingBottom: "40px",
+          overflow: "hidden",
+
+          boxShadow: !isDesktop
+            ? "0 -8px 30px rgba(0,0,0,0.08)"
+            : "-10px 0 30px rgba(0,0,0,0.08)",
+        }}
+      >
         <form style={styles.formWrapper} onSubmit={handleLogin}>
-          <span className="material-symbols-outlined" style={styles.icon}>notifications</span>
+          {!isMobile && (
+            <span className="material-symbols-outlined" style={styles.icon}>
+              notifications
+            </span>
+          )}
           <h2 style={styles.title}>Masuk ke akun anda</h2>
 
           <div style={styles.inputGroup}>
@@ -197,9 +302,24 @@ const styles = {
   logo: { width: "170px" },
   brand: { marginTop: "10px", color: "#d86936", fontSize: "40px", fontWeight: "700" },
   right: { width: "45%", background: "#ffffff", borderTopLeftRadius: "50px", borderBottomLeftRadius: "50px", display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "-40px", boxShadow: "-10px 0 30px rgba(0,0,0,0.08)", zIndex: 1 },
-  formWrapper: { width: "380px", display: "flex", flexDirection: "column", gap: "22px" },
+  formWrapper: {
+    width: "100%",
+    maxWidth: "420px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    padding: "24px",
+    boxSizing: "border-box"
+  },
   icon: { fontSize: "45px", color: "#d86936", textAlign: "center" },
-  title: { textAlign: "center", fontSize: "24px", fontWeight: "800", marginBottom: "10px", marginTop: "-10px", color: "#111" },
+  title: {
+    textAlign: "center",
+    fontSize: "24px",
+    fontWeight: "800",
+    marginBottom: "25px",
+    marginTop: "30px",
+    color: "#111"
+  },
   inputGroup: { display: "flex", flexDirection: "column" },
   label: { fontSize: "13px", color: "#555", fontWeight: "700", marginBottom: "8px", marginTop: "10px" },
   input: { padding: "14px", borderRadius: "10px", border: "2px solid #b9b6b6", fontSize: "14px", width: "100%", boxSizing: "border-box", outline: "none", transition: "0.3s" },
@@ -211,7 +331,7 @@ const styles = {
   backButton: { position: "absolute", top: "20px", left: "20px", display: "flex", alignItems: "center", gap: "8px", color: "#e46b3c", fontWeight: "700", fontSize: "15px", cursor: "pointer", padding: "10px 14px", borderRadius: "12px", transition: "all 0.25s ease" },
   backIcon: { fontSize: "24px", transition: "all 0.25s ease" },
   forgotPassword: { color: "#d86936", cursor: "pointer", fontSize: "13px", margin: 0, fontWeight: "500" },
-  forgotWrapper: { width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "-5px", marginBottom: "10px" },
+  forgotWrapper: { width: "100%", display: "flex", justifyContent: "flex-end", marginTop: "8px", marginBottom: "10px" },
   modalOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 10000 },
   modalBox: { backgroundColor: "#fff", padding: "30px", borderRadius: "20px", width: "320px", textAlign: "center", boxShadow: "0 10px 25px rgba(0,0,0,0.2)", display: "flex", flexDirection: "column", alignItems: "center" },
   modalIcon: { fontSize: "50px", color: "#d86936", marginBottom: "10px" },
@@ -230,7 +350,13 @@ const styles = {
   fontSize: "15px",
   width: "100%",
   boxShadow: "0 4px 10px rgba(216,105,54,0.3)"
-}
+},
+logoWrapper: {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+},
 };
 
 export default Masuk;
