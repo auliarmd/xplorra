@@ -24,7 +24,7 @@ function EditResep() {
   // Perbaikan: isMobile hanya dideklarasikan sekali menggunakan state
  const getIsMobile = () =>
   window.matchMedia("(max-width: 768px)").matches;
-  const [showPopup, setShowPopup] = useState(false);
+ const [isMobile, setIsMobile] = useState(getIsMobile);
 
  useEffect(() => {
   const mediaQuery = window.matchMedia("(max-width: 768px)");
