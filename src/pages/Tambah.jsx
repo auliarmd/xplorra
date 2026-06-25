@@ -43,6 +43,7 @@ useEffect(() => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     api.get("/profile")
@@ -82,6 +83,7 @@ useEffect(() => {
       return;
     }
 
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("nama", nama);
@@ -98,11 +100,13 @@ useEffect(() => {
         }
       });
 
+      setLoading(false);
       setPopupMessage("Resep berhasil ditambahkan!");
       setIsSuccess(true);
       setShowPopup(true);
     } 
     catch (err) {
+      setLoading(false);
   console.log("Status :", err.response?.status);
   console.log("Data :", err.response?.data);
   console.log("Error :", err);
@@ -492,20 +496,17 @@ useEffect(() => {
             </button>
 
             <button
-              style={{
-                ...styles.saveBtn,
-                ...(isMobile ? mobileStyles.saveBtn : {}),
-                transform: hoverSave ? "translateY(-2px)" : "translateY(0)",
-                boxShadow: hoverSave
-                  ? "0 10px 20px rgba(228,107,92,0.45)"
-                  : "0 6px 15px rgba(228,107,92,0.35)"
-              }}
-              onMouseEnter={() => setHoverSave(true)}
-              onMouseLeave={() => setHoverSave(false)}
-              onClick={handleSave}
-            >
-              Simpan Resep
-            </button>
+  disabled={loading}
+  style={{
+    ...styles.saveBtn,
+    ...(isMobile ? mobileStyles.saveBtn : {}),
+    opacity: loading ? 0.7 : 1,
+    cursor: loading ? "not-allowed" : "pointer"
+  }}
+  onClick={handleSave}
+>
+  {loading ? "Menyimpan..." : "Simpan Resep"}
+</button>
           </div>
         </div>
       </div>

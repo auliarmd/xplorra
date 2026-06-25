@@ -13,20 +13,23 @@ function Dashboard() {
   const [trendingFoods, setTrendingFoods] = useState([]);
   const trendingRef = useRef(null);
 
-  // State Responsif & Menu Mobile
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const [showMenu, setShowMenu] = useState(false);
-  const [activeMenu, setActiveMenu] = useState("Home");
+const [loading, setLoading] = useState(true);
 
-  // Perubahan Ukuran Layar Listener
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+// State Responsif & Menu Mobile
+const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+const [showMenu, setShowMenu] = useState(false);
+const [activeMenu, setActiveMenu] = useState("Home");
 
-  const isMobile = windowWidth <= 768;
+useEffect(() => {
+  const handleResize = () => setWindowWidth(window.innerWidth);
 
+  window.addEventListener("resize", handleResize);
+
+  return () =>
+    window.removeEventListener("resize", handleResize);
+}, []);
+
+const isMobile = windowWidth <= 768;
   const goToRegister = () => {
     navigate("/Register");
   };
@@ -40,53 +43,76 @@ function Dashboard() {
   };
 
   // Auto-Scroll untuk Card Trending di Mobile
-  useEffect(() => {
-    if (windowWidth > 768) return;
+useEffect(() => {
+  if (windowWidth > 768) return;
 
-    const interval = setInterval(() => {
-      if (trendingRef.current) {
-        const container = trendingRef.current;
-        const cardWidth = container.clientWidth * 0.85 + 25;
-        
-        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10) {
-          container.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          container.scrollBy({ left: cardWidth, behavior: "smooth" });
-        }
+  const interval = setInterval(() => {
+    if (trendingRef.current) {
+      const container = trendingRef.current;
+      const cardWidth = container.clientWidth * 0.85 + 25;
+
+      if (
+        container.scrollLeft + container.clientWidth >=
+        container.scrollWidth - 10
+      ) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        container.scrollBy({ left: cardWidth, behavior: "smooth" });
       }
-    }, 3000);
+    }
+  }, 3000);
 
-    return () => clearInterval(interval);
-  }, [windowWidth, trendingFoods]);
+  return () => clearInterval(interval);
+}, [windowWidth, trendingFoods]);
 
-  useEffect(() => {
-    fetch(`${BASE_URL}/foods/trending`)
-      .then((res) => res.json())
-      .then((data) => {
-        setTrendingFoods(Array.isArray(data) ? data : []);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+// Trending
+useEffect(() => {
+  fetch(`${BASE_URL}/foods/trending`)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Gagal mengambil data");
+      }
+      return res.json();
+    })
+    .then((data) => {
+      setTrendingFoods(Array.isArray(data) ? data : []);
+    })
+    .catch(console.log);
+}, []);
 
-  useEffect(() => {
-    fetch(
-      `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setFoods(data);
-        setNotFound(data.length === 0);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [kategori, daerah, search]);
+useEffect(() => {
+  setLoading(true);
 
-  const daftarKategori = ["Makanan utama", "Minuman", "Dessert"];
-  const daftarDaerah = ["Sumatera", "Kalimantan", "Sulawesi", "Maluku", "Irian Jaya", "Nusa Tenggara", "Jawa"];
+  fetch(
+    `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      setFoods(data);
+      setNotFound(data.length === 0);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.log(err);
+      setLoading(false);
+    });
+}, [kategori, daerah, search]);
+
+const daftarKategori = [
+  "Makanan utama",
+  "Minuman",
+  "Dessert",
+];
+
+const daftarDaerah = [
+  "Sumatera",
+  "Kalimantan",
+  "Sulawesi",
+  "Maluku",
+  "Irian Jaya",
+  "Nusa Tenggara",
+  "Jawa",
+];
 
   return (
     <div style={{
@@ -326,53 +352,158 @@ function Dashboard() {
             </h3>
             
             <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
-              {notFound ? (
-                <div style={styles.emptyResult}>
-                  <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
-                </div>
-              ) : (
-                <div style={isMobile ? styles.gridMobile : styles.grid}>
-                  {foods.map((item) => (
-                    <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={requireLogin}>
-                      
-                      <div style={{ ...styles.cardImgWrapper, width: isMobile ? "110px" : "100%", height: isMobile ? "110px" : "150px" }}>
-                        <img
-                          src={`${BASE_URL}/uploads/${item.gambar}`}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "0" }}
-                          alt=""
-                        />
-                      </div>
 
-                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "0px 10px 8px 15px" }}>
-                        <h4 style={isMobile ? { fontSize: "15px", margin: "0", fontWeight: "700", lineHeight: "1.2" } : styles.cardTitle}>{item.nama}</h4>
+  {loading ? (
 
-                        <div style={styles.infoRow}>
-                          <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}</span>
-                          <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes}</span>
-                        </div>
+    <div style={styles.loadingContainer}>
+      <span
+        className="material-symbols-outlined"
+        style={styles.loadingIcon}
+      >
+        progress_activity
+      </span>
 
-                        <div style={styles.bottomRow}>
-                          <span style={styles.rating}>
-                            {item.rating}
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
-                            ))}
-                          </span>
-                          <button style={isMobile ? styles.btnLihatMobile : styles.btnLihat} onClick={(e) => { e.stopPropagation(); requireLogin(); }}>
-                            Lihat
-                          </button>
-                        </div>
-                      </div>
+      <p style={styles.loadingText}>
+        Memuat resep...
+      </p>
 
-                    </div>
-                  ))}
-                </div>
-              )}
+    </div>
+
+  ) : notFound ? (
+
+    <div style={styles.emptyResult}>
+      <h2 style={styles.emptyResultText}>
+        Resep tidak ditemukan
+      </h2>
+    </div>
+
+  ) : (
+
+    <div style={isMobile ? styles.gridMobile : styles.grid}>
+
+      {foods.map((item) => (
+
+        <div
+          key={item.id}
+          style={isMobile ? styles.horizontalCardMobile : styles.card}
+          onClick={requireLogin}
+        >
+
+          <div
+            style={{
+              ...styles.cardImgWrapper,
+              width: isMobile ? "110px" : "100%",
+              height: isMobile ? "110px" : "150px",
+            }}
+          >
+            <img
+              src={`${BASE_URL}/uploads/${item.gambar}`}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: isMobile ? "15px" : "0",
+              }}
+              alt=""
+            />
+          </div>
+
+          <div
+            style={{
+              ...styles.cardBody,
+              flex: 1,
+              padding: isMobile
+                ? "10px"
+                : "0px 10px 8px 15px",
+            }}
+          >
+            <h4
+              style={
+                isMobile
+                  ? {
+                      fontSize: "15px",
+                      margin: "0",
+                      fontWeight: "700",
+                      lineHeight: "1.2",
+                    }
+                  : styles.cardTitle
+              }
+            >
+              {item.nama}
+            </h4>
+
+            <div style={styles.infoRow}>
+              <span style={styles.iconText}>
+                <span
+                  className="material-symbols-outlined"
+                  style={styles.materialIcon}
+                >
+                  comment
+                </span>
+                {item.total_komentar}
+              </span>
+
+              <span style={styles.iconText}>
+                <span
+                  className="material-symbols-outlined"
+                  style={styles.materialIcon}
+                >
+                  thumb_up
+                </span>
+                {item.likes}
+              </span>
             </div>
+
+            <div style={styles.bottomRow}>
+              <span style={styles.rating}>
+                {item.rating}
+
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className="material-symbols-outlined"
+                    style={
+                      star <= Math.round(item.rating)
+                        ? styles.star
+                        : styles.starEmpty
+                    }
+                  >
+                    star
+                  </span>
+                ))}
+              </span>
+
+              <button
+                style={
+                  isMobile
+                    ? styles.btnLihatMobile
+                    : styles.btnLihat
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  requireLogin();
+                }}
+              >
+                Lihat
+              </button>
+            </div>
+
           </div>
 
         </div>
-      </div>
+
+      ))}
+
+    </div>
+
+  )}
+
+</div>
+          </div>
+
+        </div>
+ </div>
+
     </div>
   );
 }
@@ -567,5 +698,26 @@ const styles = {
     justifyContent: "center", 
     overflow: "hidden" 
   },
+
+  loadingContainer: {
+  width: "100%",
+  height: "600px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+loadingIcon: {
+  fontSize: "60px",
+  color: "#E46B5C",
+},
+
+loadingText: {
+  marginTop: "15px",
+  color: "#8B5A2B",
+  fontWeight: "600",
+  fontSize: "18px",
+},
 };
 export default Dashboard;
