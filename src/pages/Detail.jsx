@@ -12,6 +12,7 @@ function Detail() {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [user, setUser] = useState({});
+  const [showMenu, setShowMenu] = useState(false); // State untuk Sidebar Mobile
 
   useEffect(() => {
     api.get(`/my-rating/${id}`)
@@ -39,10 +40,8 @@ function Detail() {
 
     api.get(`/resep/${id}`)
       .then((res) => {
-
-        console.log(res.data.komentar);
         setFood(res.data.resep);
-        setKomentar(res.data.komentar);
+        setKomentar(res.data.komentar || []);
         
         api.get('/my-bookmarks')
           .then((bookmarkRes) => {
@@ -57,8 +56,20 @@ function Detail() {
 
   }, [id]);
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const isMobile = screenWidth < 768;
+  const isTablet = screenWidth >= 768 && screenWidth < 1024;
+  const isDesktop = screenWidth >= 1024;
+
   if (!food) {
-    return <div style={{ textAlign: "center", padding: "50px" }}>Loading...</div>;
+    return <div style={{ textAlign: "center", padding: "50px", fontWeight: "bold", color: "#9F6822" }}>Memuat Resep...</div>;
   }
 
   const bahanArray = (() => {
@@ -97,8 +108,6 @@ function Detail() {
     try {
       const response = await api.post(`/like/${id}`);
       setLiked(response.data.liked);
-      const resepBaru = await api.get(`/resep/${id}`);
-      setFood(resepBaru.data.resep);
     } catch (err) {
       console.log(err);
     }
@@ -124,14 +133,10 @@ function Detail() {
   };
 
   const formatWaktu = (tanggal) => {
-
     if (!tanggal) return "Baru saja";
-
     const now = new Date();
     const commentDate = new Date(tanggal);
-
     const diffMs = now - commentDate;
-
     const menit = Math.floor(diffMs / 60000);
     const jam = Math.floor(diffMs / 3600000);
     const hari = Math.floor(diffMs / 86400000);
@@ -140,66 +145,165 @@ function Detail() {
     if (menit < 60) return `${menit} menit lalu`;
     if (jam < 24) return `${jam} jam lalu`;
     if (hari < 7) return `${hari} hari lalu`;
-
     return commentDate.toLocaleDateString("id-ID");
   };
 
   return (
     <div style={styles.page}>
+      
       {/* NAVBAR */}
-      <div style={styles.navbar}>
-        <div style={styles.logoArea} onClick={() => navigate("/dashboardafterlogin")}>
-          <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
-          <div style={styles.logoText}>pLorra</div>
-        </div>
-
-        {/* JUDUL DI TENGAH */}
-        <div style={styles.headerTitle}>Detail Resep</div>
-
-        <div style={styles.menuArea}>
-          <div style={styles.menu}>
-            <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-            <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
-            <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
-          </div>
-          <div
-            style={styles.profileCircle}
-            onClick={() => navigate("/profil")}
+      {isMobile ? (
+        // HEADER MOBILE (Sesuai Gambar Referensi)
+        <div style={styles.mobileNavbar}>
+          <span
+            className="material-symbols-outlined"
+            style={styles.mobileMenuIcon}
+            onClick={() => setShowMenu(true)}
           >
+            menu
+          </span>
+
+          <div style={styles.mobileHeaderTitle}>
+            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>
+              menu_book
+            </span>
+            Detail Resep
+          </div>
+
+          <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
             {user.foto ? (
-              <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              <img
+                src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+                alt="Profile"
+                style={styles.profileImg}
+              />
             ) : (
-              <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
+              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
+                person
+              </span>
             )}
           </div>
         </div>
-      </div>
+      ) : (
+        // HEADER DESKTOP / TABLET
+        <div style={styles.desktopNavbar}>
+          <div style={styles.logoArea} onClick={() => navigate("/dashboardafterlogin")}>
+            <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
+            <div style={styles.logoText}>pLorra</div>
+          </div>
+
+          <div style={styles.desktopHeaderTitle}>Detail Resep</div>
+
+          <div style={styles.menuArea}>
+            <div style={styles.menu}>
+              <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
+              <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
+              <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
+            </div>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user.foto ? (
+                <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SIDEBAR MOBILE */}
+      {isMobile && showMenu && (
+        <>
+          <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
+          <div style={styles.mobileSidebar}>
+            
+            {/* AREA LOGO & TOMBOL SILANG */}
+            <div style={styles.mobileLogoSection}>
+              <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
+                <span style={styles.mobileLogoText}>pLorra</span>
+              </div>
+              
+              {/* ICON SILANG UNTUK MENUTUP MENU */}
+              <span 
+                className="material-symbols-outlined" 
+                style={styles.mobileCloseIcon}
+                onClick={() => setShowMenu(false)}
+              >
+                close
+              </span>
+            </div>
+            
+            <div style={styles.mobileMenuTitle}>MENU</div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}>
+              Dashboard
+            </div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/notifikasi"); setShowMenu(false); }}>
+              Notifikasi
+            </div>
+            <div style={styles.mobileMenuItem} onClick={() => { navigate("/profil"); setShowMenu(false); }}>
+              Profil
+            </div>
+          </div>
+        </>
+      )}
 
       {/* HERO IMAGE SECTION */}
-      <div style={styles.heroSection}>
+      <div
+        style={{
+          ...styles.heroSection,
+          height: isMobile ? "300px" : isTablet ? "450px" : "550px",
+        }}
+      >
         <img src={`https://xplorra-production.up.railway.app/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
-        <div style={styles.heroOverlay}>
+        <div
+          style={{
+            ...styles.heroOverlay,
+            padding: isMobile ? "20px" : isTablet ? "40px" : "50px",
+          }}
+        >
           <div style={styles.heroTextContainer}>
-            <h1 style={styles.heroTitle}>{food.nama}</h1>
-            <p style={styles.heroSubtitle}>Berasal dari {food.daerah}</p>
-            <div style={styles.heroActions}>
-              {/* BUTTON SUKA */}
+           <h1
+              style={{
+                ...styles.heroTitle,
+                fontSize: isMobile ? "32px" : isTablet ? "48px" : "58px",
+              }}
+            >
+              {food.nama}
+            </h1>
+            <p
+              style={{
+                ...styles.heroSubtitle,
+                fontSize: isMobile ? "16px" : isTablet ? "20px" : "24px",
+                marginBottom: isMobile ? "15px" : "25px"
+              }}
+            >Berasal dari {food.daerah}</p>
+            <div style={{ ...styles.heroActions, flexWrap: "wrap" }}>
               <button 
                 title={liked ? "Batal menyukai" : "Suka resep ini"} 
-                style={{...styles.actionBtn, background: liked ? '#C86B3E' : 'rgba(255,255,255,0.3)'}} 
+                style={{
+                  ...styles.actionBtn,
+                  background: liked ? "#C86B3E" : "rgba(255,255,255,0.3)",
+                  padding: isMobile ? "8px 16px" : "10px 22px",
+                  fontSize: isMobile ? "13px" : "15px",
+                }} 
                 onClick={handleLike}
               >
-                <span className="material-symbols-outlined" style={styles.btnIcon}>thumb_up</span>
+                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "18px"}}>thumb_up</span>
                 {liked ? "Suka" : "Suka"}
               </button>
 
-              {/* BUTTON SIMPAN */}
               <button 
                 title={bookmarked ? "Resep Tersimpan" : "Simpan Resep Ini"} 
-                style={{...styles.actionBtn, background: bookmarked ? '#9F6822' : 'rgba(255,255,255,0.3)'}} 
+                style={{
+                  ...styles.actionBtn, 
+                  background: bookmarked ? '#9F6822' : 'rgba(255,255,255,0.3)',
+                  padding: isMobile ? "8px 16px" : "10px 22px",
+                  fontSize: isMobile ? "13px" : "15px",
+                }} 
                 onClick={handleBookmark}
               >
-                <span className="material-symbols-outlined" style={styles.btnIcon}>bookmark</span>
+                <span className="material-symbols-outlined" style={{...styles.btnIcon, fontSize: isMobile ? "16px" : "18px"}}>bookmark</span>
                 {bookmarked ? "Simpan" : "Simpan"}
               </button>
             </div>
@@ -208,15 +312,22 @@ function Detail() {
       </div>
 
       {/* MAIN CONTENT GRID */}
-      <div style={styles.mainGrid}>
-        
+      <div
+        style={{
+          ...styles.mainGrid,
+          gridTemplateColumns: isDesktop ? "1fr 2fr" : "1fr",
+          gap: isMobile ? "20px" : isTablet ? "40px" : "90px",
+          marginTop: isMobile ? "30px" : "50px",
+          padding: isMobile ? "0 15px" : "0 20px",
+          maxWidth: isDesktop ? "1450px" : "1200px",
+        }}
+      >
         {/* LEFT COLUMN */}
         <div style={styles.leftColumn}>
-          
           {/* CREATOR CARD */}
-          <div style={styles.card}>
-            <div style={styles.creatorHeader}>
-              <div style={styles.creatorAvatar}>
+          <div style={{ ...styles.card, padding: isMobile ? "20px" : "30px" }}>
+            <div style={{...styles.creatorHeader, gap: isMobile ? "10px" : "15px"}}>
+              <div style={{...styles.creatorAvatar, width: isMobile ? "50px" : "60px", height: isMobile ? "50px" : "60px"}}>
                 {food.creator_foto ? (
                   <img src={`https://xplorra-production.up.railway.app/uploads/${food.creator_foto}`} alt="creator" style={styles.creatorImg} />
                 ) : (
@@ -224,53 +335,74 @@ function Detail() {
                 )}
               </div>
               <div>
-                <h3 style={styles.creatorName}>{food.creator}</h3>
+                <h3 style={{...styles.creatorName, fontSize: isMobile ? "16px" : "18px"}}>{food.creator}</h3>
                 <span style={styles.creatorRole}>Pembuat Resep Asli</span>
               </div>
             </div>
-            <p style={styles.creatorDesc}>"{food.deskripsi}"</p>
+            <p style={{...styles.creatorDesc, fontSize: isMobile ? "12px" : "13px"}}>{food.deskripsi ? `"${food.deskripsi}"` : "Tidak ada deskripsi"}</p>
           </div>
 
           {/* INGREDIENTS CARD */}
-          <div style={styles.card}>
-            <h3 style={styles.cardTitle}>
-              <span className="material-symbols-outlined" style={styles.titleIcon}>restaurant_menu</span>
+          <div style={{ ...styles.card, padding: isMobile ? "20px" : "30px" }}>
+            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : "20px"}}>
+              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "24px"}}>restaurant_menu</span>
               Bahan-bahan
             </h3>
             <div style={styles.ingredientList}>
               {bahanArray.map((item, index) => (
                 <div key={index} style={styles.ingredientItem}>
                   <span className="material-symbols-outlined" style={styles.bulletIcon}>check_circle</span>
-                  <span>{item}</span>
+                  <span style={{
+                    fontSize: isMobile ? "13px" : isDesktop ? "17px" : "14px" // Ditambah ke 17px di desktop
+                  }}>
+                    {item}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
 
         {/* RIGHT COLUMN */}
-        <div style={styles.rightColumn}>
+        <div 
+          style={{
+            ...styles.rightColumn, 
+            gap: isMobile ? "25px" : "40px",
+            paddingLeft: isDesktop ? "20px" : "0px" 
+          }}
+        >
           
           {/* STEPS CARD */}
-          <div style={{...styles.card, backgroundColor: "#FFFFFF"}}>
-            <h3 style={styles.cardTitle}>
-              <span className="material-symbols-outlined" style={styles.titleIcon}>local_dining</span>
+          <div style={{...styles.card, backgroundColor: "#FFFFFF", padding: isMobile ? "20px" : "30px"}}>
+            <h3 style={{...styles.cardTitle, fontSize: isMobile ? "18px" : isDesktop ? "24px" : "20px"}}>
+              <span className="material-symbols-outlined" style={{...styles.titleIcon, fontSize: isMobile ? "20px" : "24px"}}>local_dining</span>
               Langkah-langkah Memasak
             </h3>
             <div style={styles.stepList}>
               {langkahArray.map((item, index) => (
-                <div key={index} style={styles.stepItem}>
-                  <div style={styles.stepNumber}>{index + 1}</div>
-                  <div style={styles.stepText}>{item}</div>
+                <div key={index} style={{...styles.stepItem, gap: isMobile ? "15px" : "20px"}}>
+                  <div style={{
+                    ...styles.stepNumber, 
+                    minWidth: isMobile ? "30px" : isDesktop ? "40px" : "35px", // Wadah angka diperbesar sedikit
+                    height: isMobile ? "30px" : isDesktop ? "40px" : "35px",
+                    fontSize: isMobile ? "14px" : isDesktop ? "18px" : "16px"
+                  }}>
+                    {index + 1}
+                  </div>
+                  <div style={{
+                    ...styles.stepText, 
+                    fontSize: isMobile ? "13px" : isDesktop ? "17px" : "14px" // Isi teks ditambah ke 17px di desktop
+                  }}>
+                    {item}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
           {/* RATING CARD */}
-          <div style={{...styles.card, textAlign: "center", padding: "40px 20px"}}>
-            <h3 style={{...styles.cardTitle, justifyContent: "center", marginBottom: "15px", color: "#8E5E41"}}>
+          <div style={{...styles.card, textAlign: "center", padding: isMobile ? "25px 15px" : "40px 20px"}}>
+            <h3 style={{...styles.cardTitle, justifyContent: "center", marginBottom: "15px", color: "#8E5E41", fontSize: isMobile ? "16px" : "20px"}}>
               Seberapa suka anda terhadap resep ini?
             </h3>
             <div style={styles.starsContainer}>
@@ -281,6 +413,7 @@ function Detail() {
                   style={{
                     ...styles.starIcon,
                     color: star <= rating ? '#E28E46' : '#C4A89A',
+                    fontSize: isMobile ? "35px" : "45px"
                   }}
                 >
                   {star <= rating ? '★' : '☆'}
@@ -292,79 +425,70 @@ function Detail() {
 
           {/* COMMENTS SECTION */}
           <div style={styles.commentsContainer}>
-            <h3 style={styles.commentHeader}>Komentar ({komentar.length})</h3>
+            <h3 style={{...styles.commentHeader, fontSize: isMobile ? "16px" : "18px"}}>Komentar ({komentar.length})</h3>
             
             {/* INPUT CARD */}
-            <div style={styles.inputCard}>
+            <div style={{...styles.inputCard, padding: isMobile ? "15px" : "20px"}}>
               <div style={styles.inputWrapper}>
-                <div style={styles.commentUserAvatar}>
+                <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "40px", height: isMobile ? "35px" : "40px"}}>
                   {user.foto ? (
                     <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="user" style={styles.creatorImg} />
                   ) : (
-                    <span className="material-symbols-outlined">person</span>
+                    <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "24px"}}>person</span>
                   )}
                 </div>
                 <input 
                   type="text" 
                   placeholder="Tulis Komentar..." 
-                  style={styles.commentInput} 
+                  style={{...styles.commentInput, fontSize: isMobile ? "13px" : "14px"}} 
                   value={isiKomentar}
                   onChange={(e) => setIsiKomentar(e.target.value)}
                 />
               </div>
               <div style={styles.sendBtnWrapper}>
-                <button style={styles.sendBtn} onClick={kirimKomentar}>Kirim</button>
+                <button style={{...styles.sendBtn, padding: isMobile ? "6px 20px" : "8px 25px", fontSize: isMobile ? "13px" : "14px"}} onClick={kirimKomentar}>Kirim</button>
               </div>
             </div>
 
             {/* COMMENT LIST */}
             <div style={styles.commentList}>
               {komentar.map((item, index) => (
-                <div key={index} style={styles.commentCard}>
-  <div style={styles.commentRow}>
-
-    <div style={styles.commentUserAvatar}>
-      {item.foto ? (
-        <img
-          src={`https://xplorra-production.up.railway.app/uploads/${item.foto}`}
-          alt="user"
-          style={styles.creatorImg}
-        />
-      ) : (
-        <span className="material-symbols-outlined">
-          person
-        </span>
-      )}
-    </div>
-
-    <div style={styles.commentContent}>
-
-      <div style={styles.commentTop}>
-        <span style={styles.commentName}>
-          {item.nama}
-        </span>
-
-        <span style={styles.commentDate}>
-          {formatWaktu(item.created_at)}
-        </span>
-      </div>
-
-      <p style={styles.commentTextContent}>
-        {item.komentar}
-      </p>
-
-    </div>
-
-  </div>
-</div>              ))}
+                <div key={index} style={{...styles.commentCard, padding: isMobile ? "15px" : "20px"}}>
+                  <div style={{...styles.commentRow, gap: isMobile ? "10px" : "15px"}}>
+                    <div style={{...styles.commentUserAvatar, width: isMobile ? "35px" : "40px", height: isMobile ? "35px" : "40px"}}>
+                      {item.foto ? (
+                        <img
+                          src={`https://xplorra-production.up.railway.app/uploads/${item.foto}`}
+                          alt="user"
+                          style={styles.creatorImg}
+                        />
+                      ) : (
+                        <span className="material-symbols-outlined" style={{fontSize: isMobile ? "18px" : "24px"}}>
+                          person
+                        </span>
+                      )}
+                    </div>
+                    <div style={styles.commentContent}>
+                      <div style={styles.commentTop}>
+                        <span style={{...styles.commentName, fontSize: isMobile ? "14px" : "15px"}}>
+                          {item.nama}
+                        </span>
+                        <span style={{...styles.commentDate, fontSize: isMobile ? "10px" : "12px"}}>
+                          {formatWaktu(item.created_at)}
+                        </span>
+                      </div>
+                      <p style={{...styles.commentTextContent, fontSize: isMobile ? "13px" : "14px"}}>
+                        {item.komentar}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
-          </div>
         </div>
-
       </div>
-
+    </div>
   );
 }
 
@@ -374,61 +498,97 @@ const styles = {
     minHeight: "100vh",
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
     paddingBottom: "80px",
+    width: "100%",
+    maxWidth: "100vw",
+    overflowX: "hidden",
+    boxSizing: "border-box",
   },
-  navbar: {
+
+  /* --- HEADER MOBILE (Sesuai Gambar) --- */
+  mobileNavbar: {
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
-    padding: "10px 20px",
+    justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
+    padding: "12px 20px",
     position: "sticky",
     top: 0,
     zIndex: 999,
-    gap: "15px",
-    flexWrap: "wrap",
+    width: "100%",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
+  },
+  mobileMenuIcon: {
+    fontSize: "30px",
+    color: "#9F6822",
+    cursor: "pointer",
+  },
+  mobileHeaderTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    color: "#9F6822",
+    fontWeight: "700",
+    fontSize: "20px",
+  },
+  mobileHeaderIcon: {
+    fontSize: "24px",
+  },
+
+  /* --- HEADER DESKTOP --- */
+  desktopNavbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
+    padding: "12px 30px",
+    position: "sticky",
+    top: 0,
+    zIndex: 999,
+    width: "100%",
+    boxSizing: "border-box",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
   },
   logoArea: {
     display: "flex",
     alignItems: "center",
     cursor: "pointer",
-    flex: 1,
   },
   logoImg: {
-    width: "45px",
+    width: "40px",
   },
   logoText: {
     color: "#E28B36",
     fontWeight: "bold",
-    fontSize: "24px",
+    fontSize: "22px",
     marginLeft: "5px",
   },
-  headerTitle: {
-    fontSize: "24px",
+  desktopHeaderTitle: {
+    fontSize: "22px",
     fontWeight: "bold",
     color: "#9F6822",
     textAlign: "center",
-    whiteSpace: "nowrap", // Warna cokelat/oranye menyesuaikan desain
   },
   menuArea: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
-    gap: "30px",
-    flex: 1,
+    gap: "25px",
   },
   menu: {
     display: "flex",
     gap: "25px",
   },
   navItem: {
-    fontSize: "15px",
     fontWeight: "bold",
     color: "#111",
     cursor: "pointer",
+    fontSize: "15px",
   },
+  
+  /* --- PROFILE CIRCLE (Digunakan Desktop & Mobile) --- */
   profileCircle: {
-    width: "38px",
-    height: "38px",
+    width: "35px",
+    height: "35px",
     borderRadius: "50%",
     backgroundColor: "#F2AB82",
     display: "flex",
@@ -444,10 +604,57 @@ const styles = {
     objectFit: "cover",
     imageRendering: "high-quality",
   },
-  heroSection: {
-    position: "relative",
-    width: "100%",
-    height: "600px", // Tinggi hero banner
+
+  /* --- SIDEBAR MOBILE --- */
+  mobileOverlay: {
+    position: "fixed",
+    top: 0, left: 0, right: 0, bottom: 0,
+    background: "rgba(0,0,0,0.4)",
+    zIndex: 1001,
+  },
+  mobileSidebar: {
+    position: "fixed",
+    top: 0, left: 0,
+    width: "260px",
+    height: "100vh",
+    background: "#F7F1EC",
+    zIndex: 1002,
+    padding: "20px",
+    boxShadow: "4px 0 20px rgba(0,0,0,0.15)",
+    boxSizing: "border-box",
+  },
+  mobileLogoSection: {
+    display: "flex",
+    alignItems: "center",
+    borderBottom: "1px solid #ddd",
+    paddingBottom: "12px",
+  },
+  mobileLogoText: {
+    color: "#E28B36",
+    fontSize: "24px",
+    fontWeight: "700",
+    marginLeft: "8px",
+  },
+  mobileMenuTitle: {
+    marginTop: "20px",
+    marginBottom: "15px",
+    fontWeight: "700",
+    fontSize: "18px",
+    color: "#5E4637",
+  },
+  mobileMenuItem: {
+    padding: "12px 10px",
+    fontSize: "16px",
+    cursor: "pointer",
+    color: "#333",
+    fontWeight: "500",
+  },
+
+  /* --- KONTEN HALAMAN --- */
+  heroSection:{
+    position:"relative",
+    width:"100%",
+    boxSizing: "border-box", 
   },
   heroImg: {
     width: "100%",
@@ -455,90 +662,85 @@ const styles = {
     objectFit: "cover",
     imageRendering: "high-quality",
   },
- heroOverlay: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  background:
-    "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 55%, rgba(0,0,0,0) 100%)",
-  display: "flex",
-  alignItems: "flex-end",
-  padding: "50px",
-},
+  heroOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0) 100%)",
+    display: "flex",
+    alignItems: "flex-end",
+    boxSizing: "border-box", 
+  },
   heroTextContainer: {
     width: "100%",
+    maxWidth: "100%",
   },
-
- heroTitle: {
-  color: "#FFFFFF",
-  fontSize: "58px",
-  fontWeight: "700",
-  margin: "0",
-  lineHeight: "1.1",
-  textShadow: "0 2px 10px rgba(0,0,0,0.4)",
-},
-heroSubtitle: {
-  color: "#FFFFFF",
-  fontSize: "24px",
-  marginTop: "10px",
-  marginBottom: "25px",
-  textShadow: "0 2px 8px rgba(0,0,0,0.4)",
-},
- heroActions: {
-  display: "flex",
-  gap: "12px",
-},
-actionBtn: {
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  border: "none",
-  padding: "10px 22px",
-  borderRadius: "25px",
-  color: "#FFF",
-  fontSize: "15px",
-  fontWeight: "600",
-  cursor: "pointer",
-  backdropFilter: "blur(5px)",
-},
-  btnIcon: {
-    fontSize: "18px",
+  heroTitle: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    margin: "0",
+    lineHeight: "1.2",
+    textShadow: "0 2px 10px rgba(0,0,0,0.5)",
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
   },
-  mainGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 2fr", // Kolom kiri lebih kecil
-    gap: "80px",
-    maxWidth: "1250px",
-    margin: "100px auto 0 auto",
-    padding: "0 20px",
+  heroSubtitle: {
+    color: "#FFFFFF",
+    marginTop: "8px",
+    textShadow: "0 2px 8px rgba(0,0,0,0.5)",
+  },
+  heroActions: {
+    display: "flex",
+    gap: "10px",
+  },
+  actionBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    border: "none",
+    borderRadius: "25px",
+    color: "#FFF",
+    fontWeight: "600",
+    cursor: "pointer",
+    backdropFilter: "blur(5px)",
+  },
+  btnIcon: {},
+  mainGrid:{
+    display:"grid",
+    maxWidth:"1200px",
+    margin:"0 auto",
+    width: "100%",
+    boxSizing: "border-box", 
   },
   leftColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: "40px",
+    gap: "30px",
+    width: "100%",
+    boxSizing: "border-box",
   },
   rightColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: "40px",
+    width: "100%",
+    boxSizing: "border-box",
   },
- card: {
-  backgroundColor: "#F7EBE2",
-  borderRadius: "15px",
-  padding: "30px",
-  boxShadow: "0 16px 40px rgba(159, 104, 34, 0.35)",
-},
+  card: {
+    backgroundColor: "#F7EBE2",
+    borderRadius: "15px",
+    boxShadow: "0 10px 30px rgba(159, 104, 34, 0.25)",
+    width: "100%",
+    boxSizing: "border-box", 
+  },
   creatorHeader: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
-    marginBottom: "15px",
+    marginBottom: "10px",
   },
   creatorAvatar: {
-    width: "60px",
-    height: "60px",
     borderRadius: "50%",
     backgroundColor: "#D9D9D9",
     display: "flex",
@@ -550,11 +752,9 @@ actionBtn: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    imageRendering: "high-quality",
   },
   creatorName: {
     margin: 0,
-    fontSize: "18px",
     color: "#4A3222",
   },
   creatorRole: {
@@ -562,36 +762,32 @@ actionBtn: {
     color: "#8E5E41",
   },
   creatorDesc: {
-    fontSize: "13px",
     color: "#5E4637",
     fontStyle: "italic",
-    lineHeight: "1.6",
+    lineHeight: "1.5",
     margin: 0,
   },
   cardTitle: {
     display: "flex",
     alignItems: "center",
-    gap: "10px",
-    margin: "0 0 20px 0",
-    fontSize: "20px",
+    gap: "8px",
+    margin: "0 0 15px 0",
     color: "#4A3222",
   },
   titleIcon: {
-    fontSize: "24px",
     color: "#9F6822",
   },
   ingredientList: {
     display: "flex",
     flexDirection: "column",
-    gap: "15px",
+    gap: "12px",
   },
   ingredientItem: {
     display: "flex",
     alignItems: "flex-start",
     gap: "10px",
-    fontSize: "14px",
     color: "#4A3222",
-    lineHeight: "1.5",
+    lineHeight: "1.4",
   },
   bulletIcon: {
     fontSize: "16px",
@@ -601,16 +797,13 @@ actionBtn: {
   stepList: {
     display: "flex",
     flexDirection: "column",
-    gap: "20px",
+    gap: "15px",
   },
   stepItem: {
     display: "flex",
     alignItems: "flex-start",
-    gap: "20px",
   },
   stepNumber: {
-    minWidth: "35px",
-    height: "35px",
     backgroundColor: "#D98857",
     color: "#FFF",
     display: "flex",
@@ -618,22 +811,19 @@ actionBtn: {
     alignItems: "center",
     borderRadius: "8px",
     fontWeight: "bold",
-    fontSize: "16px",
   },
   stepText: {
-    fontSize: "14px",
     color: "#4A3222",
-    lineHeight: "1.6",
-    marginTop: "5px",
+    lineHeight: "1.5",
+    marginTop: "2px",
   },
   starsContainer: {
     display: "flex",
     justifyContent: "center",
-    gap: "15px",
-    marginBottom: "10px",
+    gap: "10px",
+    marginBottom: "8px",
   },
   starIcon: {
-    fontSize: "45px",
     cursor: "pointer",
     transition: "0.2s",
   },
@@ -646,31 +836,31 @@ actionBtn: {
     marginTop: "10px",
   },
   commentHeader: {
-    fontSize: "18px",
     color: "#4A3222",
-    marginBottom: "15px",
+    marginBottom: "12px",
   },
- inputCard: {
-  backgroundColor: "#FFFFFF",
-  borderRadius: "15px",
-  padding: "20px",
-  marginBottom: "20px",
-  display: "flex",
-  flexDirection: "column",
-  gap: "15px",
-  boxShadow: "0 8px 25px rgba(0,0,0,0.12)",
-},
+  inputCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: "15px",
+    marginBottom: "15px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.08)",
+    width: "100%",
+    boxSizing: "border-box", 
+  },
   inputWrapper: {
     display: "flex",
     alignItems: "center",
-    gap: "15px",
+    gap: "12px",
   },
   commentInput: {
     flex: 1,
     border: "none",
     outline: "none",
-    fontSize: "14px",
     color: "#4A3222",
+    width: "100%",
   },
   sendBtnWrapper: {
     display: "flex",
@@ -680,81 +870,67 @@ actionBtn: {
     backgroundColor: "#9A5D20",
     color: "#FFF",
     border: "none",
-    padding: "8px 25px",
     borderRadius: "20px",
     fontWeight: "bold",
     cursor: "pointer",
     transition: "0.3s",
   },
- commentList: {
-  display: "flex",
-  flexDirection: "column",
-  gap: "15px",
-  maxHeight: "500px",
-  overflowY: "auto",
-  paddingRight: "8px",
-},
-
-commentRow: {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: "15px",
-},
-
-commentContent: {
-  flex: 1,
-},
-commentTop: {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "6px",
-},
-
- commentCard: {
-  backgroundColor: "#F7EBE2",
-  borderRadius: "15px",
-  padding: "20px",
-  boxShadow: "0 6px 20px rgba(0,0,0,0.12)",
-},
-HeaderRow: {
+  commentList: {
     display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    maxHeight: "400px",
+    overflowY: "auto",
+    paddingRight: "5px",
+  },
+  commentRow: {
+    display: "flex",
+    alignItems: "flex-start",
+  },
+  commentContent: {
+    flex: 1,
+  },
+  commentTop: {
+    display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
-    gap: "15px",
-    marginBottom: "10px",
+    marginBottom: "4px",
+  },
+  commentCard: {
+    backgroundColor: "#F7EBE2",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+    width: "100%",
+    boxSizing: "border-box", 
   },
   commentUserAvatar: {
-    width: "40px",
-    height: "40px",
     borderRadius: "50%",
     backgroundColor: "#D9D9D9",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
-  },
-  commentUserInfo: {
-    display: "flex",
-    justifyContent: "space-between",
-    flex: 1,
-    alignItems: "center",
+    flexShrink: 0,
   },
   commentName: {
-  fontWeight: "700",
-  color: "#4A3222",
-  fontSize: "15px",
+    fontWeight: "700",
+    color: "#4A3222",
   },
   commentDate: {
-    fontSize: "12px",
     color: "#8E5E41",
   },
   commentTextContent: {
-  marginTop: "6px",
-  marginBottom: 0,
-  fontSize: "14px",
-  color: "#5E4637",
-  lineHeight: "1.5",
-},
+    marginTop: "4px",
+    marginBottom: 0,
+    color: "#5E4637",
+    lineHeight: "1.4",
+  },
+  mobileCloseIcon: {
+    fontSize: "28px",
+    color: "#9F6822",
+    cursor: "pointer",
+    padding: "4px",
+  },
 };
 
 export default Detail;

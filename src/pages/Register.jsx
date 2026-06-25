@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../api/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -15,8 +15,20 @@ function Register() {
 
   // State untuk Pop Up
   const [showPopup, setShowPopup] = useState(false);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+    useEffect(() => {
+      const handleResize = () => {
+        setScreenWidth(window.innerWidth);
+      };
+      window.addEventListener("resize", handleResize);
+      return () => {
+        window.removeEventListener("resize", handleResize);
+      };
+    }, []);
+    const isMobile = screenWidth < 768;
+    const isTablet = screenWidth >= 768 && screenWidth < 1024;
+    const isDesktop = screenWidth >= 1024;
   const [popupMessage, setPopupMessage] = useState("");
-
   const handleRegister = async (e) => {
     if (e) e.preventDefault();
 
@@ -77,23 +89,126 @@ function Register() {
   };
 
   return (
-    <div style={styles.container}>
+    <div
+      style={{
+        ...styles.container,
+        flexDirection: isDesktop ? "row" : "column",
+        overflowY: !isDesktop ? "auto" : "hidden",
+      }}
+    >
       {/* LEFT SIDE */}
-      <div style={styles.left}>
-        <div style={{ ...styles.backButton, color: backHover ? "#d86936" : "#e46b3c", transform: backHover ? "translateX(5px)" : "translateX(0)", background: backHover ? "rgba(255,255,255,0.15)" : "transparent" }} onMouseEnter={() => setBackHover(true)} onMouseLeave={() => setBackHover(false)} onClick={() => navigate("/dashboard")}>
+      <div
+        style={{
+          ...styles.left,
+
+          width: isDesktop
+            ? "55%"
+            : "100%",
+
+          minHeight: isMobile
+            ? "280px"
+            : isTablet
+            ? "280px"
+            : "100%",
+
+          paddingTop: isMobile
+            ? "60px"
+            : isTablet
+            ? "50px"
+            : "0",
+        }}
+      >
+        <div
+          style={{
+            ...styles.backButton,
+            fontSize: isMobile ? "13px" : "15px",
+            top: isMobile ? "10px" : "20px",
+            left: isMobile ? "10px" : "20px",
+            color: backHover ? "#d86936" : "#e46b3c",
+            transform: backHover ? "translateX(5px)" : "translateX(0)",
+            background: backHover
+              ? "rgba(255,255,255,0.15)"
+              : "transparent",
+          }}onMouseEnter={() => setBackHover(true)} onMouseLeave={() => setBackHover(false)} onClick={() => navigate("/dashboard")}>
           <span className="material-symbols-outlined" style={{ ...styles.backIcon, transform: backHover ? "translateX(-4px)" : "translateX(0)" }}>arrow_back</span>
-          <span>KEMBALI KE DASHBOARD</span>
+          {!isMobile && <span>KEMBALI KE DASHBOARD</span>}
         </div>
         <div style={styles.logoWrapper}>
-          <img src="/logo_X.png" alt="logo" style={styles.logo} />
-          <h1 style={styles.brand}>XpLorra</h1>
+          <img
+            src="/logo_X.png"
+            alt="logo"
+            style={{
+              ...styles.logo,
+
+              width: isMobile
+                ? "110px"
+                : isTablet
+                ? "120px"
+                : "200px",
+            }}
+          />
+          <h1
+            style={{
+              ...styles.brand,
+
+              fontSize: isMobile
+                ? "35px"
+                : isTablet
+                ? "36px"
+                : "60px",
+            }}
+          >
+            XpLorra
+          </h1>
         </div>
       </div>
 
       {/* RIGHT SIDE */}
-      <div style={styles.right}>
+      <div
+        style={{
+          ...styles.right,
+
+          width: isDesktop
+            ? "45%"
+            : "100%",
+
+          marginLeft: isDesktop
+            ? "-40px"
+            : "0",
+
+          marginTop: !isDesktop
+            ? "-85px"
+            : "0",
+
+          borderTopLeftRadius: !isDesktop
+            ? "55px"
+            : "50px",
+
+          borderTopRightRadius: !isDesktop
+            ? "55px"
+            : "0",
+
+          borderBottomLeftRadius: isDesktop
+            ? "50px"
+            : "0",
+
+          minHeight: !isDesktop
+            ? "auto"
+            : "100%",
+
+          paddingBottom: "40px",
+
+          boxShadow: !isDesktop
+            ? "0 -8px 30px rgba(0,0,0,0.08)"
+            : "-10px 0 30px rgba(0,0,0,0.08)",
+        }}
+      >
         <form style={styles.formWrapper} onSubmit={handleRegister}>
-          <span className="material-symbols-outlined" style={styles.icon}>notifications</span>
+          {!isMobile && (
+            <span className="material-symbols-outlined" style={styles.icon}>
+              notifications
+            </span>
+          )}
           <h2 style={styles.title}>Buat akun anda</h2>
 
           <div style={styles.inputGroup}>
@@ -151,13 +266,29 @@ function Register() {
 
 const styles = {
   container: { display: "flex", width: "100vw", height: "100vh", fontFamily: "sans-serif", position: "relative", overflow: "hidden", backgroundColor: "#ffffff" },
-  left: { width: "55%", background: "linear-gradient(180deg, #F6E1C7, #C17854)", display: "flex", justifyContent: "center", alignItems: "center", position: "relative" },
+  left: {
+    width: "55%",
+    background: "linear-gradient(180deg,#F6E1C7,#C17854)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
+    paddingBottom: "40px",
+  },
   logo: { width: "170px" },
   brand: { marginTop: "10px", color: "#d86936", fontSize: "40px", fontWeight: "700" },
   right: { width: "45%", background: "#ffffff", borderTopLeftRadius: "50px", borderBottomLeftRadius: "50px", display: "flex", justifyContent: "center", alignItems: "center", marginLeft: "-40px", boxShadow: "-10px 0 30px rgba(0,0,0,0.08)", zIndex: 1 },
-  formWrapper: { width: "380px", display: "flex", flexDirection: "column", gap: "8px" },
+ formWrapper: {
+    width: "100%",
+    maxWidth: "420px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    padding: "24px",
+    boxSizing: "border-box",
+  },
   icon: { fontSize: "45px", color: "#d86936", textAlign: "center" },
-  title: { textAlign: "center", fontSize: "24px", fontWeight: "800", marginBottom: "10px", marginTop: "-10px", color: "#111" },
+  title: { textAlign: "center", fontSize: "24px", fontWeight: "800", marginBottom: "30px", marginTop: "25px", color: "#111" },
   inputGroup: { display: "flex", flexDirection: "column", marginBottom: "8px" },
   label: { fontSize: "13px", color: "#555", fontWeight: "700", marginBottom: "4px", marginTop: "0px" },
   input: { padding: "14px", borderRadius: "8px", border: "2px solid #b9b6b6", fontSize: "14px", width: "100%", boxSizing: "border-box", outline: "none", transition: "0.3s" },
@@ -186,7 +317,13 @@ const styles = {
   fontSize: "15px",
   width: "100%",
   boxShadow: "0 4px 10px rgba(216,105,54,0.3)"
-}
+},
+logoWrapper: {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+},
 };
 
 export default Register;
