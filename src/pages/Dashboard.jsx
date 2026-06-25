@@ -177,7 +177,6 @@ function Dashboard() {
           </div>
         </>
       )}
-
       {/* SEARCH BOX & FILTER MOBILE */}
       {isMobile && (
         <div style={styles.mobileSearchWrapper}>
@@ -227,7 +226,10 @@ function Dashboard() {
                 <div style={styles.imageWrapper}>
                   <img
                     src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                    style={{ ...styles.trendingImg, height: isMobile ? "230px" : "250px" }}
+                    style={{
+                      ...styles.trendingImg,
+                      height: "100%",
+                    }}
                     alt={item.nama}
                     onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                   />
@@ -418,19 +420,49 @@ const styles = {
   radioActive: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" },
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "4px", background: "#e15b3c", margin: "10px 0 20px 0", width: "100%" },
-  
-  // Layout Trending Responsif
-  trendingDesktopGrid: { display: "flex", justifyContent: "center", gap: "clamp(16px, 5vw, 130px)", width: "100%" },
+  trendingDesktopGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: "28px",
+    width: "100%",
+    alignItems: "stretch",
+  },
   trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
-  trendingCard: { width: "100%", maxWidth: "600px", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 20px rgba(0,0,0,0.12)" },
-  imageWrapper: { position: "relative" },
-  trendingImg: { width: "100%", objectFit: "cover" },
+  trendingCard: {
+    width: "100%",
+    borderRadius: "22px",
+    overflow: "hidden",
+    background: "#fff",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
+    display: "flex",
+    flexDirection: "column",
+  },
+  imageWrapper: {
+    position: "relative",
+    overflow: "hidden",
+    height: "350px",
+  },
+  trendingImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
   overlay: { position: "absolute", top: "20px", left: "20px" },
   trendingText: { color: " #000", fontSize: "24px", fontWeight: "900", lineHeight: "1", WebkitTextStroke: "0.7px white", margin: 0 },
-  trendingOverlay: { padding: "20px" },
-  trendingHeading: { fontSize: "22px", fontWeight: "700", lineHeight: "1.3", margin: "0 0 20px 0" },
-  
-  // Card Container & Grid List
+  trendingOverlay: {
+    padding: "18px 22px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+  },
+  trendingHeading: {
+    fontSize: "25px",
+    fontWeight: "800",
+    lineHeight: "1.2",
+    margin: "0 0 16px 0",
+    color: "#000",
+  },
   cardContainer: { flex: 1, height: "640px", overflowY: "auto", paddingRight: "10px" },
   cardContainerMobile: { marginTop: "5px", width: "100%" },
   grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "25px" },
@@ -438,21 +470,39 @@ const styles = {
   card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 8px 20px rgba(0,0,0,0.08)", width: "100%", cursor: "pointer" },
   horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
-  cardBody: { display: "flex", flexDirection: "column", gap: "8px" },
+  cardBody: { display: "flex", flexDirection: "column", gap: "8px", paddingTop: "20px" },
   cardTitle: { fontSize: "16px", margin: "0", lineHeight: "1.1" },
-  infoRow: { display: "flex", gap: "12px", fontSize: "12px", color: "#555" },
+  infoRow: {
+    display: "flex",
+    gap: "18px",
+    alignItems: "center",
+    color: "#555",
+    fontSize: "14px",
+  },
   iconText: { display: "flex", alignItems: "center", gap: "4px" },
   materialIcon: { fontSize: "20px" },
-  bottomRow: { display: "flex", justifyContent: "space-between", alignItems: "center", margin: "0", marginTop: "auto" },
+  bottomRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "6px",
+  },
   rating: { display: "flex", alignItems: "center", gap: "2px", fontSize: "14px" },
   star: { fontSize: "20px", color: "#FFC107" },
   starEmpty: { fontSize: "22px", color: "#ddd" },
-  btnLihat: { background: "#d86936", color: "#fff", border: "none", padding: "8px 35px", borderRadius: "20px", cursor: "pointer" },
+  btnLihat: {
+    background: "#d96f3d",
+    color: "#fff",
+    border: "none",
+    padding: "10px 34px",
+    borderRadius: "25px",
+    fontWeight: "700",
+    fontSize: "15px",
+    cursor: "pointer",
+  },
   btnLihatMobile: { background: "#d86936", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   emptyResult: { width: "100%", height: "300px", display: "flex", justifyContent: "center", alignItems: "center" },
   emptyResultText: { color: "#393939", fontSize: "24px", fontWeight: "700", textAlign: "center" },
-
-  // Mobile Styles Tambahan
   mobileNavbar: { 
     display: "flex", 
     alignItems: "center", 
@@ -484,8 +534,7 @@ const styles = {
   scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
   filterBadge: { background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#555", fontWeight: "600", cursor: "pointer" },
   filterBadgeActive: { background: "#e15b3c", border: "1px solid #e15b3c", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#fff", fontWeight: "600", cursor: "pointer" },
-mobileNavbarLeft: {
-    flex: 1,
+  mobileNavbarLeft: {      flex: 1,
     display: "flex",
     justifyContent: "flex-start",
     alignItems: "center"
