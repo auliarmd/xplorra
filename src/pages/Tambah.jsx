@@ -161,7 +161,20 @@ const ubahLangkah = (index,value) => {
 
 };
 
-const isMobile = window.innerWidth <= 768;
+const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+useEffect(() => {
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () =>
+    window.removeEventListener("resize", handleResize);
+
+}, []);
 
 const mobileStyles = {
 
@@ -265,96 +278,96 @@ return (
 )}
 
 
-      {/* NAVBAR */}
-     {isMobile && (
-  <div
-    style={{
-      ...styles.mobileOverlay,
-      left: showMobileMenu ? "0" : "-100%"
-    }}
-  >
+{/* ================= MOBILE SIDEBAR ================= */}
 
-    <div style={styles.mobileMenuHeader}>
+{isMobile && (
 
-  <div style={styles.mobileLogoContainer}>
-    <img
-      src="/logo_X.png"
-      alt="logo"
-      style={styles.mobileLogo}
-    />
+<div
+style={{
+...styles.mobileOverlay,
+left: showMobileMenu ? "0" : "-280px"
+}}
+>
 
-    <span style={styles.mobileLogoText}>
-      pLorra
-    </span>
-  </div>
+<div style={styles.mobileMenuHeader}>
 
-  <div
-    style={styles.mobileHamburgerInside}
-    onClick={() =>
-      setShowMobileMenu(false)
-    }
-  >
-    <span
-      className="material-symbols-outlined"
-      style={{
-        fontSize:"28px",
-        color:"#8B5A2B"
-      }}
-    >
-      menu
-    </span>
-  </div>
+<div style={styles.mobileLogoContainer}>
+
+<img
+src="/logo_X.png"
+alt="logo"
+style={styles.mobileLogo}
+/>
+
+<span style={styles.mobileLogoText}>
+pLorra
+</span>
 
 </div>
 
-    <div
-      style={styles.mobileMenuItem}
-      onClick={() => navigate("/dashboardafterlogin")}
-    >
-      <span
-        className="material-symbols-outlined"
-        style={styles.mobileMenuIcon}
-      >
-        home
-      </span>
+<span
+className="material-symbols-outlined"
+style={styles.mobileHamburger}
+onClick={() => setShowMobileMenu(false)}
+>
+menu
+</span>
 
-      Home
-    </div>
+</div>
 
-    <div
-      style={{
-        ...styles.mobileMenuItem,
-        color:"#000000",
-        fontWeight:"700"
-      }}
-      onClick={() => navigate("/Notifikasi")}
-    >
-      <span
-        className="material-symbols-outlined"
-        style={styles.mobileMenuIcon}
-      >
-        notifications
-      </span>
+<div
+style={styles.mobileMenuItem}
+onClick={()=>{
+navigate("/dashboardafterlogin");
+setShowMobileMenu(false);
+}}
+>
 
-      Notifikasi
-    </div>
+<span className="material-symbols-outlined">
+home
+</span>
 
-    <div
-      style={styles.mobileMenuItem}
-      onClick={() => navigate("/profil")}
-    >
-      <span
-        className="material-symbols-outlined"
-        style={styles.mobileMenuIcon}
-      >
-        person
-      </span>
+Home
 
-      Profil
-    </div>
+</div>
 
-  </div>
+<div
+style={styles.mobileMenuItem}
+onClick={()=>{
+navigate("/profil");
+setShowMobileMenu(false);
+}}
+>
+
+<span className="material-symbols-outlined">
+person
+</span>
+
+Profil
+
+</div>
+
+<div
+style={styles.mobileMenuItem}
+onClick={()=>{
+navigate("/Notifikasi");
+setShowMobileMenu(false);
+}}
+>
+
+<span className="material-symbols-outlined">
+notifications
+</span>
+
+Notifikasi
+
+</div>
+
+</div>
+
 )}
+
+{/* ================= NAVBAR ================= */}
 
 <div
   style={{
@@ -363,139 +376,150 @@ return (
   }}
 >
 
-  {isMobile ? (
+{isMobile ? (
 
-  !showMobileMenu && (
-    <div
-      style={styles.hamburgerBtn}
-      onClick={() =>
-        setShowMobileMenu(true)
-      }
-    >
-     <span
-      className="material-symbols-outlined"
-      style={{
-        fontSize:"28px",
-        color:"#8B5A2B"
-      }}
-    >
-      menu
-    </span>
-    </div>
-  )
+<div
+style={styles.hamburgerBtn}
+onClick={()=>setShowMobileMenu(true)}
+>
+
+<span
+className="material-symbols-outlined"
+style={styles.hamburgerIcon}
+>
+
+menu
+
+</span>
+
+</div>
 
 ) : (
 
-  <div style={styles.logoContainer}>
-    <img
-      src="/logo_X.png"
-      alt="logo"
-      style={styles.logoImg}
-    />
+<div style={styles.logoContainer}>
 
-    <span style={styles.logoText}>
-      pLorra
-    </span>
-  </div>
+<img
+src="/logo_X.png"
+alt="logo"
+style={styles.logoImg}
+/>
+
+<span style={styles.logoText}>
+pLorra
+</span>
+
+</div>
 
 )}
 
-  <div
-    style={{
-      ...styles.headerCenter,
-      ...(isMobile ? mobileStyles.headerCenter : {})
-    }}
-  >
+<div
+style={
+isMobile
+? styles.mobileHeaderCenter
+: styles.headerCenter
+}
+>
 
-    <div style={styles.headerTitle}>
-      Tambah Resep Baru
-    </div>
+<div
+style={
+isMobile
+? styles.mobileHeaderTitle
+: styles.headerTitle
+}
+>
 
-    {!isMobile && (
-      <div style={styles.headerSubtitle}>
-        Bagikan kekayaan kuliner nusantara dengan komunitas.
-      </div>
-    )}
+Tambah Resep Baru
 
-  </div>
+</div>
 
+{!isMobile && (
 
-  
+<div style={styles.headerSubtitle}>
 
-  <div style={styles.rightSection}>
+Bagikan kekayaan kuliner nusantara dengan komunitas.
 
-  {!isMobile && (
+</div>
 
-    <div style={styles.menu}>
+)}
 
-      <span
-        onClick={() =>
-          navigate("/dashboardafterlogin")
-        }
-      >
-        Home
-      </span>
+</div>
 
-      <span
-        onClick={() =>
-          navigate("/profil")
-        }
-      >
-        Profil
-      </span>
+<div style={styles.rightSection}>
 
-      <span
-        onClick={() =>
-          navigate("/Notifikasi")
-        }
-      >
-        Notifikasi
-      </span>
+{!isMobile && (
 
-    </div>
+<div style={styles.menu}>
 
-  )}
+<span
+onClick={()=>navigate("/dashboardafterlogin")}
+>
 
-  <div
-    style={styles.profileCircle}
-    onClick={() =>
-      navigate("/profil")
-    }
-  >
+Home
 
-    {user?.foto ? (
+</span>
 
-      <img
-        src={`${api.defaults.baseURL}/uploads/${user.foto}`}
-        alt="profile"
-        style={styles.profileImage}
-      />
+<span
+onClick={()=>navigate("/profil")}
+>
 
-    ) : (
+Profil
 
-      <span
-        className="material-symbols-outlined"
-        style={{
-          fontSize:"24px",
-          color:"#666"
-        }}
-      >
-        person
-      </span>
+</span>
 
-    )}
+<span
+onClick={()=>navigate("/Notifikasi")}
+>
 
-  </div>
+Notifikasi
+
+</span>
+
+</div>
+
+)}
+
+<div
+style={styles.profileCircle}
+onClick={()=>navigate("/profil")}
+>
+
+{user?.foto ? (
+
+<img
+src={`${api.defaults.baseURL}/uploads/${user.foto}`}
+style={styles.profileImage}
+alt=""
+/>
+
+) : (
+
+<span className="material-symbols-outlined">
+
+person
+
+</span>
+
+)}
 
 </div>
 
 </div>
 
-
+</div>
       {/* CONTENT */}
-      <div style={styles.content}>
+    <div
+  style={{
+    ...styles.content,
+    ...(isMobile ? mobileStyles.content : {})
+  }}
+>
 
-       <div style={styles.formContainer}>
+      <div
+  style={{
+    ...styles.formContainer,
+    ...(isMobile ? mobileStyles.formContainer : {})
+  }}
+>
 
 {/* INFORMASI DASAR */}
 <div style={styles.sectionHeader}>
@@ -549,7 +573,12 @@ return (
   Media
 </div>
 
-<div style={styles.uploadBox}>
+<div
+  style={{
+    ...styles.uploadBox,
+    ...(isMobile ? mobileStyles.uploadBox : {})
+  }}
+>
  {preview ? (
   <>
     <img
@@ -637,7 +666,13 @@ return (
 </label>
 
 {bahan.map((item, index) => (
-  <div key={index} style={styles.dynamicRow}>
+<div
+  key={index}
+  style={{
+    ...styles.dynamicRow,
+    ...(isMobile ? mobileStyles.dynamicRow : {})
+  }}
+>
     <input
       type="text"
       style={styles.input}
@@ -703,10 +738,16 @@ return (
   + Tambah Langkah
 </button>
 
-<div style={styles.footer}>
- <button
+<div
   style={{
-    ...styles.cancelBtn,
+    ...styles.footer,
+    ...(isMobile ? mobileStyles.footer : {})
+  }}
+>
+ <button
+ style={{
+  ...styles.cancelBtn,
+  ...(isMobile ? mobileStyles.cancelBtn : {}),
     transform: hoverCancel
       ? "translateY(-2px)"
       : "translateY(0)",
@@ -722,8 +763,9 @@ return (
 </button>
 
      <button
-  style={{
-    ...styles.saveBtn,
+ style={{
+  ...styles.saveBtn,
+  ...(isMobile ? mobileStyles.saveBtn : {}),
     transform: hoverSave
       ? "translateY(-2px)"
       : "translateY(0)",
@@ -758,25 +800,38 @@ page:{
 
 navbar:{
   display:"flex",
-  alignItems:"center",
   justifyContent:"space-between",
-  padding:"12px 30px",
-  background:"#fff",
+  alignItems:"center",
+
   position:"fixed",
+
   top:0,
   left:0,
   right:0,
-  zIndex:999,
-  borderBottom:"1px solid #ccc"
+
+  height:"70px",
+
+  padding:"0 18px",
+
+  background:"#fff",
+
+  borderBottom:"1px solid #ddd",
+
+  zIndex:9999
 },
 
 
 
 headerCenter:{
   flex:1,
-  textAlign:"center",
-  marginLeft:"100px"
 
+  display:"flex",
+
+  flexDirection:"column",
+
+  justifyContent:"center",
+
+  alignItems:"center"
 },
 
 headerTitle:{
@@ -808,8 +863,14 @@ logoText:{
 
 rightSection:{
   display:"flex",
+
   alignItems:"center",
-  gap:"15px"
+
+  gap:"15px",
+
+  minWidth:"45px",
+
+  justifyContent:"flex-end"
 },
 
 profileCircle:{
@@ -1159,127 +1220,84 @@ btnConfirm: {
   cursor: "pointer",
   outline: "none",
 },
-
 hamburgerBtn:{
-  width:"40px",
-  height:"40px",
-
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center",
-  cursor:"pointer",
-  marginLeft:"5px"
+display:"flex",
+alignItems:"center",
+justifyContent:"center",
+width:"42px",
+height:"42px",
+cursor:"pointer"
 },
 
-mobileMenu:{
-  position:"fixed",
-
-  top:"70px",
-  left:0,
-
-  width:"240px",
-  height:"100vh",
-
-  background:"#fff",
-
-  boxShadow:"2px 0 10px rgba(0,0,0,0.15)",
-
-  zIndex:9999
+hamburgerIcon:{
+fontSize:"32px",
+color:"#8B5A2B"
 },
 
-mobileMenuItem:{
-  display:"flex",
-  alignItems:"center",
-
-  gap:"12px",
-
-  padding:"18px 20px",
-
-  borderBottom:"1px solid #eee",
-
-  fontWeight:"600",
-
-  cursor:"pointer"
+mobileHeaderCenter:{
+flex:1,
+display:"flex",
+justifyContent:"center",
+alignItems:"center"
 },
+
+mobileHeaderTitle:{
+fontSize:"20px",
+fontWeight:"700",
+color:"#8B5A2B"
+},
+
 mobileOverlay:{
-  position:"fixed",
-  top:"0",
-  left:"-100%",
-  width:"270px",
-  height:"100vh",
-
-  background:"#fff",
-
-  transition:"0.3s ease",
-
-  zIndex:99999,
-
-  boxShadow:"3px 0 15px rgba(0,0,0,0.15)"
+position:"fixed",
+top:0,
+left:"-280px",
+width:"280px",
+height:"100vh",
+background:"#fff",
+transition:"0.3s",
+boxShadow:"3px 0 20px rgba(0,0,0,.18)",
+zIndex:99999
 },
 
 mobileMenuHeader:{
-  display:"flex",
-  alignItems:"center",
-
-  gap:"8px",
-
-  padding:"20px",
-
-  borderBottom:"1px solid #eee"
-},
-
-mobileLogo:{
-  width:"45px"
-},
-
-mobileLogoText:{
-  color:"#F28C28",
-  fontWeight:"700",
-  fontSize:"28px"
-},
-
-mobileMenuTitle:{
-  padding:"20px",
-  fontWeight:"700",
-  color:"#444"
-},
-
-mobileMenuIcon:{
-  fontSize:"22px",
-
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center",
-
-  width:"24px",
-  height:"24px",
-
-  flexShrink:0
+display:"flex",
+justifyContent:"space-between",
+alignItems:"center",
+padding:"18px",
+borderBottom:"1px solid #eee"
 },
 
 mobileLogoContainer:{
-  display:"flex",
-  alignItems:"center",
-  gap:"8px"
+display:"flex",
+alignItems:"center",
+gap:"8px"
 },
 
-mobileMenuHeader:{
-  display:"flex",
-  justifyContent:"space-between",
-  alignItems:"center",
-
-  padding:"18px 20px",
-
-  borderBottom:"1px solid #eee"
+mobileLogo:{
+width:"40px"
 },
 
-mobileHamburgerInside:{
-  cursor:"pointer",
+mobileLogoText:{
+fontSize:"24px",
+fontWeight:"700",
+color:"#F28C28"
+},
 
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center"
-}
+mobileHamburger:{
+fontSize:"30px",
+cursor:"pointer",
+color:"#8B5A2B"
+},
+
+mobileMenuItem:{
+display:"flex",
+alignItems:"center",
+gap:"15px",
+padding:"18px",
+cursor:"pointer",
+fontWeight:"600",
+borderBottom:"1px solid #eee"
+},
 
 
 };

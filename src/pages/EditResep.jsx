@@ -18,6 +18,8 @@ const [hoverSave, setHoverSave] = useState(false);
 const [hoverCancel, setHoverCancel] = useState(false);
 const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 const isMobile = window.innerWidth <= 768;
+console.log("Width:", window.innerWidth);
+console.log("isMobile:", isMobile);
 const [showMobileMenu, setShowMobileMenu] = useState(false);
 
 useEffect(() => {
@@ -201,89 +203,96 @@ console.log(user);
     <div style={styles.mapBackground}></div>
 
       {/* NAVBAR */}
-     <div
+<div
   style={{
     ...styles.navbar,
     ...(isMobile ? mobileStyles.navbar : {})
   }}
 >
 
-  {/* Logo / Hamburger */}
+  {/* MOBILE */}
   {isMobile ? (
-
-    <div
-      style={styles.hamburgerBtn}
-      onClick={() =>
-        setShowMobileMenu(!showMobileMenu)
-      }
-    >
+    <>
       <span
         className="material-symbols-outlined"
-        style={{ fontSize: "30px" }}
+        style={styles.mobileMenuIcon}
+        onClick={() => setShowMobileMenu(true)}
       >
         menu
       </span>
-    </div>
 
+      <div style={styles.mobileHeaderTitle}>
+        Edit Resep
+      </div>
+
+      <div
+        style={styles.profileCircle}
+        onClick={() => navigate("/profil")}
+      >
+        {user?.foto ? (
+          <img
+            src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+            alt="profile"
+            style={styles.profileImage}
+          />
+        ) : (
+          <span className="material-symbols-outlined">
+            person
+          </span>
+        )}
+      </div>
+    </>
   ) : (
+    <>
+      <div style={styles.logoContainer}>
+        <img
+          src="/logo_X.png"
+          alt="logo"
+          style={styles.logoImg}
+        />
+        <span style={styles.logoText}>
+          pLorra
+        </span>
+      </div>
 
-    <div style={styles.logoContainer}>
-      <img
-        src="/logo_X.png"
-        alt="logo"
-        style={styles.logoImg}
-      />
-      <span style={styles.logoText}>
-        pLorra
-      </span>
-    </div>
+      <div style={styles.headerCenter}>
+        <div style={styles.headerTitle}>
+          Edit Resep
+        </div>
+      </div>
 
+      <div style={styles.menu}>
+        <span onClick={() => navigate("/dashboardafterlogin")}>
+          Home
+        </span>
+
+        <span onClick={() => navigate("/profil")}>
+          Profil
+        </span>
+
+        <span onClick={() => navigate("/Notifikasi")}>
+          Notifikasi
+        </span>
+      </div>
+
+      <div
+        style={styles.profileCircle}
+        onClick={() => navigate("/profil")}
+      >
+        {user?.foto ? (
+          <img
+            src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+            alt="profile"
+            style={styles.profileImage}
+          />
+        ) : (
+          <span className="material-symbols-outlined">
+            person
+          </span>
+        )}
+      </div>
+    </>
   )}
-
-  <div style={styles.headerCenter}>
-    <div style={styles.headerTitle}>
-      Edit Resep
-    </div>
-  </div>
-
-  <div style={styles.rightSection}></div>
-
-  {!isMobile && (
-
-    <div style={styles.menu}>
-
-      <span onClick={() => navigate("/dashboardafterlogin")}>
-        Home
-      </span>
-
-      <span onClick={() => navigate("/profil")}>
-        Profil
-      </span>
-
-      <span onClick={() => navigate("/Notifikasi")}>
-        Notifikasi
-      </span>
-
-    </div>
-
-  )}
-
-  <div
-    style={styles.profileCircle}
-    onClick={() => navigate("/profil")}
-  >
-    {user?.foto ? (
-      <img
-        src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-        alt="profile"
-        style={styles.profileImage}
-      />
-    ) : (
-      <span className="material-symbols-outlined">
-        person
-      </span>
-    )}
-  </div>
 
 </div>
 
@@ -676,20 +685,31 @@ console.log(user);
 )}
 
         </div>
-
       </div>
-
     </div>
+
   );
 
-  }
+}
+
+
 
   const mobileStyles = {
 
-  navbar:{
-    padding:"10px 15px"
-  },
+ navbar:{
+    height:"65px",
+    padding:"0 16px",
 
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"space-between",
+
+    background:"#fff",
+
+    borderBottom:"1px solid #ECECEC",
+
+    boxShadow:"0 2px 8px rgba(0,0,0,0.05)"
+},
   logoContainer:{
     display:"none"
   },
@@ -698,15 +718,28 @@ console.log(user);
     fontSize:"18px"
   },
 
+mobileHeaderTitle:{
+    flex:1,
+    textAlign:"center",
+    fontSize:"20px",
+    fontWeight:"700",
+    color:"#8B5A2B",
+},
+
   menu:{
     display:"none"
   },
 
-  profileCircle:{
-    width:"38px",
-    height:"38px",
-    marginRight:"0"
-  },
+ profileCircle:{
+  width:"40px",
+  height:"40px",
+  borderRadius:"50%",
+  overflow:"hidden",
+  display:"flex",
+  justifyContent:"center",
+  alignItems:"center",
+  cursor:"pointer",
+},
 
   content:{
     padding:"20px 10px 40px"
@@ -1257,8 +1290,9 @@ mobileLogoText:{
 },
 
 mobileMenuIcon:{
-  cursor:"pointer",
-  fontSize:"28px"
+    fontSize:"30px",
+    color:"#8B5A2B",
+    cursor:"pointer",
 },
 
 mobileMenuItem:{
