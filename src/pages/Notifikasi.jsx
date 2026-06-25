@@ -3,242 +3,221 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 function Notifikasi() {
-
   const [tabAktif, setTabAktif] = useState("semua");
-
-  const [notifications, setNotifications] =
-  useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [user, setUser] = useState(null);
 
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  const [isMobile, setIsMobile] = useState(
-  window.innerWidth <= 768
-);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
-
-  window.addEventListener(
-    "resize",
-    handleResize
-  );
-
-  return () =>
-    window.removeEventListener(
-      "resize",
-      handleResize
-    );
-}, []);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const getTimeAgo = (dateString) => {
-
     const now = new Date();
     const date = new Date(dateString);
+    const diff = Math.floor((now - date) / 1000);
 
-    const diff =
-      Math.floor((now - date) / 1000);
-
-    if (diff < 60)
-      return "Baru saja";
-
-    if (diff < 3600)
-      return `${Math.floor(diff / 60)} menit lalu`;
-
-    if (diff < 86400)
-      return `${Math.floor(diff / 3600)} jam lalu`;
-
-    if (diff < 2592000)
-      return `${Math.floor(diff / 86400)} hari lalu`;
+    if (diff < 60) return "Baru saja";
+    if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
+    if (diff < 2592000) return `${Math.floor(diff / 86400)} hari lalu`;
 
     return date.toLocaleDateString("id-ID");
   };
 
-  useEffect(()=>{
-
-      api.get('/profile')
-
+  useEffect(() => {
+    api.get('/profile')
       .then((res) => {
-
         setUser(res.data.user);
-
       })
-
       .catch((err) => {
-
         console.log(err);
-
       });
 
     api.get('/notifications')
-
-    .then((res)=>{
-
-      setNotifications(res.data);
-
-    })
-
-    .catch((err)=>{
-
-      console.log(err);
-
-    });
-
-  },[]);
+      .then((res) => {
+        setNotifications(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   const filteredNotifications =
-  tabAktif === "belum"
-    ? notifications.filter(
-        notif => !notif.is_read
-      )
-    : notifications;
+    tabAktif === "belum"
+      ? notifications.filter(notif => !notif.is_read)
+      : notifications;
 
   return (
     <div style={styles.page}>
-
-    <div
-        style={
-          isMobile
-            ? styles.mobileNavbar
-            : styles.navbar
-        }
-      >
       
-      {isMobile && (
-
-        <div style={styles.hamburger}>
-
-          <span
-            className="material-symbols-outlined"
-          >
-            menu
-          </span>
-
-        </div>
-
-        )}
-
-  {/* LOGO */}
-  {!isMobile && (
-  <div style={styles.logoContainer}>
-    <img
-      src="/logo_X.png"
-      alt="logo"
-      style={styles.logoImg}
-    />
-    <span style={styles.logoText}>
-      pLorra
-    </span>
-  </div>
-  )}
-
-  {/* JUDUL HEADER */}
-  <div
-  style={
-    isMobile
-      ? styles.mobileHeaderCenter
-      : styles.headerCenter
-  }
->
-
-    <div style={styles.headerTitleRow}>
-
-      <span
-        className="material-symbols-outlined"
-        style={
-          isMobile
-            ? styles.mobileBell
-            : styles.headerBell
+      {/* STYLE HOVER */}
+      <style>{`
+        .hover-sidebar-item {
+          transition: all 0.2s ease-in-out;
         }
-              >
-        notifications
-      </span>
+        .hover-sidebar-item:hover {
+          background-color: rgba(225, 91, 60, 0.08) !important;
+          color: #e15b3c !important;
+          padding-left: 18px !important;
+        }
+      `}</style>
 
-      <span style={
-          isMobile
-            ? styles.mobileTitle
-            : styles.headerTitle
-        }>
-        Notifikasi
-      </span>
+      {/* MOBILE NAVBAR */}
+      {isMobile && (
+        <div style={styles.mobileNavbar}>
+          {/* Kiri */}
+          <div style={styles.mobileNavbarLeft}>
+            <span
+              className="material-symbols-outlined"
+              style={styles.mobileMenuIcon}
+              onClick={() => setShowMenu(true)}
+            >
+              menu
+            </span>
+          </div>
 
-    </div>
+          {/* Tengah */}
+          <div style={styles.mobileHeaderCenter}>
+            <span className="material-symbols-outlined" style={styles.mobileBell}>
+              notifications
+            </span>
+            <span style={styles.mobileTitle}>Notifikasi</span>
+          </div>
 
-  </div>
-
-  {/* MENU + FOTO PROFIL */}
-  <div style={styles.rightSection}>
-
-  {!isMobile && (
-
-  <div style={styles.menu}>
-    <span
-      onClick={() =>
-        navigate("/dashboardafterlogin")
-      }
-    >
-      Home
-    </span>
-
-    <span
-      onClick={() =>
-        navigate("/profil")
-      }
-    >
-      Profil
-    </span>
-
-    <span style={styles.active}>
-      Notifikasi
-    </span>
-  </div>
-
-  )}
-
-  <div
-    style={styles.profileCircle}
-    onClick={() => navigate("/profil")}
-  >
-      {user?.foto ? (
-
-        <img
-          src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-          alt="Profile"
-          style={{
-            width:"100%",
-            height:"100%",
-            borderRadius:"50%",
-            objectFit:"cover"
-          }}
-        />
-
-      ) : (
-
-        <span className="material-symbols-outlined">
-          person
-        </span>
-
+          {/* Kanan */}
+          <div style={styles.mobileNavbarRight}>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user?.foto ? (
+                <img
+                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <span className="material-symbols-outlined">person</span>
+              )}
+            </div>
+          </div>
+        </div>
       )}
-    </div>
 
-  </div>
+      {/* DESKTOP NAVBAR */}
+      {!isMobile && (
+        <div style={styles.navbar}>
+          {/* LOGO */}
+          <div style={styles.logoContainer}>
+            <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
+            <span style={styles.logoText}>pLorra</span>
+          </div>
 
-</div>
+          {/* JUDUL HEADER */}
+          <div style={styles.headerCenter}>
+            <div style={styles.headerTitleRow}>
+              <span className="material-symbols-outlined" style={styles.headerBell}>
+                notifications
+              </span>
+              <span style={styles.headerTitle}>Notifikasi</span>
+            </div>
+          </div>
+
+          {/* MENU + FOTO PROFIL */}
+          <div style={styles.rightSection}>
+            <div style={styles.menu}>
+              <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
+              <span onClick={() => navigate("/profil")}>Profil</span>
+              <span style={styles.active}>Notifikasi</span>
+            </div>
+
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user?.foto ? (
+                <img
+                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
+                  alt="Profile"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "50%",
+                    objectFit: "cover"
+                  }}
+                />
+              ) : (
+                <span className="material-symbols-outlined">person</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MENU SIDEBAR DRAWER MOBILE */}
+      {isMobile && showMenu && (
+        <>
+          <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
+          <div style={styles.mobileSidebar}>
+            <div style={styles.mobileLogoSection}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
+                <span style={styles.mobileLogoText}>pLorra</span>
+              </div>
+              <span 
+                className="material-symbols-outlined" 
+                style={styles.closeMenuIcon}
+                onClick={() => setShowMenu(false)}
+              >
+                close
+              </span>
+            </div>
+            
+            <div style={styles.mobileMenuTitle}></div>
+            
+            <div 
+              className="hover-sidebar-item" 
+              style={styles.mobileMenuItem} 
+              onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}
+            >
+              Dashboard
+            </div>
+            <div 
+              className="hover-sidebar-item" 
+              style={styles.mobileMenuItemActive} 
+              onClick={() => { setShowMenu(false); }}
+            >
+              Notifikasi
+            </div>
+            <div 
+              className="hover-sidebar-item" 
+              style={styles.mobileMenuItem} 
+              onClick={() => { navigate("/profil"); setShowMenu(false); }}
+            >
+              Profil
+            </div>
+          </div>
+        </>
+      )}
+
       {/* TAB */}
       <div style={styles.tabContainer}>
-
         {/* TAB SEMUA */}
         <button
-            onClick={() => setTabAktif("semua")}
-            style={{
-              ...styles.tabBtn,
-              ...(tabAktif === "semua"
-                ? styles.activeTab
-                : {})
-            }}
-          >
+          onClick={() => setTabAktif("semua")}
+          style={{
+            ...styles.tabBtn,
+            ...(tabAktif === "semua" ? styles.activeTab : {})
+          }}
+        >
           Semua
         </button>
 
@@ -247,155 +226,96 @@ useEffect(() => {
           onClick={() => setTabAktif("belum")}
           style={{
             ...styles.tabBtn,
-            ...(tabAktif === "belum"
-              ? styles.activeTab
-              : {})
+            ...(tabAktif === "belum" ? styles.activeTab : {})
           }}
         >
-          Belum Dibaca (
-            {
-              notifications.filter(
-                notif => !notif.is_read
-              ).length
-            }
-)
+          Belum Dibaca ({notifications.filter(notif => !notif.is_read).length})
         </button>
-
       </div>
 
       {/* NOTIFIKASI */}
-     <div style={styles.notifList}>
-
-  {filteredNotifications.length === 0 ? (
-
-  <div style={styles.emptyNotif}>
-
-  <div style={styles.emptyWrapper}>
-
-    <span
-      className="material-symbols-outlined"
-      style={styles.emptyIcon}
-    >
-      notifications_off
-    </span>
-
-    <p>
-
-      {tabAktif === "belum"
-        ? "Tidak ada notifikasi yang belum dibaca"
-        : "Belum ada notifikasi"}
-
-    </p>
-
-  </div>
-
-</div>
-
-  ) : (
-
-    filteredNotifications.map((notif) => (
-
-      <div
-        key={notif.id}
-        style={{
-          ...styles.notifItem,
-          cursor: "pointer"
-        }}
-        onClick={async () => {
-
-          try {
-
-            await api.put(
-              `/notifications/read/${notif.id}`
-            );
-
-            setNotifications(prev =>
-              prev.map(item =>
-                item.id === notif.id
-                  ? {
-                      ...item,
-                      is_read: 1
-                    }
-                  : item
-              )
-            );
-
-            navigate(`/detail/${notif.food_id}`);
-
-          } catch(err) {
-
-            console.log(err);
-
-          }
-
-        }}
-      >
-
-        <div style={styles.leftNotif}>
-
-          {notif.foto ? (
-
-            <img
-              src={`https://xplorra-production.up.railway.app/uploads/${notif.foto}`}
-              alt="User"
-              style={styles.userIcon}
-            />
-
-          ) : (
-
-            <span
-              className="material-symbols-outlined"
-              style={styles.defaultNotifIcon}
-            >
-              account_circle
-            </span>
-
-          )}
-
-          <div>
-
-            <div style={styles.textNotif}>
-              <b>{notif.from_user}</b>{" "}
-              {notif.message}{" "}
-              <b>{notif.recipe_name}</b>
+      <div style={styles.notifList}>
+        {filteredNotifications.length === 0 ? (
+          <div style={styles.emptyNotif}>
+            <div style={styles.emptyWrapper}>
+              <span className="material-symbols-outlined" style={styles.emptyIcon}>
+                notifications_off
+              </span>
+              <p>
+                {tabAktif === "belum"
+                  ? "Tidak ada notifikasi yang belum dibaca"
+                  : "Belum ada notifikasi"}
+              </p>
             </div>
-
-            <div style={styles.time}>
-              {getTimeAgo(notif.created_at)}
-            </div>
-
           </div>
+        ) : (
+          filteredNotifications.map((notif) => (
+            <div
+              key={notif.id}
+              style={{
+                ...styles.notifItem,
+                cursor: "pointer"
+              }}
+              onClick={async () => {
+                try {
+                  await api.put(`/notifications/read/${notif.id}`);
+                  setNotifications(prev =>
+                    prev.map(item =>
+                      item.id === notif.id ? { ...item, is_read: 1 } : item
+                    )
+                  );
+                  navigate(`/detail/${notif.food_id}`);
+                } catch (err) {
+                  console.log(err);
+                }
+              }}
+            >
+              <div style={styles.leftNotif}>
+                {notif.foto ? (
+                  <img
+                    src={`https://xplorra-production.up.railway.app/uploads/${notif.foto}`}
+                    alt="User"
+                    style={styles.userIcon}
+                  />
+                ) : (
+                  <span className="material-symbols-outlined" style={styles.defaultNotifIcon}>
+                    account_circle
+                  </span>
+                )}
 
-        </div>
+                <div>
+                  <div style={styles.textNotif}>
+                    <b>{notif.from_user}</b> {notif.message} <b>{notif.recipe_name}</b>
+                  </div>
+                  <div style={styles.time}>
+                    {getTimeAgo(notif.created_at)}
+                  </div>
+                </div>
+              </div>
 
-        {!notif.is_read && (
-          <div style={styles.blueDot}></div>
+              {!notif.is_read && (
+                <div style={styles.blueDot}></div>
+              )}
+            </div>
+          ))
         )}
-
       </div>
-
-    ))
-
-  )}
-
-</div>
 
     </div>
   );
 }
 
 const styles = {
-  page:{
-  minHeight:"100vh",
-  background:"#f5f5f5",
-  fontFamily:"Segoe UI, sans-serif",
-  paddingTop:"70px",
-},
-
+  page: {
+    minHeight: "100vh",
+    background: "#f5f5f5",
+    fontFamily: "Segoe UI, sans-serif",
+    paddingTop: "70px",
+  },
   /* NAVBAR */
   navbar: {
     display: "flex",
-     alignItems: "center",
+    alignItems: "center",
     justifyContent: "space-between",
     padding: "15px 15px",
     background: "#fff",
@@ -403,191 +323,150 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    borderBottom:"1px solid #ddd",
+    borderBottom: "1px solid #ddd",
     zIndex: 9999,
   },
-
- headerCenter:{
-  flex:1,
-  display:"flex",
-  justifyContent:"center",
-  alignItems:"center"
-},
-
-headerTitleRow:{
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center",
-  gap:"10px"
-},
-
-headerBell:{
-  fontSize:"30px",
-  color:"#8B5A2B",
-  marginLeft: "100px",
-  fontVariationSettings:
-    "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48"
-},
-
-headerTitle:{
-  fontSize:"24px",
-  fontWeight:"700",
-  color:"#8B5A2B",
-},
-
+  headerCenter: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  headerTitleRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px"
+  },
+  headerBell: {
+    fontSize: "30px",
+    color: "#8B5A2B",
+    marginLeft: "100px",
+    fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48"
+  },
+  headerTitle: {
+    fontSize: "24px",
+    fontWeight: "700",
+    color: "#8B5A2B",
+  },
   logoContainer: {
     display: "flex",
     alignItems: "center",
     gap: "1px",
-    },
-
-    logoImg: {
+  },
+  logoImg: {
     width: "40px",
-    },
-
-    logoText: {
+  },
+  logoText: {
     color: "#F28C28",
     fontWeight: "bold",
     fontSize: "24px",
     letterSpacing: "1px",
-    },
-
-    rightSection:{
-  display:"flex",
-  alignItems:"center",
-  gap:"5px",
-  height:"42px"
-},
-
-emptyNotif:{
-  display:"flex",
-  justifyContent:"center",
-  alignItems:"center",
-
-  height:"250px",
-
-  color:"#888",
-
-  fontSize:"18px",
-
-  fontWeight:"500",
-
-  background:"#fff"
-},
-
-emptyWrapper:{
-  textAlign:"center"
-},
-
-emptyIcon:{
-  fontSize:"60px",
-  color:"#bbb",
-  marginBottom:"10px"
-},
-  
-menu:{
-  display:"flex",
-  alignItems:"center",
-
-  gap:"35px",
-
-  fontSize:"15px",
-
-  fontWeight:"600",
-
-  marginRight:"25px",
-  cursor:"pointer",
-},
-
+  },
+  rightSection: {
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+    height: "42px"
+  },
+  emptyNotif: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "250px",
+    color: "#888",
+    fontSize: "18px",
+    fontWeight: "500",
+    background: "#fff"
+  },
+  emptyWrapper: {
+    textAlign: "center"
+  },
+  emptyIcon: {
+    fontSize: "60px",
+    color: "#bbb",
+    marginBottom: "10px"
+  },
+  menu: {
+    display: "flex",
+    alignItems: "center",
+    gap: "35px",
+    fontSize: "15px",
+    fontWeight: "600",
+    marginRight: "25px",
+    cursor: "pointer",
+  },
   active: {
     color: "#F28C28",
     fontWeight: "bold",
   },
-
-profileCircle:{
-  width:"42px",
-  height:"42px",
-  borderRadius:"50%",
-  background:"#f4b8a3",
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"center",
-  color:"#fff",
-  cursor:"pointer",
-  flexShrink:0
-},
-
+  profileCircle: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "50%",
+    background: "#f4b8a3",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#fff",
+    cursor: "pointer",
+    flexShrink: 0
+  },
   content: {
     padding: "15px 30px 10px",
   },
-
   titleRow: {
     display: "flex",
     alignItems: "center",
     gap: "20px",
     marginTop: "-5px",
   },
-
   bellWrapper: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
-
   bellIcon: {
     fontSize: "50px",
     marginRight: "15px",
     color: "#000",
-
-    fontVariationSettings:
-      "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48",
+    fontVariationSettings: "'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48",
   },
-
   title: {
     fontSize: "32px",
     fontWeight: "700",
     transform: "translateX(-30px)",
   },
-
   /* TAB */
- tabContainer:{
-  position:"fixed",
-  top:"70px",
-  left:"0",
-  right:"0",
-  display:"flex",
-  background:"#fff",
-  zIndex:"9998",
-  borderBottom:"1px solid #ddd"
-},
-
+  tabContainer: {
+    position: "fixed",
+    top: "70px",
+    left: "0",
+    right: "0",
+    display: "flex",
+    background: "#fff",
+    zIndex: "9998",
+    borderBottom: "1px solid #ddd"
+  },
   tabBtn: {
     flex: 1,
     padding: "16px",
-
     border: "1px solid #ccc",
-
     background: "#fff",
-
     fontSize: "20px",
-
     cursor: "pointer",
-
     transition: "0.3s",
   },
-
   activeTab: {
     border: "1px solid #e46b3c",
     color: "#e46b3c",
     fontWeight: "700",
     background: "#fff7f2",
   },
-
   /* LIST */
   notifList: {
     marginTop: "60px",
   },
-
   notifItem: {
     display: "flex",
     justifyContent: "space-between",
@@ -596,14 +475,12 @@ profileCircle:{
     borderBottom: "1px solid #eee",
     background: "#fff",
   },
-
   leftNotif: {
     display: "flex",
     alignItems: "flex-start",
     gap: "12px",
     flex: 1,
   },
-
   userIcon: {
     width: "42px",
     height: "42px",
@@ -612,153 +489,205 @@ profileCircle:{
     border: "1px solid #eee",
     flexShrink: 0,
   },
-
   textNotif: {
     fontSize: "17px",
     lineHeight: "1.4",
     color: "#222",
   },
-
   time: {
     color: "#888",
     marginTop: "5px",
   },
-
   blueDot: {
-  width: "12px",
-  height: "12px",
-  borderRadius: "50%",
-  background: "#4c4cff",
-
-  marginLeft: "20px",
-  marginRight: "10px",
-
-  flexShrink: 0,
-},
-
+    width: "12px",
+    height: "12px",
+    borderRadius: "50%",
+    background: "#4c4cff",
+    marginLeft: "20px",
+    marginRight: "10px",
+    flexShrink: 0,
+  },
   defaultNotifIcon: {
     fontSize: "44px",
     color: "#777",
     flexShrink: 0,
   },
-
-
   /* MOBILE */
-mobileContainer:{
-  maxWidth:"430px",
-  margin:"0 auto",
-  background:"#fff",
-  minHeight:"100vh",
-},
-
-mobileNavbar:{
-  position:"fixed",
-  top:0,
-  left:0,
-  right:0,
-
-  height:"70px",
-
-  background:"#fff",
-
-  display:"flex",
-  alignItems:"center",
-  justifyContent:"space-between",
-
-  padding:"0 20px",
-
-  boxShadow:"0 4px 12px rgba(0,0,0,0.08)",
-
-  zIndex:9999,
-},
-
-hamburger:{
-  fontSize:"34px",
-  color:"#9A5B12",
-  cursor:"pointer",
-},
-
-mobileTitle:{
-  display:"flex",
-  alignItems:"center",
-  gap:"10px",
-
-  color:"#9A5B12",
-  fontWeight:"700",
-  fontSize:"18px",
-},
-
-mobileBell:{
-  fontSize:"28px",
-  color:"#9A5B12",
-  fontVariationSettings:
-  "'FILL' 1,'wght' 500",
-},
-
-mobileProfile:{
-  width:"46px",
-  height:"46px",
-  borderRadius:"50%",
-  overflow:"hidden",
-  flexShrink:0,
-},
-
-/* TAB */
-mobileTabWrapper:{
-  marginTop:"85px",
-  padding:"0 12px",
-},
-
-/* LIST */
-mobileNotifList:{
-  padding:"10px 12px 30px",
-},
-
-mobileNotifItem:{
-  display:"flex",
-  justifyContent:"space-between",
-  alignItems:"center",
-
-  background:"#fff",
-
-  borderRadius:"18px",
-
-  padding:"16px",
-
-  marginBottom:"14px",
-
-  boxShadow:"0 2px 10px rgba(0,0,0,0.06)",
-},
-
-mobileLeftNotif:{
-  display:"flex",
-  gap:"14px",
-  flex:1,
-},
-
-mobileUserIcon:{
-  width:"58px",
-  height:"58px",
-
-  borderRadius:"50%",
-
-  objectFit:"cover",
-
-  flexShrink:0,
-},
-
-mobileTextNotif:{
-  fontSize:"16px",
-  lineHeight:"1.3",
-  color:"#222",
-},
-
-mobileTime:{
-  marginTop:"6px",
-  color:"#666",
-  fontSize:"13px",
-},
-
+  mobileContainer: {
+    maxWidth: "430px",
+    margin: "0 auto",
+    background: "#fff",
+    minHeight: "100vh",
+  },
+  mobileNavbar: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "70px",
+    background: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 20px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+    zIndex: 9999,
+  },
+  hamburger: {
+    fontSize: "34px",
+    color: "#9A5B12",
+    cursor: "pointer",
+  },
+  mobileTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    color: "#9A5B12",
+    fontWeight: "700",
+    fontSize: "18px",
+  },
+  mobileBell: {
+    fontSize: "28px",
+    color: "#9A5B12",
+    fontVariationSettings: "'FILL' 1,'wght' 500",
+  },
+  mobileProfile: {
+    width: "46px",
+    height: "46px",
+    borderRadius: "50%",
+    overflow: "hidden",
+    flexShrink: 0,
+  },
+  /* TAB MOBILE */
+  mobileTabWrapper: {
+    marginTop: "85px",
+    padding: "0 12px",
+  },
+  /* LIST MOBILE */
+  mobileNotifList: {
+    padding: "10px 12px 30px",
+  },
+  mobileNotifItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    background: "#fff",
+    borderRadius: "18px",
+    padding: "16px",
+    marginBottom: "14px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+  },
+  mobileLeftNotif: {
+    display: "flex",
+    gap: "14px",
+    flex: 1,
+  },
+  mobileUserIcon: {
+    width: "58px",
+    height: "58px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    flexShrink: 0,
+  },
+  mobileTextNotif: {
+    fontSize: "16px",
+    lineHeight: "1.3",
+    color: "#222",
+  },
+  mobileTime: {
+    marginTop: "6px",
+    color: "#666",
+    fontSize: "13px",
+  },
+  mobileOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: "rgba(0,0,0,0.35)",
+    zIndex: 9998,
+  },
+  mobileSidebar: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "260px",
+    height: "100vh",
+    background: "#F7F1EC",
+    zIndex: 9999,
+    boxShadow: "4px 0 18px rgba(0,0,0,.15)",
+    padding: "20px",
+    boxSizing: "border-box",
+  },
+  mobileLogoSection: { 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    borderBottom: "1px solid #ddd", 
+    paddingBottom: "12px" 
+  },
+  mobileLogoText: { 
+    color: "#E28B36", 
+    fontSize: "24px", 
+    fontWeight: "700", 
+    marginLeft: "8px" 
+  },
+  closeMenuIcon: { 
+    fontSize: "28px", 
+    color: "#5E4637", 
+    cursor: "pointer", 
+    padding: "4px" 
+  },
+  mobileMenuTitle: { 
+    marginTop: "20px", 
+    marginBottom: "15px", 
+    fontWeight: "700", 
+    fontSize: "18px", 
+    color: "#5E4637" 
+  },
+  mobileMenuItem: { 
+    padding: "12px 14px", 
+    fontSize: "16px", 
+    cursor: "pointer", 
+    color: "#555", 
+    fontWeight: "500", 
+    borderRadius: "10px", 
+    backgroundColor: "transparent" 
+  },
+  mobileMenuItemActive: { 
+    padding: "12px 14px", 
+    fontSize: "16px", 
+    cursor: "pointer", 
+    color: "#e15b3c", 
+    backgroundColor: "rgba(225, 91, 60, 0.12)", 
+    fontWeight: "700", 
+    borderRadius: "10px" 
+  },
+  mobileNavbarLeft: {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  mobileNavbarRight: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  mobileHeaderCenter: {
+    flex: 2,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "8px",
+  },
+  mobileMenuIcon: {
+    fontSize: "30px",
+    color: "#9A5B12",
+    cursor: "pointer",
+  },
 };
 
 export default Notifikasi;

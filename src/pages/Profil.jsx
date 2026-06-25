@@ -14,6 +14,11 @@ function Profil() {
   const [showPhotoMenu, setShowPhotoMenu] = useState(false); 
   const galleryInputRef = useRef(null);
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  
+  // State baru untuk popup sukses ubah kata sandi & ubah nama
+  const [showSuccessPasswordPopup, setShowSuccessPasswordPopup] = useState(false);
+  const [showSuccessNamePopup, setShowSuccessNamePopup] = useState(false);
+
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -71,8 +76,10 @@ function Profil() {
       const res = await api.put("/change-password", { oldPassword, newPassword }, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
-      alert(res.data.message || "Password berhasil diubah");
+      
       setShowPasswordPopup(false);
+      setShowSuccessPasswordPopup(true);
+      
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -116,7 +123,7 @@ function Profil() {
         setUser((prev) => ({ ...prev, nama: trimmedName }));
         setNewName(trimmedName);
         setIsEditingName(false);
-        alert("Nama berhasil diubah");
+        setShowSuccessNamePopup(true);
       }
     } catch (err) {
       console.error(err);
@@ -131,8 +138,12 @@ function Profil() {
   const [removeBookmarkTargetId, setRemoveBookmarkTargetId] = useState(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState("");
+  
+  // State hover untuk tombol popup
   const [hoverCancelLogout, setHoverCancelLogout] = useState(false);
   const [hoverConfirmLogout, setHoverConfirmLogout] = useState(false);
+  const [hoverConfirmName, setHoverConfirmName] = useState(false);
+  const [hoverSuccessPassword, setHoverSuccessPassword] = useState(false);
   const [hoverPhoto, setHoverPhoto] = useState("");
 
   useEffect(() => {
@@ -310,24 +321,23 @@ function Profil() {
           <div style={{ ...styles.modalBox, width: isMobile ? "90%" : "380px", padding: isMobile ? "20px" : "25px" }} onClick={(e) => e.stopPropagation()}>
             <h3 style={styles.modalTitle}>Ganti Password</h3>
             
-            {/* FIX: Letak ikon mata diselaraskan dengan aman di sisi kanan input */}
             <div style={styles.passwordWrapper}>
               <input type={showOldPassword ? "text" : "password"} placeholder="Kata Sandi Lama" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} style={styles.passwordInput} />
-              <button type="button" onClick={() => setShowOldPassword(!showOldPassword)} style={styles.eyeButton}>
+              <button type="button" onClick={() => setShowOldPassword(!showOldPassword)} style={styles.eyeButton} title={showOldPassword ? "Sembunyikan password" : "Tampilkan password"}>
                 {showOldPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
             
             <div style={styles.passwordWrapper}>
               <input type={showNewPassword ? "text" : "password"} placeholder="Kata Sandi Baru" minLength={6} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={styles.passwordInput} />
-              <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} style={styles.eyeButton}>
+              <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} style={styles.eyeButton} title={showNewPassword ? "Sembunyikan password" : "Tampilkan password"}>
                 {showNewPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
             
             <div style={styles.passwordWrapper}>
               <input type={showConfirmPassword ? "text" : "password"} placeholder="Konfirmasi Kata Sandi Baru" minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={styles.passwordInput} />
-              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeButton}>
+              <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeButton} title={showConfirmPassword ? "Sembunyikan password" : "Tampilkan password"}>
                 {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
               </button>
             </div>
@@ -339,6 +349,58 @@ function Profil() {
           </div>
         </div>
       )}
+
+      {/* POPUP BERHASIL UBAH KATA SANDI - WARNA HIJAU SUDAH DISERAGAMKAN MENJADI ORANGE */}
+      {showSuccessPasswordPopup && (
+        <div style={styles.modalOverlay} onClick={() => setShowSuccessPasswordPopup(false)}>
+          <div style={{ ...styles.modalBox, width: isMobile ? "85%" : "360px" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ margin: "10px auto 15px auto", width: "60px", height: "60px", borderRadius: "50%", background: "#FFF7F3", display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: "36px", color: "#c54500" }}>check_circle</span>
+            </div>
+            <h3 style={{ ...styles.modalTitle, color: "#c54500", marginBottom: "8px" }}>Berhasil!</h3>
+            <p style={{ ...styles.modalText, margin: "0 0 20px 0", fontSize: "14px" }}>Kata sandi akun Anda telah sukses diperbarui.</p>
+            <button 
+              style={{ 
+                ...styles.btnConfirm, 
+                backgroundColor: hoverSuccessPassword ? "#a63800" : "#c54500", 
+                color: "#fff", 
+                width: "100%", 
+                flex: "none", 
+                padding: "12px" 
+              }} 
+              onMouseEnter={() => setHoverSuccessPassword(true)}
+              onMouseLeave={() => setHoverSuccessPassword(false)}
+              onClick={() => setShowSuccessPasswordPopup(false)}
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP BERHASIL UBAH NAMA - MODEL DISAMAKAN DENGAN POPUP LOGOUT */}
+      {showSuccessNamePopup && (
+        <div style={styles.modalOverlay} onClick={() => setShowSuccessNamePopup(false)}>
+          <div style={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+            <h3 style={styles.modalTitle}>Nama Diperbarui!</h3>
+            <p style={styles.modalText}>Nama profil Anda berhasil diubah menjadi <strong>{user?.nama}</strong>.</p>
+            <div style={styles.modalActions}>
+              <button 
+                style={{ 
+                  ...styles.btnConfirm, 
+                  backgroundColor: hoverConfirmName ? "#a63800" : "#c54500",
+                  width: "100%" 
+                }} 
+                onMouseEnter={() => setHoverConfirmName(true)} 
+                onMouseLeave={() => setHoverConfirmName(false)} 
+                onClick={() => setShowSuccessNamePopup(false)}
+              >
+                Oke, Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 
@@ -346,7 +408,7 @@ function Profil() {
     return (
       <div style={styles.mobilePage}>
         <div style={styles.mobileHeader}>
-          <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setIsDrawerOpen(true)}>menu</span>
+          <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setIsDrawerOpen(true)} title="Buka menu navigasi">menu</span>
         </div>
 
         {isDrawerOpen && (
@@ -357,7 +419,7 @@ function Profil() {
                   <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
                   <span style={styles.logoText}>pLorra</span>
                 </div>
-                <span className="material-symbols-outlined" style={{ cursor: "pointer", color: "#9C5B00" }} onClick={() => setIsDrawerOpen(false)}>close</span>
+                <span className="material-symbols-outlined" style={{ cursor: "pointer", color: "#9C5B00" }} onClick={() => setIsDrawerOpen(false)} title="Tutup menu">close</span>
               </div>
               <div style={styles.drawerMenuContent}>
                 <div style={styles.drawerMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setIsDrawerOpen(false); }}>Home</div>
@@ -376,7 +438,7 @@ function Profil() {
               ) : (
                 <span className="material-symbols-outlined" style={styles.mobilePhotoPlaceholder}>person</span>
               )}
-              <div style={styles.mobileCameraBtnAbsolute} onClick={() => setShowPhotoMenu(true)} >
+              <div style={styles.mobileCameraBtnAbsolute} onClick={() => setShowPhotoMenu(true)} title="Ubah foto profil">
                 <span className="material-symbols-outlined" style={{ color:"#fff", fontSize:"18px" }}>photo_camera</span>
               </div>
             </div>
@@ -405,7 +467,7 @@ function Profil() {
               <div style={styles.mobileLabel}>NAMA</div>
               <div style={styles.mobileInputBox}>
                 <input type="text" value={isEditingName ? newName : user?.nama} onChange={(e) => setNewName(e.target.value)} readOnly={!isEditingName} style={styles.mobileInput} />
-                <span className="material-symbols-outlined" style={styles.mobileEditIcon} onClick={() => { if (isEditingName) { handleUpdateName(); } else { setNewName(user.nama); setIsEditingName(true); } }}>
+                <span className="material-symbols-outlined" style={styles.mobileEditIcon} title={isEditingName ? "Simpan nama" : "Ubah nama"} onClick={() => { if (isEditingName) { handleUpdateName(); } else { setNewName(user.nama); setIsEditingName(true); } }}>
                   {isEditingName ? "check" : "edit"}
                 </span>
               </div>
@@ -425,12 +487,12 @@ function Profil() {
                     <div style={styles.mobilePasswordLabel}>Perbarui kata sandi</div>
                     <div style={styles.mobilePasswordDots}>•••••••••••</div>
                   </div>
-                  <button style={styles.mobileChangePasswordBtn} onClick={() => { setShowPasswordPopup(true); setIsDrawerOpen(false); }}>Ganti</button>
+                  <button style={styles.mobileChangePasswordBtn} onClick={() => { setShowPasswordPopup(true); setIsDrawerOpen(false); }} title="Ganti password">Ganti</button>
                 </div>
               </div>
 
               <div style={styles.mobileLogoutSection}>
-                <button style={styles.mobileLogoutBtn} onClick={() => setShowLogoutPopup(true)}>
+                <button style={styles.mobileLogoutBtn} onClick={() => setShowLogoutPopup(true)} title="Keluar akun">
                   <span className="material-symbols-outlined" style={styles.mobileLogoutIcon}>logout</span>Keluar
                 </button>
               </div>
@@ -472,10 +534,10 @@ function Profil() {
                   <div style={styles.cardImgWrapper}>
                     <img src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`} style={styles.mobileCardImg} alt={item.nama} />
                     <div style={styles.mobileFloatingActionGroup}>
-                      <button style={styles.mobileActionRoundBtn} onClick={(e) => { e.stopPropagation(); navigate(`/edit/${item.id}`); }}>
+                      <button style={styles.mobileActionRoundBtn} title="Edit Resep" onClick={(e) => { e.stopPropagation(); navigate(`/edit/${item.id}`); }}>
                         <span className="material-symbols-outlined" style={{ fontSize: "15px", color: "#E46B3C" }}>edit</span>
                       </button>
-                      <button style={styles.mobileActionRoundBtn} onClick={(e) => { e.stopPropagation(); setDeleteTargetId(item.id); setShowDeletePopup(true); }}>
+                      <button style={styles.mobileActionRoundBtn} title="Hapus Resep" onClick={(e) => { e.stopPropagation(); setDeleteTargetId(item.id); setShowDeletePopup(true); }}>
                         <span className="material-symbols-outlined" style={{ fontSize: "15px", color: "#dc2626" }}>delete</span>
                       </button>
                     </div>
@@ -533,7 +595,7 @@ function Profil() {
                 <div key={item.id} style={styles.mobileRecipeCardItem} onClick={() => navigate(`/detail/${item.id}`)}>
                   <div style={styles.cardImgWrapper}>
                     <img src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`} style={styles.mobileCardImg} alt="" />
-                    <button style={styles.mobileBookmarkBtn} onClick={(e) => { e.stopPropagation(); setRemoveBookmarkTargetId(item.id); setShowRemoveBookmarkPopup(true); }}>
+                    <button style={styles.mobileBookmarkBtn} title="Hapus dari Favorit" onClick={(e) => { e.stopPropagation(); setRemoveBookmarkTargetId(item.id); setShowRemoveBookmarkPopup(true); }}>
                       <span className="material-symbols-outlined" style={styles.mobileBookmarkActive}>bookmark</span>
                     </button>
                   </div>
@@ -629,7 +691,7 @@ function Profil() {
               ) : (
                 <span className="material-symbols-outlined" style={styles.profilePlaceholder}>person</span>
               )}
-              <div style={styles.cameraBtn} onClick={() => setShowPhotoMenu(true)}>
+              <div style={styles.cameraBtn} onClick={() => setShowPhotoMenu(true)} title="Ubah foto profil">
                 <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "#fff" }}>photo_camera</span>
               </div>
             </div>
@@ -642,13 +704,13 @@ function Profil() {
                     {isEditingName ? (
                       <>
                         <input value={newName} onChange={(e)=>setNewName(e.target.value)} style={styles.nameInput} />
-                        <span className="material-symbols-outlined" style={{ ...styles.editPencil, color:"green" }} onClick={handleUpdateName}>check</span>
-                        <span className="material-symbols-outlined" style={{ ...styles.editPencil, marginLeft:"8px", color:"red" }} onClick={()=>{ setIsEditingName(false); setNewName(user.nama); }}>close</span>
+                        <span className="material-symbols-outlined" style={{ ...styles.editPencil, color:"green" }} onClick={handleUpdateName} title="Simpan">check</span>
+                        <span className="material-symbols-outlined" style={{ ...styles.editPencil, marginLeft:"8px", color:"red" }} onClick={()=>{ setIsEditingName(false); setNewName(user.nama); }} title="Batal">close</span>
                       </>
                     ) : (
                       <>
                         {user.nama}
-                        <span className="material-symbols-outlined" style={styles.editPencil} onClick={()=>{ setNewName(user.nama); setIsEditingName(true); }}>edit</span>
+                        <span className="material-symbols-outlined" style={styles.editPencil} onClick={()=>{ setNewName(user.nama); setIsEditingName(true); }} title="Ubah Nama">edit</span>
                       </>
                     )}
                   </div>
@@ -679,6 +741,7 @@ function Profil() {
                   onMouseEnter={() => setHoverPassword(true)}
                   onMouseLeave={() => setHoverPassword(false)}
                   onClick={() => setShowPasswordPopup(true)}
+                  title="Ganti kata sandi"
                 >
                   Perbarui Kata Sandi
                 </button>
@@ -696,6 +759,7 @@ function Profil() {
                   onMouseEnter={() => setHoverLogout(true)}
                   onMouseLeave={() => setHoverLogout(false)}
                   onClick={() => setShowLogoutPopup(true)}
+                  title="Keluar dari akun"
                 >
                   Keluar
                 </button>
@@ -704,7 +768,6 @@ function Profil() {
           </div>
         )}
 
-        {/* LIST RESEP DAN FAVORIT DESKTOP */}
         {(activeTab === "resep" || activeTab === "favorit") && (
           <div style={styles.rightSection}>
             <h1 style={styles.pageTitle}>{activeTab === "resep" ? "Resep Saya" : "Resep Tersimpan"}</h1>
@@ -723,18 +786,17 @@ function Profil() {
                       <div style={styles.cardImgWrapper}>
                         <img src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`} style={styles.cardImg} alt={item.nama} />
                         
-                        {/* FIX: Jika Tab Resep Saya, Tampilkan tombol Edit dan Hapus melayang di bagian atas gambar */}
                         {activeTab === "resep" ? (
                           <div style={styles.desktopFloatingActionGroup}>
-                            <button style={styles.desktopActionRoundBtn} onClick={(e) => { e.stopPropagation(); navigate(`/edit/${item.id}`); }}>
+                            <button style={styles.desktopActionRoundBtn} title="Edit Resep" onClick={(e) => { e.stopPropagation(); navigate(`/edit/${item.id}`); }}>
                               <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "#E46B3C" }}>edit</span>
                             </button>
-                            <button style={styles.desktopActionRoundBtn} onClick={(e) => { e.stopPropagation(); setDeleteTargetId(item.id); setShowDeletePopup(true); }}>
+                            <button style={styles.desktopActionRoundBtn} title="Hapus Resep" onClick={(e) => { e.stopPropagation(); setDeleteTargetId(item.id); setShowDeletePopup(true); }}>
                               <span className="material-symbols-outlined" style={{ fontSize: "16px", color: "#dc2626" }}>delete</span>
                             </button>
                           </div>
                         ) : (
-                          <button style={styles.bookmarkBtn} onClick={(e) => { e.stopPropagation(); setRemoveBookmarkTargetId(item.id); setShowRemoveBookmarkPopup(true); }}>
+                          <button style={styles.bookmarkBtn} title="Hapus dari Favorit" onClick={(e) => { e.stopPropagation(); setRemoveBookmarkTargetId(item.id); setShowRemoveBookmarkPopup(true); }}>
                             <span className="material-symbols-outlined" style={styles.bookmarkActive}>bookmark</span>
                           </button>
                         )}
@@ -752,7 +814,6 @@ function Profil() {
                               <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
                             ))}
                           </span>
-                          {/* FIX: Kedua tab kini sama-sama menampilkan tombol "Lihat" di bagian bawah */}
                           <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
                         </div>
                       </div>
@@ -854,23 +915,21 @@ const styles = {
   btnConfirm:{ padding:"10px 20px", border:"none", borderRadius:"8px", background:"#c54500", color:"#fff", cursor:"pointer", flex: 1, fontWeight: "600" },
   nameInput:{ border:"none", outline:"none", background:"transparent", width:"100%", fontSize:"14px", },
   
-  /* FIX: Wrapper Password & Ikon Mata Sesuai Masukan gambar image_220c83.png */
   passwordWrapper: { position: "relative", width: "100%", marginBottom: "16px", display: "flex", alignItems: "center" },
   passwordInput: { width: "100%", padding: "14px 45px 14px 14px", border: "1px solid #ddd", borderRadius: "10px", boxSizing: "border-box", outline: "none", fontSize: "15px" },
-  eyeButton: { position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#666", display: "flex", alignItems: "center", padding: 0 },
+  eyeButton: { position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#666", display: "flex", alignItems: "center", padding: 0, zIndex: 10 },
   
   buttonGroup: { display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "20px", width: "100%" },
   menuButton: { border: "1px solid #ddd", background: "#fff", padding: "10px 18px", borderRadius: "8px", cursor: "pointer", fontWeight: "600", },
   logoutButton: { background: "#c54500", color: "#fff", border: "none", padding: "10px 24px", borderRadius: "8px", cursor: "pointer", fontWeight: "600", },
   
-  // FIX: Tombol melayang aksi resep saya versi Desktop
   desktopFloatingActionGroup: { position: "absolute", top: "10px", right: "10px", display: "flex", gap: "6px", zIndex: 10 },
   desktopActionRoundBtn: { width: "32px", height: "32px", borderRadius: "50%", backgroundColor: "rgba(255, 255, 255, 0.95)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" },
 
-  /* MOBILE LAYOUT STRUCUTRE */
+  /* MOBILE LAYOUT STRUCTURE */
   mobilePage:{ minHeight:"100vh", background:"#FBF8F4", paddingBottom: "40px", width: "100%", overflowX: "hidden" },
-  mobileHeader:{ height:"70px", background:"#fff", display:"flex", alignItems:"center", padding:"0 20px", boxShadow:"0 3px 12px rgba(0,0,0,.08)", position:"sticky", top:0, zIndex: 100 },
-  mobileMenuIcon:{ fontSize:"34px", color:"#9C5B00", cursor:"pointer", },
+  mobileHeader:{ height:"54px", background:"#fff", display:"flex", alignItems:"center", padding:"0 20px", boxShadow:"0 3px 12px rgba(0,0,0,.08)", position:"sticky", top:0, zIndex: 100 },
+  mobileMenuIcon:{ fontSize:"26px", color:"#9C5B00", cursor:"pointer", },
   mobilePhotoSection:{ display:"flex", flexDirection:"column", alignItems:"center", marginTop:"25px", padding: "0 20px" },
   mobilePhotoWrapper:{ position:"relative", display: "inline-block" },
   mobilePhoto:{ width:"130px", height:"130px", borderRadius:"50%", objectFit:"cover", border:"5px solid #fff", boxShadow:"0 4px 12px rgba(0,0,0,.12)", },
