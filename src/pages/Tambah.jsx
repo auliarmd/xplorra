@@ -101,12 +101,18 @@ useEffect(() => {
       setPopupMessage("Resep berhasil ditambahkan!");
       setIsSuccess(true);
       setShowPopup(true);
-    } catch (err) {
-      console.log(err);
-      setPopupMessage("Gagal menambahkan resep!");
-      setIsSuccess(false);
-      setShowPopup(true);
-    }
+    } 
+    catch (err) {
+  console.log("Status :", err.response?.status);
+  console.log("Data :", err.response?.data);
+  console.log("Error :", err);
+
+  setPopupMessage(
+    err.response?.data?.message || "Gagal menambahkan resep!"
+  );
+  setIsSuccess(false);
+  setShowPopup(true);
+}
   };
 
   const tambahBahan = () => setBahan([...bahan, ""]);
@@ -126,16 +132,40 @@ useEffect(() => {
   };
 
   const mobileStyles = {
-    navbar: { padding: "10px 15px" },
-    content: { padding: "20px 10px" },
-    formContainer: { padding: "20px" },
-    uploadBox: { height: "250px" },
-    dynamicRow: { flexDirection: "column", alignItems: "stretch", position: "relative" },
-    footer: { flexDirection: "column" },
-    cancelBtn: { width: "100%" },
-    saveBtn: { width: "100%" },
-    deleteBtnMobile: { alignSelf: "flex-end", marginTop: "-5px" }
-  };
+  navbar: { padding: "10px 15px" },
+  content: { padding: "20px 10px" },
+  formContainer: { padding: "20px" },
+  uploadBox: { height: "250px" },
+
+  dynamicRow: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    position: "relative"
+  },
+
+  dynamicRowLangkah: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "8px"
+  },
+
+  deleteBtnMobile: {
+    alignSelf: "flex-end",
+    marginTop: "-5px"
+  },
+
+  deleteBtnLangkah: {
+    marginTop: "0",
+    alignSelf: "center",
+    flexShrink: 0
+  },
+
+  footer: { flexDirection: "column" },
+  cancelBtn: { width: "100%" },
+  saveBtn: { width: "100%" }
+};
+  
 
   return (
     <div style={styles.page}>
@@ -376,7 +406,10 @@ useEffect(() => {
           {bahan.map((item, index) => (
             <div
               key={index}
-              style={{ ...styles.dynamicRow, ...(isMobile ? mobileStyles.dynamicRow : {}) }}
+              style={{
+  ...styles.dynamicRow,
+  ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
+}}
             >
               <input
                 type="text"
@@ -385,13 +418,18 @@ useEffect(() => {
                 placeholder="Contoh: 500gr Daging Sapi"
                 onChange={(e) => ubahBahan(index, e.target.value)}
               />
-              <button
-                type="button"
-                style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnMobile : {}) }}
-                onClick={() => hapusBahan(index)}
-              >
-                🗑
-              </button>
+             {item.trim() !== "" && (
+  <button
+    type="button"
+    style={{
+      ...styles.deleteBtn,
+      ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
+    }}
+    onClick={() => hapusBahan(index)}
+  >
+    🗑
+  </button>
+)}
             </div>
           ))}
 
@@ -402,9 +440,12 @@ useEffect(() => {
           <label style={styles.label}>Langkah Memasak</label>
           {langkah.map((item, index) => (
             <div
-              key={index}
-              style={{ ...styles.dynamicRow, ...(isMobile ? mobileStyles.dynamicRow : {}) }}
-            >
+  key={index}
+  style={{
+    ...styles.dynamicRow,
+    ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
+  }}
+>
               {!isMobile && <div style={styles.stepNumber}>{index + 1}</div>}
               <input
                 type="text"
@@ -413,13 +454,18 @@ useEffect(() => {
                 placeholder={isMobile ? `Langkah ${index + 1}...` : "Jelaskan langkah pembuatan..."}
                 onChange={(e) => ubahLangkah(index, e.target.value)}
               />
-              <button
-                type="button"
-                style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnMobile : {}) }}
-                onClick={() => hapusLangkah(index)}
-              >
-                🗑
-              </button>
+              {item.trim() !== "" && (
+  <button
+    type="button"
+    style={{
+      ...styles.deleteBtn,
+      ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
+    }}
+    onClick={() => hapusLangkah(index)}
+  >
+    🗑
+  </button>
+)}
             </div>
           ))}
 

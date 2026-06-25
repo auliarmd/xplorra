@@ -430,56 +430,86 @@ function EditResep() {
           <label style={styles.label}>Bahan</label>
 
           {bahan.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                ...styles.dynamicRow,
-                ...(isMobile ? mobileStyles.dynamicRow : {}),
-              }}
-            >
-              <input
-                type="text"
-                placeholder={`Bahan ${index + 1}`}
-                style={styles.input}
-                value={item}
-                onChange={(e) => ubahBahan(index, e.target.value)}
-              />
-              <button
-                style={styles.deleteBtn}
-                onClick={() => hapusBahan(index)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+  <div
+    key={index}
+    style={{
+      ...styles.dynamicRow,
+      ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
+    }}
+  >
+    <input
+      type="text"
+      style={styles.input}
+      value={item}
+      placeholder="Contoh: 500gr Daging Sapi"
+      onChange={(e) => ubahBahan(index, e.target.value)}
+    />
 
-          <button
-            type="button"
-            style={styles.addBtn}
-            onClick={tambahBahan}
-          >
-            + Tambah Bahan
-          </button>
+    {item.trim() !== "" && (
+      <button
+        type="button"
+        style={{
+          ...styles.deleteBtn,
+          ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
+        }}
+        onClick={() => hapusBahan(index)}
+      >
+        🗑
+      </button>
+    )}
+  </div>
+))}
+
+<button
+  type="button"
+  style={styles.addBtn}
+  onClick={tambahBahan}
+>
+  + Tambah Bahan
+</button>
 
           <label style={styles.label}>Langkah Memasak</label>
 
-          {langkah.map((item, index) => (
-            <div key={index} style={styles.dynamicRow}>
-              <textarea
-                placeholder={`Langkah ${index + 1}`}
-                style={styles.smallTextarea}
-                value={item}
-                onChange={(e) => ubahLangkah(index, e.target.value)}
-              />
-              <button
-                type="button"
-                style={styles.deleteBtn}
-                onClick={() => hapusLangkah(index)}
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+         {langkah.map((item, index) => (
+  <div
+    key={index}
+    style={{
+      ...styles.dynamicRow,
+      ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
+    }}
+  >
+    {!isMobile && (
+      <div style={styles.stepNumber}>
+        {index + 1}
+      </div>
+    )}
+
+    <input
+      type="text"
+      style={styles.input}
+      value={item}
+      placeholder={
+        isMobile
+          ? `Langkah ${index + 1}...`
+          : "Jelaskan langkah pembuatan..."
+      }
+      onChange={(e) => ubahLangkah(index, e.target.value)}
+    />
+
+    {item.trim() !== "" && (
+      <button
+        type="button"
+        style={{
+          ...styles.deleteBtn,
+          ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
+        }}
+        onClick={() => hapusLangkah(index)}
+      >
+        🗑
+      </button>
+    )}
+  </div>
+))}
 
           <button
             type="button"
@@ -853,18 +883,14 @@ mobileMenuItem: {
     gap: "12px",
     width: "100%",
   },
-  deleteBtn: {
-    background: "#FF5A5A",
-    color: "#fff",
-    border: "none",
-    width: "38px",
-    height: "38px",
-    borderRadius: "12px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "18px",
-    flexShrink: 0,
-  },
+deleteBtn: {
+  background: "transparent",
+  border: "none",
+  color: "#E74C3C",
+  fontSize: "22px",
+  cursor: "pointer",
+  flexShrink: 0
+},
   smallTextarea: {
     flex: 1,
     minHeight: "120px",
@@ -968,7 +994,33 @@ mobileMenuItem: {
 hamburgerIcon: {
   fontSize: "32px",
   color: "#8B5A2B"
-}
+},
+
+dynamicRowLangkah: {
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "center",
+  gap: "8px"
+},
+
+deleteBtnLangkah: {
+  marginTop: 0,
+  alignSelf: "center",
+  flexShrink: 0
+},
+
+stepNumber: {
+  width: "30px",
+  height: "30px",
+  borderRadius: "50%",
+  background: "#D77A35",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+  fontWeight: "600"
+},
 
 }
 export default EditResep;
