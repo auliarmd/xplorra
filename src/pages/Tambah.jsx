@@ -224,7 +224,7 @@ useEffect(() => {
           </div>
         ) : (
           <div style={styles.logoContainer}>
-            <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
+            <img src="/logo_Xplorra.png" alt="logo" style={styles.logoImg} />
             <span style={styles.logoText}>pLorra</span>
           </div>
         )}
