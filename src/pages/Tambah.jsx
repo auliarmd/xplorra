@@ -12,7 +12,6 @@ function TambahResep() {
   const [preview, setPreview] = useState("");
   const [bahan, setBahan] = useState([""]);
   const [langkah, setLangkah] = useState([""]);
-  const [hoverSave, setHoverSave] = useState(false);
   const [hoverCancel, setHoverCancel] = useState(false);
   const [user, setUser] = useState(null);
   
