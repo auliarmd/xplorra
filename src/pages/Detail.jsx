@@ -195,11 +195,6 @@ function Detail() {
           <div style={styles.desktopHeaderTitle}>Detail Resep</div>
 
           <div style={styles.menuArea}>
-            <div style={styles.menu}>
-              <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-              <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
-              <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
-            </div>
             <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
               {user.foto ? (
                 <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
@@ -233,17 +228,44 @@ function Detail() {
                 close
               </span>
             </div>
-            
-            <div style={styles.mobileMenuTitle}>MENU</div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}>
-              Dashboard
-            </div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/notifikasi"); setShowMenu(false); }}>
-              Notifikasi
-            </div>
-            <div style={styles.mobileMenuItem} onClick={() => { navigate("/profil"); setShowMenu(false); }}>
-              Profil
-            </div>
+            <div
+  style={styles.mobileMenuItem}
+  onClick={() => {
+    navigate("/dashboardafterlogin");
+    setShowMenu(false);
+  }}
+>
+  Dashboard
+</div>
+
+<div
+  style={{
+    ...styles.mobileMenuItem,
+    ...styles.mobileMenuActive,
+  }}
+>
+  Detail Resep
+</div>
+
+<div
+  style={styles.mobileMenuItem}
+  onClick={() => {
+    navigate("/profil");
+    setShowMenu(false);
+  }}
+>
+  Profil
+</div>
+
+<div
+  style={styles.mobileMenuItem}
+  onClick={() => {
+    navigate("/notifikasi");
+    setShowMenu(false);
+  }}
+>
+  Notifikasi
+</div>
           </div>
         </>
       )}
@@ -252,7 +274,7 @@ function Detail() {
       <div
         style={{
           ...styles.heroSection,
-          height: isMobile ? "300px" : isTablet ? "450px" : "550px",
+          height: isMobile ? "260px" : isTablet ? "450px" : "550px",
         }}
       >
         <img src={`https://xplorra-production.up.railway.app/uploads/${food.gambar}`} alt={food.nama} style={styles.heroImg} />
@@ -635,20 +657,22 @@ const styles = {
     fontWeight: "700",
     marginLeft: "8px",
   },
-  mobileMenuTitle: {
-    marginTop: "20px",
-    marginBottom: "15px",
-    fontWeight: "700",
-    fontSize: "18px",
-    color: "#5E4637",
-  },
+
   mobileMenuItem: {
     padding: "12px 10px",
     fontSize: "16px",
     cursor: "pointer",
     color: "#333",
     fontWeight: "500",
+    marginBottom: "8px",
   },
+
+  mobileMenuActive: {
+  background: "#F5D7C6",
+  color: "#9F6822",
+  fontWeight: "700",
+  borderRadius: "10px",
+},
 
   /* --- KONTEN HALAMAN --- */
   heroSection:{

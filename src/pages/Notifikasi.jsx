@@ -592,30 +592,31 @@ profileCircle:{
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-
-    padding: "20px 30px",
-
-    borderBottom: "1px solid #ddd",
-
+    padding: "14px 18px",
+    borderBottom: "1px solid #eee",
     background: "#fff",
   },
 
   leftNotif: {
     display: "flex",
-    alignItems: "center",
-    gap: "20px",
+    alignItems: "flex-start",
+    gap: "12px",
+    flex: 1,
   },
 
   userIcon: {
-    width: "60px",
-    height: "60px",
+    width: "42px",
+    height: "42px",
     borderRadius: "50%",
     objectFit: "cover",
-    border: "2px solid #eee",
+    border: "1px solid #eee",
+    flexShrink: 0,
   },
 
   textNotif: {
-    fontSize: "20px",
+    fontSize: "17px",
+    lineHeight: "1.4",
+    color: "#222",
   },
 
   time: {
@@ -635,9 +636,10 @@ profileCircle:{
   flexShrink: 0,
 },
 
-  defaultNotifIcon:{
-    fontSize:'60px',
-    color:'#777',
+  defaultNotifIcon: {
+    fontSize: "44px",
+    color: "#777",
+    flexShrink: 0,
   },
 
 
