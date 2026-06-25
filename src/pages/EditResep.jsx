@@ -18,14 +18,13 @@ function EditResep() {
   const [hoverCancel, setHoverCancel] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-
-  // Perbaikan: isMobile hanya dideklarasikan sekali menggunakan state
- const getIsMobile = () =>
-  window.matchMedia("(max-width: 768px)").matches;
-const [isMobile, setIsMobile] = useState(getIsMobile);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  // Perbaikan: isMobile hanya dideklarasikan sekali menggunakan state
+ const getIsMobile = () =>
+  window.matchMedia("(max-width: 768px)").matches;
+  const [showPopup, setShowPopup] = useState(false);
 
  useEffect(() => {
   const mediaQuery = window.matchMedia("(max-width: 768px)");
@@ -608,11 +607,6 @@ mobileHamburger: {
   color: "#8B5A2B",
   marginRight: "20px",
 },
-mobileLogoContainer: {
-  display: "flex",
-  alignItems: "center",
-  gap: "8px",
-},
 
 mobileLogo: {
   width: "40px",
@@ -623,13 +617,6 @@ mobileLogoText: {
   fontWeight: "700",
   color: "#F28C28",
 },
-
-mobileHamburger: {
-  fontSize: "30px",
-  cursor: "pointer",
-  color: "#8B5A2B",
-},
-
 mobileMenuItem: {
   display: "flex",
   alignItems: "center",
@@ -651,14 +638,6 @@ mobileMenuItem: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-  },
-  mobileLogo: {
-    width: "38px",
-  },
-  mobileLogoText: {
-    fontWeight: "700",
-    color: "#F28C28",
-    fontSize: "22px",
   },
   // ========================================
 
