@@ -147,19 +147,28 @@ function DashboardAfterLogin() {
       {/* NAVBAR / HEADER */}
       {isMobile ? (
         <div style={styles.mobileNavbar}>
-          <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
-            menu
-          </span>
-          <div style={styles.mobileHeaderTitle}>
-            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>space_dashboard</span>
-            Dashboard
+          {/* Kiri: Tombol Menu */}
+          <div style={styles.mobileNavbarLeft}>
+            <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
+              menu
+            </span>
           </div>
-          <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-            {user.foto ? (
-              <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
-            ) : (
-              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>person</span>
-            )}
+          
+          {/* Tengah: Ikon & Tulisan Dashboard */}
+          <div style={styles.mobileHeaderTitleCenter}>
+            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>space_dashboard</span>
+            <span>Dashboard</span>
+          </div>
+          
+          {/* Kanan: Avatar Profil */}
+          <div style={styles.mobileNavbarRight}>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user.foto ? (
+                <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>person</span>
+              )}
+            </div>
           </div>
         </div>
       ) : (
@@ -593,9 +602,28 @@ const styles = {
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
   btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   feedbackBtn: { position: "fixed", bottom: "20px", right: "20px", width: "52px", height: "52px", borderRadius: "50%", background: "#e15b3c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 99 },
-  mobileNavbar: { display: "flex", alignItems: "center", justifyindex: "space-between", backgroundColor: "#FFFFFF", padding: "12px 20px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
+  mobileNavbar: { 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
+    backgroundColor: "#FFFFFF", 
+    padding: "12px 20px", 
+    position: "sticky", 
+    top: 0, 
+    zIndex: 999, 
+    width: "100%", 
+    boxSizing: "border-box", 
+    boxShadow: "0 2px 10px rgba(0,0,0,0.05)" 
+  },
   mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
-  mobileHeaderTitle: { display: "flex", alignItems: "center", gap: "8px", color: "#9F6822", fontWeight: "700", fontSize: "20px" },
+  mobileHeaderTitle: { 
+    display: "flex", 
+    alignItems: "center", 
+    gap: "6px", // sedikit dirapatkan jarak ikon kotak dan teksnya
+    color: "#9F6822", 
+    fontWeight: "700", 
+    fontSize: "18px" // disesuaikan agar pas di layar HP kecil
+  },
   mobileHeaderIcon: { fontSize: "24px" },
   profileCircle: { width: "35px", height: "35px", borderRadius: "50%", background: "#f4b8a3", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", cursor: "pointer", overflow: "hidden" },
   profileImg: { width: "100%", height: "100%", objectFit: "cover" },
@@ -609,6 +637,28 @@ const styles = {
   mobileMenuItemActive: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#e15b3c", backgroundColor: "rgba(225, 91, 60, 0.12)", fontWeight: "700", borderRadius: "10px" },
   emptyResult: { padding: "40px 0", textAlign: "center" },
   emptyResultText: { color: "#a4a4a4", fontSize: "22px", fontWeight: "700" },
+  mobileNavbarLeft: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center"
+  },
+  mobileHeaderTitleCenter: { 
+    display: "flex", 
+    alignItems: "center", 
+    justifyContent: "center",
+    gap: "6px", 
+    color: "#9F6822", 
+    fontWeight: "700", 
+    fontSize: "18px",
+    whiteSpace: "nowrap"
+  },
+  mobileNavbarRight: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
 };
 
 export default DashboardAfterLogin;
