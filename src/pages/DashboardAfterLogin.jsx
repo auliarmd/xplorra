@@ -12,41 +12,38 @@ function DashboardAfterLogin() {
   const [kategori, setKategori] = useState("");
   const [user, setUser] = useState({});
   const [daerah, setDaerah] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const filterFoods = React.useCallback(
   (newKategori, newDaerah, newSearch) => {
 
-    const kategoriValue =
-      newKategori ?? kategori;
+    setLoading(true);
 
-    const daerahValue =
-      newDaerah ?? daerah;
+    const kategoriValue = newKategori ?? kategori;
+    const daerahValue = newDaerah ?? daerah;
+    const searchValue = newSearch ?? search;
 
-    const searchValue =
-      newSearch ?? search;
-
-      console.log(
-      `/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`
-    );
     api.get(
       `/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`
     )
+      .then((res) => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setFoods(res.data);
 
-    .then((res)=>{
+        setNotFound(res.data.length === 0);
 
-      setFoods(res.data);
+        setLoading(false);
 
-      setNotFound(res.data.length === 0);
+      })
+      .catch((err) => {
 
-    })
+        console.log(err);
 
-    .catch((err)=>{
+        setLoading(false);
 
-      console.log(err);
+      });
 
-    });
-
-},
+  },
   [kategori, daerah, search]
 );
 
@@ -572,15 +569,30 @@ const toggleSave = async (id) => {
         {/* PESAN JIKA RESEP KOSONG */}
         <div style={styles.cardContainer}>
 
-          {notFound ? (
+  {loading ? (
 
-            <div style={styles.emptyResult}>
-              <h2 style={styles.emptyResultText}>
-                Resep tidak ditemukan
-              </h2>
-            </div>
+    <div style={styles.loadingContainer}>
+      <span
+        className="material-symbols-outlined"
+        style={styles.loadingIcon}
+      >
+        hourglass_top
+      </span>
 
-          ) : (
+      <p style={styles.loadingText}>
+        Memuat resep...
+      </p>
+    </div>
+
+  ) : notFound ? (
+
+    <div style={styles.emptyResult}>
+      <h2 style={styles.emptyResultText}>
+        Resep tidak ditemukan
+      </h2>
+    </div>
+
+  ) : (
 
             <div style={styles.grid}>
 
@@ -594,9 +606,6 @@ const toggleSave = async (id) => {
 
   {/* WRAPPER GAMBAR */}
   <div style={styles.cardImgWrapper}>
-    {console.log(item)}
-        {console.log(item.gambar)}
-        {console.log(`${api.defaults.baseURL}/uploads/${item.gambar}`)}
         <img
           src={`${api.defaults.baseURL}/uploads/${item.gambar}`}
           style={styles.cardImg}
@@ -1176,6 +1185,27 @@ starEmpty: {
     fontWeight: "bold",
     marginBottom: "15px",
   },
+
+  loadingContainer: {
+  width: "100%",
+  height: "600px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+},
+
+loadingIcon: {
+  fontSize: "55px",
+  color: "#E46B5C",
+},
+
+loadingText: {
+  marginTop: "12px",
+  fontSize: "18px",
+  fontWeight: "600",
+  color: "#8B5A2B",
+},
 
 };
 
