@@ -197,7 +197,7 @@ function Detail() {
           <div style={styles.menuArea}>
             <div style={styles.menu}>
               <span style={styles.navItem} onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-              <span style={styles.navItem} onClick={() => navigate("/profil")}>Profil</span>
+              <span style={styles.navItem} onClick={() => navigate("/profil")}>Profile</span>
               <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
             </div>
             <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
@@ -234,7 +234,7 @@ function Detail() {
               </span>
             </div>
             
-            <div style={styles.mobileMenuTitle}>MENU</div>
+            <div style={styles.mobileMenuTitle}></div>
             <div style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMenu(false); }}>
               Dashboard
             </div>
