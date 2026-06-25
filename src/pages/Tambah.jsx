@@ -18,26 +18,16 @@ function TambahResep() {
   
   // State untuk Mobile Menu & Layar
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-
-  // ... (di dalam komponen)
-const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-useEffect(() => {
-  // 1. Fungsi untuk cek ukuran layar
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
-
-  // 2. PENTING: Panggil fungsi ini SATU KALI saat komponen pertama kali dimuat
-  handleResize();
-
-  // 3. Tambahkan listener agar tetap responsif jika layar di-resize
-  window.addEventListener("resize", handleResize);
-
-  return () =>
-    window.removeEventListener("resize", handleResize);
-}, []);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // State untuk Popup
   const [showPopup, setShowPopup] = useState(false);
@@ -55,13 +45,6 @@ useEffect(() => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-
-  // Listener untuk ukuran layar
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleSave = async () => {
@@ -107,16 +90,16 @@ useEffect(() => {
     } 
     catch (err) {
       setLoading(false);
-  console.log("Status :", err.response?.status);
-  console.log("Data :", err.response?.data);
-  console.log("Error :", err);
+      console.log("Status :", err.response?.status);
+      console.log("Data :", err.response?.data);
+      console.log("Error :", err);
 
-  setPopupMessage(
-    err.response?.data?.message || "Gagal menambahkan resep!"
-  );
-  setIsSuccess(false);
-  setShowPopup(true);
-}
+      setPopupMessage(
+        err.response?.data?.message || "Gagal menambahkan resep!"
+      );
+      setIsSuccess(false);
+      setShowPopup(true);
+    }
   };
 
   const tambahBahan = () => setBahan([...bahan, ""]);
@@ -136,53 +119,45 @@ useEffect(() => {
   };
 
   const mobileStyles = {
-  navbar: { padding: "10px 15px" },
-  content: { padding: "20px 10px" },
-  formContainer: { padding: "20px" },
-  uploadBox: { height: "250px" },
-
-  dynamicRow: {
-    flexDirection: "column",
-    alignItems: "stretch",
-    position: "relative"
-  },
-
-  dynamicRowLangkah: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "8px"
-  },
-
-  deleteBtnMobile: {
-    alignSelf: "flex-end",
-    marginTop: "-5px"
-  },
-
-  deleteBtnLangkah: {
-    marginTop: "0",
-    alignSelf: "center",
-    flexShrink: 0
-  },
-
-  footer: { flexDirection: "column" },
-  cancelBtn: { width: "100%" },
-  saveBtn: { width: "100%" }
-};
-  
+    content: { padding: "20px 15px", marginTop: "0px" },
+    formContainer: { padding: "20px" },
+    uploadBox: { height: "250px" },
+    dynamicRowLangkah: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: "8px"
+    },
+    deleteBtnLangkah: {
+      marginTop: "0",
+      alignSelf: "center",
+      flexShrink: 0
+    },
+    footer: { flexDirection: "column" },
+    cancelBtn: { width: "100%" },
+    saveBtn: { width: "100%" }
+  };
 
   return (
     <div style={styles.page}>
       <div style={styles.mapBackground}></div>
 
+      <style>{`
+        .hover-sidebar-item {
+          transition: all 0.2s ease-in-out;
+        }
+        .hover-sidebar-item:hover {
+          background-color: rgba(225, 91, 60, 0.08) !important;
+          color: #e15b3c !important;
+          padding-left: 18px !important;
+        }
+      `}</style>
+
       {/* ================= POPUP ================= */}
       {showPopup && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalBox}>
-            <span
-              className="material-symbols-outlined"
-              style={isSuccess ? styles.successIcon : styles.errorIcon}
-            >
+            <span className="material-symbols-outlined" style={isSuccess ? styles.successIcon : styles.errorIcon}>
               {isSuccess ? "check_circle" : "error"}
             </span>
             <h3 style={styles.modalTitle}>Pemberitahuan</h3>
@@ -201,103 +176,76 @@ useEffect(() => {
         </div>
       )}
 
-      {/* ================= MOBILE SIDEBAR ================= */}
-      {isMobile && (
-        <div
-          style={{
-            ...styles.mobileOverlay,
-            left: showMobileMenu ? "0" : "-280px"
-          }}
-        >
-          <div style={styles.mobileMenuHeader}>
-            <div style={styles.mobileLogoContainer}>
-              <img src="/logo_X.png" alt="logo" style={styles.mobileLogo} />
-              <span style={styles.mobileLogoText}>pLorra</span>
-            </div>
-            <span
-              className="material-symbols-outlined"
-              style={styles.mobileHamburger}
-              onClick={() => setShowMobileMenu(false)}
-            >
+      {/* ================= NAVBAR & HEADER SERAGAM ================= */}
+      {isMobile ? (
+        <div style={styles.mobileNavbar}>
+          <div style={styles.mobileNavbarLeft}>
+            <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMobileMenu(true)}>
               menu
             </span>
           </div>
-
-          <div
-            style={styles.mobileMenuItem}
-            onClick={() => { navigate("/dashboardafterlogin"); setShowMobileMenu(false); }}
-          >
-            <span className="material-symbols-outlined">home</span>
-            Home
+          
+          <div style={styles.mobileHeaderTitleCenter}>
+            <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>note_add</span>
+            <span>Tambah Resep</span>
           </div>
-
-          <div
-            style={styles.mobileMenuItem}
-            onClick={() => { navigate("/profil"); setShowMobileMenu(false); }}
-          >
-            <span className="material-symbols-outlined">person</span>
-            Profil
-          </div>
-
-          <div
-            style={styles.mobileMenuItem}
-            onClick={() => { navigate("/Notifikasi"); setShowMobileMenu(false); }}
-          >
-            <span className="material-symbols-outlined">notifications</span>
-            Notifikasi
+          
+          <div style={styles.mobileNavbarRight}>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user?.foto ? (
+                <img src={`${api.defaults.baseURL}/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              ) : (
+                <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>person</span>
+              )}
+            </div>
           </div>
         </div>
-      )}
-
-      {/* ================= NAVBAR ================= */}
-      <div style={{ ...styles.navbar, ...(isMobile ? mobileStyles.navbar : {}) }}>
-        {isMobile ? (
-          <div style={styles.hamburgerBtn} onClick={() => setShowMobileMenu(true)}>
-            <span className="material-symbols-outlined" style={styles.hamburgerIcon}>
-              menu
-            </span>
-          </div>
-        ) : (
+      ) : (
+        <div style={styles.navbar}>
           <div style={styles.logoContainer}>
             <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
             <span style={styles.logoText}>pLorra</span>
           </div>
-        )}
-
-        <div style={isMobile ? styles.mobileHeaderCenter : styles.headerCenter}>
-          <div style={isMobile ? styles.mobileHeaderTitle : styles.headerTitle}>
-            Tambah Resep Baru
+          <div style={styles.menu}>
+            <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
+            <span onClick={() => navigate("/profil")}>Profil</span>
+            <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
           </div>
-          {!isMobile && (
-            <div style={styles.headerSubtitle}>
-              Bagikan kekayaan kuliner nusantara dengan komunitas.
+          <div style={styles.rightMenu}>
+            <button style={styles.activeBtnTambah}>+ Tambah resep</button>
+            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
+              {user?.foto ? (
+                <img src={`${api.defaults.baseURL}/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
+              ) : (
+                <span className="material-symbols-outlined">person</span>
+              )}
             </div>
-          )}
-        </div>
-
-        <div style={styles.rightSection}>
-          {!isMobile && (
-            <div style={styles.menu}>
-              <span onClick={() => navigate("/dashboardafterlogin")}>Home</span>
-              <span onClick={() => navigate("/profil")}>Profil</span>
-              <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
-            </div>
-          )}
-          <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-            {user?.foto ? (
-              <img
-                src={`${api.defaults.baseURL}/uploads/${user.foto}`}
-                style={styles.profileImage}
-                alt=""
-              />
-            ) : (
-              <span className="material-symbols-outlined">person</span>
-            )}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ================= CONTENT ================= */}
+      {/* ================= MOBILE SIDEBAR DRAWER SERAGAM ================= */}
+      {isMobile && showMobileMenu && (
+        <>
+          <div style={styles.mobileOverlay} onClick={() => setShowMobileMenu(false)} />
+          <div style={styles.mobileSidebar}>
+            <div style={styles.mobileLogoSection}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
+                <span style={styles.mobileLogoText}>pLorra</span>
+              </div>
+              <span className="material-symbols-outlined" style={styles.closeMenuIcon} onClick={() => setShowMobileMenu(false)}>close</span>
+            </div>
+            <div style={styles.mobileMenuTitle}>MENU</div>
+            <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setShowMobileMenu(false); }}>Dashboard</div>
+            <div className="hover-sidebar-item" style={styles.mobileMenuItemActive} onClick={() => { setShowMobileMenu(false); }}>Tambah Resep</div>
+            <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { navigate("/Notifikasi"); setShowMobileMenu(false); }}>Notifikasi</div>
+            <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { navigate("/profil"); setShowMobileMenu(false); }}>Profil</div>
+          </div>
+        </>
+      )}
+
+      {/* ================= CONTENT FORM ================= */}
       <div style={{ ...styles.content, ...(isMobile ? mobileStyles.content : {}) }}>
         <div style={{ ...styles.formContainer, ...(isMobile ? mobileStyles.formContainer : {}) }}>
           
@@ -408,13 +356,7 @@ useEffect(() => {
 
           <label style={styles.label}>Bahan-bahan</label>
           {bahan.map((item, index) => (
-            <div
-              key={index}
-              style={{
-  ...styles.dynamicRow,
-  ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
-}}
-            >
+            <div key={index} style={isMobile ? mobileStyles.dynamicRowLangkah : styles.dynamicRow}>
               <input
                 type="text"
                 style={styles.input}
@@ -422,18 +364,15 @@ useEffect(() => {
                 placeholder="Contoh: 500gr Daging Sapi"
                 onChange={(e) => ubahBahan(index, e.target.value)}
               />
-             {item.trim() !== "" && (
-  <button
-    type="button"
-    style={{
-      ...styles.deleteBtn,
-      ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
-    }}
-    onClick={() => hapusBahan(index)}
-  >
-    🗑
-  </button>
-)}
+              {item.trim() !== "" && (
+                <button
+                  type="button"
+                  style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnLangkah : {}) }}
+                  onClick={() => hapusBahan(index)}
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                </button>
+              )}
             </div>
           ))}
 
@@ -443,13 +382,7 @@ useEffect(() => {
 
           <label style={styles.label}>Langkah Memasak</label>
           {langkah.map((item, index) => (
-            <div
-  key={index}
-  style={{
-    ...styles.dynamicRow,
-    ...(isMobile ? mobileStyles.dynamicRowLangkah : {})
-  }}
->
+            <div key={index} style={isMobile ? mobileStyles.dynamicRowLangkah : styles.dynamicRow}>
               {!isMobile && <div style={styles.stepNumber}>{index + 1}</div>}
               <input
                 type="text"
@@ -459,17 +392,14 @@ useEffect(() => {
                 onChange={(e) => ubahLangkah(index, e.target.value)}
               />
               {item.trim() !== "" && (
-  <button
-    type="button"
-    style={{
-      ...styles.deleteBtn,
-      ...(isMobile ? mobileStyles.deleteBtnLangkah : {})
-    }}
-    onClick={() => hapusLangkah(index)}
-  >
-    🗑
-  </button>
-)}
+                <button
+                  type="button"
+                  style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnLangkah : {}) }}
+                  onClick={() => hapusLangkah(index)}
+                >
+                  <span className="material-symbols-outlined">delete</span>
+                </button>
+              )}
             </div>
           ))}
 
@@ -484,9 +414,7 @@ useEffect(() => {
                 ...styles.cancelBtn,
                 ...(isMobile ? mobileStyles.cancelBtn : {}),
                 transform: hoverCancel ? "translateY(-2px)" : "translateY(0)",
-                boxShadow: hoverCancel
-                  ? "0 10px 20px rgba(0,0,0,0.18)"
-                  : "0 6px 15px rgba(0,0,0,0.12)"
+                boxShadow: hoverCancel ? "0 10px 20px rgba(0,0,0,0.18)" : "0 6px 15px rgba(0,0,0,0.12)"
               }}
               onMouseEnter={() => setHoverCancel(true)}
               onMouseLeave={() => setHoverCancel(false)}
@@ -496,17 +424,17 @@ useEffect(() => {
             </button>
 
             <button
-  disabled={loading}
-  style={{
-    ...styles.saveBtn,
-    ...(isMobile ? mobileStyles.saveBtn : {}),
-    opacity: loading ? 0.7 : 1,
-    cursor: loading ? "not-allowed" : "pointer"
-  }}
-  onClick={handleSave}
->
-  {loading ? "Menyimpan..." : "Simpan Resep"}
-</button>
+              disabled={loading}
+              style={{
+                ...styles.saveBtn,
+                ...(isMobile ? mobileStyles.saveBtn : {}),
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? "not-allowed" : "pointer"
+              }}
+              onClick={handleSave}
+            >
+              {loading ? "Menyimpan..." : "Simpan Resep"}
+            </button>
           </div>
         </div>
       </div>
@@ -515,420 +443,63 @@ useEffect(() => {
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    background: "linear-gradient(to bottom,#F4E9DC,#D49A75)",
-    position: "relative",
-    overflow: "hidden",
-    fontFamily: "Poppins, sans-serif",
-    paddingTop: "80px",
-    zIndex: 0
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: "70px",
-    padding: "0 18px",
-    background: "#fff",
-    borderBottom: "1px solid #ddd",
-    zIndex: 9999
-  },
-  headerCenter: {
-    flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  headerTitle: {
-    fontSize: "22px",
-    fontWeight: "700",
-    color: "#8B5A2B",
-    marginBottom: "3px"
-  },
-  headerSubtitle: {
-    fontSize: "12px",
-    color: "#666"
-  },
-  logoContainer: {
-    display: "flex",
-    alignItems: "center"
-  },
-  logoImg: {
-    width: "50px"
-  },
-  logoText: {
-    color: "#F28C28",
-    fontWeight: "bold",
-    fontSize: "28px"
-  },
-  rightSection: {
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    minWidth: "45px",
-    justifyContent: "flex-end"
-  },
-  profileCircle: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    background: "#f5f5f5",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    flexShrink: 0
-  },
-  menu: {
-    display: "flex",
-    alignItems: "center",
-    gap: "30px",
-    fontWeight: "600",
-    cursor: "pointer"
-  },
-  content: {
-    display: "flex",
-    justifyContent: "center",
-    padding: "40px 30px",
-    marginTop: "20px"
-  },
-  formContainer: {
-    width: "100%",
-    maxWidth: "1100px",
-    background: "rgba(232,210,194,0.95)",
-    borderRadius: "10px",
-    padding: "35px",
-    position: "relative",
-    zIndex: 2,
-    display: "flex",
-    flexDirection: "column",
-    gap: "14px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.12)"
-  },
-  input: {
-    width: "100%",
-    padding: "12px",
-    border: "1px solid #d89d73",
-    borderRadius: "4px",
-    outline: "none",
-    boxSizing: "border-box"
-  },
-  select: {
-    width: "100%",
-    height: "42px",
-    border: "1px solid #d89d73",
-    borderRadius: "4px",
-    padding: "0 12px",
-    outline: "none"
-  },
-  uploadBox: {
-    width: "100%",
-    height: "400px",
-    background: "#fff",
-    border: "2px dashed #E7A27A",
-    borderRadius: "8px",
-    overflow: "hidden",
-    position: "relative"
-  },
-  uploadImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    display: "block"
-  },
-  removeImageBtn: {
-    position: "absolute",
-    top: "8px",
-    right: "8px",
-    width: "30px",
-    height: "30px",
-    borderRadius: "50%",
-    border: "3px solid white",
-    background: "#E74C3C",
-    color: "white",
-    fontSize: "24px",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "bold",
-    zIndex: 10
-  },
-  changeImageBtn: {
-    position: "absolute",
-    bottom: "28px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    display: "inline-block",
-    padding: "10px 30px",
-    background: "#fff",
-    color: "#8B5A2B",
-    border: "2px solid #E7A27A",
-    borderRadius: "6px",
-    fontWeight: "600",
-    fontSize: "14px",
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-    zIndex: 10
-  },
-  dynamicRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px"
-  },
-  deleteBtn: {
-    background: "transparent",
-    border: "none",
-    color: "red",
-    fontSize: "18px",
-    cursor: "pointer"
-  },
-  mapBackground: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundImage: "url('/map.png')",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "center",
-    backgroundSize: "100%",
-    opacity: 0.12,
-    zIndex: -999,
-    pointerEvents: "none"
-  },
-  sectionHeader: {
-    fontSize: "26px",
-    color: "#3D2A20",
-    borderBottom: "1px solid #c9a48b",
-    paddingBottom: "10px",
-    marginTop: "15px"
-  },
-  label: {
-    fontSize: "14px",
-    color: "#444"
-  },
-  textarea: {
-    width: "100%",
-    minHeight: "100px",
-    padding: "12px",
-    border: "1px solid #d89d73",
-    borderRadius: "4px",
-    resize: "none",
-    outline: "none",
-    boxSizing: "border-box"
-  },
-  uploadArea: {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer"
-  },
-  cameraIcon: {
-    fontSize: "48px",
-    color: "#F26A3D",
-    marginBottom: "10px",
-    fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48"
-  },
-  uploadTitle: {
-    fontWeight: "700",
-    color: "#E36B4E"
-  },
-  uploadText: {
-    color: "#777",
-    fontSize: "14px"
-  },
-  uploadInfo: {
-    fontSize: "12px",
-    color: "#777"
-  },
-  stepNumber: {
-    width: "28px",
-    height: "28px",
-    borderRadius: "50%",
-    background: "#D77A35",
-    color: "#fff",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0
-  },
-  linkButton: {
-    border: "none",
-    background: "transparent",
-    color: "#9B5A2B",
-    cursor: "pointer",
-    alignSelf: "flex-start",
-    fontWeight: "600"
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: "12px",
-    borderTop: "1px solid #c9a48b",
-    marginTop: "25px",
-    paddingTop: "20px"
-  },
-  cancelBtn: {
-    minWidth: "120px",
-    height: "46px",
-    background: "#fff",
-    border: "1px solid #b87944",
-    color: "#b87944",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "15px",
-    fontWeight: "600",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
-    transition: "0.2s"
-  },
-  saveBtn: {
-    minWidth: "140px",
-    height: "46px",
-    background: "#E46B5C",
-    color: "#fff",
-    border: "none",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "15px",
-    fontWeight: "600",
-    boxShadow: "0 6px 15px rgba(228,107,92,0.35)",
-    transition: "0.2s"
-  },
-  profileImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    borderRadius: "50%"
-  },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 99999,
-  },
-  modalBox: {
-    backgroundColor: "#fff",
-    width: "350px",
-    padding: "30px",
-    borderRadius: "20px",
-    textAlign: "center",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
-  },
-  successIcon: {
-    fontSize: "55px",
-    color: "#4CAF50",
-    marginBottom: "10px",
-  },
-  errorIcon: {
-    fontSize: "55px",
-    color: "#E46B5C",
-    marginBottom: "10px",
-  },
-  modalTitle: {
-    margin: "0 0 10px",
-    fontSize: "22px",
-    fontWeight: "700",
-  },
-  modalText: {
-    color: "#666",
-    marginBottom: "20px",
-    lineHeight: "1.5",
-  },
-  btnConfirm: {
-    width: "100%",
-    padding: "12px",
-    border: "none",
-    borderRadius: "25px",
-    backgroundColor: "#E46B5C",
-    color: "#fff",
-    fontWeight: "600",
-    cursor: "pointer",
-    outline: "none",
-  },
-  hamburgerBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "42px",
-    height: "42px",
-    cursor: "pointer"
-  },
-  hamburgerIcon: {
-    fontSize: "32px",
-    color: "#8B5A2B"
-  },
-  mobileHeaderCenter: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  mobileHeaderTitle: {
-    fontSize: "20px",
-    fontWeight: "700",
-    color: "#8B5A2B"
-  },
-  mobileOverlay: {
-    position: "fixed",
-    top: 0,
-    width: "280px",
-    height: "100vh",
-    background: "#fff",
-    transition: "0.3s ease-in-out",
-    boxShadow: "3px 0 20px rgba(0,0,0,.18)",
-    zIndex: 99999
-  },
-  mobileMenuHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "18px",
-    borderBottom: "1px solid #eee"
-  },
-  mobileLogoContainer: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px"
-  },
-  mobileLogo: {
-    width: "40px"
-  },
-  mobileLogoText: {
-    fontSize: "24px",
-    fontWeight: "700",
-    color: "#F28C28"
-  },
-  mobileHamburger: {
-    fontSize: "30px",
-    cursor: "pointer",
-    color: "#8B5A2B"
-  },
-  mobileMenuItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "15px",
-    padding: "18px",
-    cursor: "pointer",
-    fontWeight: "600",
-    borderBottom: "1px solid #eee"
-  }
+  page: { minHeight: "100vh", background: "#f7f1ec", position: "relative", fontFamily: "sans-serif", paddingBottom: "40px" },
+  navbar: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 50px", background: "#fff", position: "sticky", top: 0, zIndex: 999, boxShadow: "0 2px 10px rgba(0,0,0,0.03)", height: "auto", borderBottom: "none" },
+  logoContainer: { display: "flex", alignItems: "center", gap: "1px" },
+  logoImg: { width: "40px" },
+  logoText: { color: "#F28C28", fontWeight: "bold", fontSize: "24px", letterSpacing: "1px" },
+  menu: { display: "flex", gap: "30px", fontSize: "18px", fontWeight: "700", cursor: "pointer", marginLeft: "100px" },
+  rightMenu: { display: "flex", alignItems: "center", gap: "15px" },
+  activeBtnTambah: { border: "1.5px solid #e15b3c", color: "#fff", background: "#e15b3c", padding: "6px 15px", borderRadius: "20px", cursor: "default", fontWeight: "600" },
+  profileCircle: { width: "35px", height: "35px", borderRadius: "50%", background: "#f4b8a3", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", cursor: "pointer", overflow: "hidden" },
+  profileImg: { width: "100%", height: "100%", objectFit: "cover" },
+  content: { display: "flex", justifyContent: "center", padding: "40px 50px", position: "relative", zIndex: 10 },
+  formContainer: { width: "100%", maxWidth: "1400px", background: "#fff", borderRadius: "18px", padding: "35px", display: "flex", flexDirection: "column", gap: "14px", boxShadow: "0 6px 18px rgba(0,0,0,0.06)" },
+  input: { width: "100%", padding: "12px", border: "1px solid rgba(0,0,0,0.1)", borderRadius: "8px", outline: "none", boxSizing: "border-box" },
+  select: { width: "100%", height: "42px", border: "1px solid rgba(0,0,0,0.1)", borderRadius: "8px", padding: "0 12px", outline: "none" },
+  uploadBox: { width: "100%", height: "400px", background: "#fff", border: "2px dashed #E7A27A", borderRadius: "8px", overflow: "hidden", position: "relative" },
+  uploadImage: { width: "100%", height: "100%", objectFit: "cover", display: "block" },
+  removeImageBtn: { position: "absolute", top: "8px", right: "8px", width: "30px", height: "30px", borderRadius: "50%", border: "3px solid white", background: "#E74C3C", color: "white", fontSize: "24px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", zIndex: 10 },
+  changeImageBtn: { position: "absolute", bottom: "28px", left: "50%", transform: "translateX(-50%)", display: "inline-block", padding: "10px 30px", background: "#fff", color: "#8B5A2B", border: "2px solid #E7A27A", borderRadius: "6px", fontWeight: "600", fontSize: "14px", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.15)", zIndex: 10 },
+  dynamicRow: { display: "flex", alignItems: "center", gap: "10px", width: "100%" },
+  deleteBtn: { background: "transparent", border: "none", color: "#e15b3c", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: "4px" },
+  mapBackground: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundImage: "url('/map.png')", backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "cover", opacity: 0.05, zIndex: 1, pointerEvents: "none" },
+  sectionHeader: { fontSize: "22px", color: "#e15b3c", fontWeight: "700", borderBottom: "2px solid rgba(0,0,0,0.06)", paddingBottom: "8px", marginTop: "15px", marginBottom: "5px" },
+  label: { fontSize: "14px", color: "#444", fontWeight: "700" },
+  textarea: { width: "100%", minHeight: "100px", padding: "12px", border: "1px solid rgba(0,0,0,0.1)", borderRadius: "8px", resize: "none", outline: "none", boxSizing: "border-box" },
+  uploadArea: { width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", cursor: "pointer" },
+  cameraIcon: { fontSize: "48px", color: "#e15b3c", marginBottom: "10px" },
+  uploadTitle: { fontWeight: "700", color: "#e15b3c" },
+  uploadText: { color: "#777", fontSize: "14px" },
+  uploadInfo: { fontSize: "12px", color: "#777" },
+  stepNumber: { width: "28px", height: "28px", borderRadius: "50%", background: "#e15b3c", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  linkButton: { border: "none", background: "transparent", color: "#e15b3c", cursor: "pointer", alignSelf: "flex-start", fontWeight: "700" },
+  footer: { display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "12px", borderTop: "1px solid rgba(0,0,0,0.06)", marginTop: "25px", paddingTop: "20px" },
+  cancelBtn: { minWidth: "120px", height: "46px", background: "#fff", border: "1px solid #e15b3c", color: "#e15b3c", borderRadius: "25px", cursor: "pointer", fontSize: "15px", fontWeight: "700", transition: "0.2s" },
+  saveBtn: { minWidth: "140px", height: "46px", background: "#e15b3c", color: "#fff", border: "none", borderRadius: "25px", cursor: "pointer", fontSize: "15px", fontWeight: "700", transition: "0.2s" },
+  modalOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 99999 },
+  modalBox: { backgroundColor: "#fff", width: "350px", padding: "30px", borderRadius: "20px", textAlign: "center", boxShadow: "0 10px 25px rgba(0,0,0,0.2)" },
+  successIcon: { fontSize: "55px", color: "#4CAF50", marginBottom: "10px" },
+  errorIcon: { fontSize: "55px", color: "#e15b3c", marginBottom: "10px" },
+  modalTitle: { margin: "0 0 10px", fontSize: "22px", fontWeight: "700" },
+  modalText: { color: "#666", marginBottom: "20px", lineHeight: "1.5" },
+  btnConfirm: { width: "100%", padding: "12px", border: "none", borderRadius: "25px", backgroundColor: "#e15b3c", color: "#fff", fontWeight: "600", cursor: "pointer", outline: "none" },
+  
+  // Gaya Khusus Mobile (Menyamakan dengan Dashboard)
+  mobileNavbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#FFFFFF", padding: "12px 20px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
+  mobileNavbarLeft: { flex: 1, display: "flex", justifyContent: "flex-start", alignItems: "center" },
+  mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
+  mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "#9F6822", fontWeight: "700", fontSize: "18px", whiteSpace: "nowrap" },
+  mobileHeaderIcon: { fontSize: "24px" },
+  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" },
+  mobileOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.4)", zIndex: 1001 },
+  mobileSidebar: { position: "fixed", top: 0, left: 0, width: "260px", height: "100vh", background: "#F7F1EC", zIndex: 1002, padding: "20px", boxShadow: "4px 0 20px rgba(0,0,0,0.15)", boxSizing: "border-box" },
+  mobileLogoSection: { display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ddd", paddingBottom: "12px" },
+  mobileLogoText: { color: "#E28B36", fontSize: "24px", fontWeight: "700", marginLeft: "8px" },
+  closeMenuIcon: { fontSize: "28px", color: "#5E4637", cursor: "pointer", padding: "4px" },
+  mobileMenuTitle: { marginTop: "20px", marginBottom: "15px", fontWeight: "700", fontSize: "18px", color: "#5E4637" },
+  mobileMenuItem: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#555", fontWeight: "500", borderRadius: "10px", backgroundColor: "transparent" },
+  mobileMenuItemActive: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#e15b3c", backgroundColor: "rgba(225, 91, 60, 0.12)", fontWeight: "700", borderRadius: "10px" }
 };
 
 export default TambahResep;

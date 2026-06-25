@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import api from "../api/axios";
 
 const BASE_URL = "https://xplorra-production.up.railway.app";
 
@@ -13,23 +14,21 @@ function Dashboard() {
   const [trendingFoods, setTrendingFoods] = useState([]);
   const trendingRef = useRef(null);
 
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-// State Responsif & Menu Mobile
-const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-const [showMenu, setShowMenu] = useState(false);
-const [activeMenu, setActiveMenu] = useState("Home");
+  // State Responsif & Menu Mobile
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [showMenu, setShowMenu] = useState(false);
+  const [activeMenu, setActiveMenu] = useState("Home");
 
-useEffect(() => {
-  const handleResize = () => setWindowWidth(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  window.addEventListener("resize", handleResize);
+  const isMobile = windowWidth <= 768;
 
-  return () =>
-    window.removeEventListener("resize", handleResize);
-}, []);
-
-const isMobile = windowWidth <= 768;
   const goToRegister = () => {
     navigate("/Register");
   };
@@ -42,77 +41,78 @@ const isMobile = windowWidth <= 768;
     navigate("/Masuk");
   };
 
+  // Fungsi Filter Resep dengan useCallback
+  const filterFoods = useCallback(
+    (newKategori, newDaerah, newSearch) => {
+      setLoading(true);
+
+      const kategoriValue = newKategori ?? kategori;
+      const daerahValue = newDaerah ?? daerah;
+      const searchValue = newSearch ?? search;
+
+      api.get(`/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`)
+        .then((res) => {
+          const data = Array.isArray(res.data) ? res.data : [];
+          setFoods(data);
+          setNotFound(data.length === 0);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setFoods([]);
+          setNotFound(true);
+          setLoading(false);
+        });
+    },
+    [kategori, daerah, search]
+  );
+
   // Auto-Scroll untuk Card Trending di Mobile
-useEffect(() => {
-  if (windowWidth > 768) return;
+  useEffect(() => {
+    if (windowWidth > 768) return;
 
-  const interval = setInterval(() => {
-    if (trendingRef.current) {
-      const container = trendingRef.current;
-      const cardWidth = container.clientWidth * 0.85 + 25;
-
-      if (
-        container.scrollLeft + container.clientWidth >=
-        container.scrollWidth - 10
-      ) {
-        container.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        container.scrollBy({ left: cardWidth, behavior: "smooth" });
+    const interval = setInterval(() => {
+      if (trendingRef.current) {
+        const container = trendingRef.current;
+        const cardWidth = container.clientWidth * 0.85 + 25;
+        
+        if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10) {
+          container.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          container.scrollBy({ left: cardWidth, behavior: "smooth" });
+        }
       }
-    }
-  }, 3000);
+    }, 3000);
 
-  return () => clearInterval(interval);
-}, [windowWidth, trendingFoods]);
+    return () => clearInterval(interval);
+  }, [windowWidth, trendingFoods]);
 
-// Trending
-useEffect(() => {
-  fetch(`${BASE_URL}/foods/trending`)
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Gagal mengambil data");
-      }
-      return res.json();
-    })
-    .then((data) => {
-      setTrendingFoods(Array.isArray(data) ? data : []);
-    })
-    .catch(console.log);
-}, []);
+  // Pengambilan Data Awal
+  useEffect(() => {
+    api.get('/foods')
+      .then((res) => setFoods(res.data))
+      .catch((err) => console.log(err));
 
-useEffect(() => {
-  setLoading(true);
+    api.get('/foods/trending')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setTrendingFoods(res.data);
+        } else {
+          setTrendingFoods([]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setTrendingFoods([]);
+      });
+  }, []);
 
-  fetch(
-    `${BASE_URL}/foods?kategori=${kategori}&daerah=${daerah}&search=${search}`
-  )
-    .then((res) => res.json())
-    .then((data) => {
-      setFoods(data);
-      setNotFound(data.length === 0);
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.log(err);
-      setLoading(false);
-    });
-}, [kategori, daerah, search]);
+  useEffect(() => {
+    filterFoods();
+  }, [kategori, daerah, search, filterFoods]);
 
-const daftarKategori = [
-  "Makanan utama",
-  "Minuman",
-  "Dessert",
-];
-
-const daftarDaerah = [
-  "Sumatera",
-  "Kalimantan",
-  "Sulawesi",
-  "Maluku",
-  "Irian Jaya",
-  "Nusa Tenggara",
-  "Jawa",
-];
+  const daftarKategori = ["Makanan utama", "Minuman", "Dessert"];
+  const daftarDaerah = ["Sumatera", "Kalimantan", "Sulawesi", "Maluku", "Irian Jaya", "Nusa Tenggara", "Jawa"];
 
   return (
     <div style={{
@@ -134,31 +134,31 @@ const daftarDaerah = [
           color: #e15b3c !important;
           padding-left: 18px !important;
         }
+        .btn-desktop-masuk:hover {
+          background-color: rgba(225, 91, 60, 0.05) !important;
+        }
+        .btn-desktop-daftar:hover {
+          background-color: #c4472b !important;
+        }
       `}</style>
       
       {/* NAVBAR / HEADER */}
       {isMobile ? (
         <div style={styles.mobileNavbar}>
-          {/* Kiri: Tombol Menu */}
           <div style={styles.mobileNavbarLeft}>
             <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
               menu
             </span>
           </div>
           
-          {/* Tengah: Ikon & Tulisan Dashboard */}
           <div style={styles.mobileHeaderTitleCenter}>
             <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>space_dashboard</span>
             <span>Dashboard</span>
           </div>
           
-          {/* Kanan: Ikon profil yang akan mengarahkan ke halaman login saat diklik */}
           <div style={styles.mobileNavbarRight}>
-            <div 
-              style={{ ...styles.profileCircle, background: "#f0e6df", cursor: "pointer" }} 
-              onClick={requireLogin}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: "18px", color: "#bc9c8c" }}>person_off</span>
+            <div style={styles.profileCircle} onClick={goToMasuk}>
+              <span className="material-symbols-outlined">person</span>
             </div>
           </div>
         </div>
@@ -168,15 +168,14 @@ const daftarDaerah = [
             <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
             <span style={styles.logoText}>pLorra</span>
           </div>
-
           <div style={styles.menu}>
             <span style={styles.active}>Home</span>
-            <span onClick={requireLogin} style={{ cursor: "pointer" }}>Profil</span>
+            <span onClick={requireLogin}>Profil</span>
+            <span onClick={requireLogin}>Notifikasi</span>
           </div>
-
-          <div>
-            <button style={styles.btnPrimary} onClick={goToRegister}>Daftar</button>
-            <button style={styles.btnSecondary} onClick={goToMasuk}>Masuk</button>
+          <div style={styles.rightMenuDesktop}>
+            <button className="btn-desktop-masuk" style={styles.btnMasukDesktop} onClick={goToMasuk}>Masuk</button>
+            <button className="btn-desktop-daftar" style={styles.btnDaftarDesktop} onClick={goToRegister}>Daftar</button>
           </div>
         </div>
       )}
@@ -186,43 +185,26 @@ const daftarDaerah = [
         <>
           <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
           <div style={styles.mobileSidebar}>
-            <div style={styles.mobileLogoSection}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
-                <span style={styles.mobileLogoText}>pLorra</span>
+            <div>
+              <div style={styles.mobileLogoSection}>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img src="/logo_X.png" alt="" style={{ width: "40px" }} />
+                  <span style={styles.mobileLogoText}>pLorra</span>
+                </div>
+                <span className="material-symbols-outlined" style={styles.closeMenuIcon} onClick={() => setShowMenu(false)}>close</span>
               </div>
-              <span className="material-symbols-outlined" style={styles.closeMenuIcon} onClick={() => setShowMenu(false)}>close</span>
+              <div style={styles.mobileMenuTitle}></div>
+              <div className="hover-sidebar-item" style={activeMenu === "Home" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Home"); setShowMenu(false); }}>Home</div>
+              <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { requireLogin(); setShowMenu(false); }}>Notifikasi</div>
+              <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { requireLogin(); setShowMenu(false); }}>Profil</div>
             </div>
-            <div style={styles.mobileMenuTitle}>MENU</div>
-            <div className="hover-sidebar-item" style={activeMenu === "Home" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Home"); setShowMenu(false); }}>Home</div>
-            <div className="hover-sidebar-item" style={activeMenu === "Profil" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Profil"); requireLogin(); setShowMenu(false); }}>Profil</div>
-            <div style={{ position: "absolute", bottom: "30px", left: "20px", right: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
-              <button style={{ ...styles.btnPrimary, width: "100%", margin: 0 }} onClick={goToRegister}>Daftar</button>
-              <button style={{ ...styles.btnSecondary, width: "100%", margin: 0 }} onClick={goToMasuk}>Masuk</button>
+            
+            <div style={styles.mobileDrawerBottomActions}>
+              <button style={styles.btnMasukDrawer} onClick={goToMasuk}>Masuk</button>
+              <button style={styles.btnDaftarDrawer} onClick={goToRegister}>Daftar</button>
             </div>
           </div>
         </>
-      )}
-      {/* SEARCH BOX & FILTER MOBILE */}
-      {isMobile && (
-        <div style={styles.mobileSearchWrapper}>
-          <div style={styles.searchBoxMobile}>
-            <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
-            <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <div style={styles.scrollFilterContainer}>
-            <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
-            {daftarKategori.map((kat) => (
-              <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
-            ))}
-          </div>
-          <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px" }}>
-            <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
-            {daftarDaerah.map((dae) => (
-              <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
-            ))}
-          </div>
-        </div>
       )}
 
       {/* BACKGROUND PETA DESKTOP */}
@@ -239,28 +221,35 @@ const daftarDaerah = [
       }}>
 
         {/* 1. SECTION TRENDING */}
-        <div style={{ marginBottom: "60px" }}>
+        <div style={{ marginBottom: isMobile ? "20px" : "60px" }}>
           <div style={{ height: "25px" }}></div> 
           
           <div ref={trendingRef} style={isMobile ? styles.trendingMobileScroll : styles.trendingDesktopGrid}>
-            {trendingFoods.map((item) => (
+            {Array.isArray(trendingFoods) && trendingFoods.map((item) => (
               <div 
                 key={item.id} 
                 style={{ ...styles.trendingCard, minWidth: isMobile ? "85vw" : "auto" }} 
-                onClick={requireLogin}
+                onClick={() => navigate(`/detail/${item.id}`)}
               >
-                <div style={styles.imageWrapper}>
+                {/* PENERAPAN TINGGI (HEIGHT) RESPONSIF PADA IMAGE WRAPPER DI SINI */}
+                <div style={{ ...styles.imageWrapper, height: isMobile ? "210px" : "310px" }}>
                   <img
-                    src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                    style={{
-                      ...styles.trendingImg,
-                      height: "100%",
-                    }}
+                    src={`${BASE_URL}/uploads/${item.gambar}`}
+                    style={{ ...styles.trendingImg, height: "100%" }}
                     alt={item.nama}
                     onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                   />
                   <div style={styles.overlay}>
-                    <p style={styles.trendingText}>Trending Now</p>
+                    <span style={styles.trendingTextBlack}>Trending Now</span>
+                    <button 
+                      style={styles.bookmarkBtn} 
+                      onClick={(e) => { e.stopPropagation(); requireLogin(); }}
+                      title="Simpan resep"
+                    >
+                      <span className="material-symbols-outlined" style={styles.bookmark}>
+                        bookmark_border
+                      </span>
+                    </button>
                   </div>
                 </div>
 
@@ -272,18 +261,33 @@ const daftarDaerah = [
                       <span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}
                     </span>
                     <span style={styles.iconText}>
-                      <span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.rating}
+                      <span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes || 0}
                     </span>
                   </div>
 
                   <div style={styles.bottomRow}>
                     <span style={styles.rating}>
                       {item.rating}
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                      {[1,2,3,4,5].map((star)=>(
+                        <span
+                          key={star}
+                          className="material-symbols-outlined"
+                          style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}
+                        >
+                          star
+                        </span>
                       ))}
                     </span>
-                    <button style={styles.btnLihat} onClick={requireLogin}>Lihat</button>
+
+                    <button
+                      style={styles.btnLihat}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/detail/${item.id}`)
+                      }}
+                    >
+                      Lihat
+                    </button>
                   </div>
                 </div>
               </div>
@@ -291,30 +295,52 @@ const daftarDaerah = [
           </div>
         </div>
 
-        {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
+        {/* 2. SEARCH BOX & FILTER */}
+        {isMobile && (
+          <div style={styles.mobileSearchWrapper}>
+            <div style={styles.searchBoxMobile}>
+              <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
+              <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <div style={styles.scrollFilterContainer}>
+              <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
+              {daftarKategori.map((kat) => (
+                <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
+              ))}
+            </div>
+            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px" }}>
+              <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
+              {daftarDaerah.map((dae) => (
+                <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
         <div style={{ 
           display: "flex", 
           flexDirection: isMobile ? "column" : "row", 
-          gap: isMobile ? "20px" : "110px",
+          gap: isMobile ? "20px" : "40px",
           alignItems: "flex-start"
         }}>
           
-          {/* SIDEBAR FILTER */}
+          {/* SIDEBAR FILTER (DESKTOP) */}
           {!isMobile && (
             <div style={styles.sidebar}>
-              {/* SEARCH BOX DESKTOP: Berada di paling atas sebelum judul kategori */}
-              <div style={styles.searchBox}>
-                <span className="material-symbols-outlined" style={styles.searchIcon}>search</span>
-                <input placeholder="Search" style={styles.searchInput} value={search} onChange={(e) => setSearch(e.target.value)} />
-                {(kategori || daerah) && (
-                  <span className="material-symbols-outlined" style={styles.clearFilterIcon} onClick={() => { setKategori(""); setDaerah(""); }} title="Hapus Filter">
-                    filter_alt_off
-                  </span>
-                )}
+              <div style={styles.searchBoxContainerSidebar}>
+                <div style={styles.searchBox}>
+                  <span className="material-symbols-outlined" style={styles.searchIcon}>search</span>
+                  <input placeholder="Search" style={styles.searchInput} value={search} onChange={(e) => setSearch(e.target.value)} />
+                  {(kategori || daerah) && (
+                    <span className="material-symbols-outlined" style={styles.clearFilterIcon} onClick={() => { setKategori(""); setDaerah(""); }} title="Hapus Filter">
+                      filter_alt_off
+                    </span>
+                  )}
+                </div>
               </div>
 
               <h2 style={styles.title}>Kategori</h2>
-
               <p style={styles.sectionTitle}>Jenis hidangan</p>
               {daftarKategori.map((kat) => (
                 <div key={kat} style={styles.optionRow} onClick={() => setKategori(kat)}>
@@ -339,385 +365,225 @@ const daftarDaerah = [
             </div>
           )}
 
-          {/* REKOMENDASI UNTUKMU / MAIN LIST */}
-          <div style={{ flex: 1, width: "100%" }}>
+          {/* MAIN LIST CONTAINER */}
+          <div style={isMobile ? { flex: 1, width: "100%" } : styles.mainListContainer}>
             <h3 style={{ 
+              ...styles.mobileSectionHeading, 
               fontSize: isMobile ? "18px" : "24px", 
-              margin: "0 0 15px 0",
-              display: isMobile ? "block" : "none",
-              fontWeight: "800",
-              color: "#333"
+              margin: "0 0 5px 0",
+              display: isMobile ? "block" : "none" 
             }}>
               Rekomendasi Untukmu
             </h3>
             
             <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
+              {loading ? (
+                <div style={styles.loadingContainer}>
+                  <span className="material-symbols-outlined" style={styles.loadingIcon}>hourglass_top</span>
+                  <p style={styles.loadingText}>Memuat resep...</p>
+                </div>
+              ) : notFound ? (
+                <div style={styles.emptyResult}>
+                  <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
+                </div>
+              ) : (
+                <div style={{ ...styles.grid, gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                  {(Array.isArray(foods) ? foods : []).map((item) => (
+                    <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={() => navigate(`/detail/${item.id}`)}>
+                      
+                      <div style={{ ...styles.cardImgWrapper, width: isMobile ? "110px" : "100%", height: isMobile ? "110px" : "160px" }}>
+                        <img
+                          src={`${BASE_URL}/uploads/${item.gambar}`}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "0" }}
+                          alt=""
+                        />
+                        {!isMobile && (
+                          <button 
+                            style={styles.bookmarkBtnCard} 
+                            onClick={(e) => { e.stopPropagation(); requireLogin(); }}
+                            title="Simpan resep"
+                          >
+                            <span className="material-symbols-outlined" style={styles.bookmarkCard}>
+                              bookmark_border
+                            </span>
+                          </button>
+                        )}
+                      </div>
 
-  {loading ? (
+                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px 15px 12px 15px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                          <h4 style={{ fontSize: isMobile ? "15px" : "17px", margin: "0", fontWeight: "700", lineHeight: "1.2" }}>{item.nama}</h4>
+                          {isMobile && (
+                            <span 
+                              className="material-symbols-outlined" 
+                              style={styles.bookmarkCard}
+                              onClick={(e) => { e.stopPropagation(); requireLogin(); }}
+                              title="Simpan resep"
+                            >
+                              bookmark_border
+                            </span>
+                          )}
+                        </div>
 
-    <div style={styles.loadingContainer}>
-      <span
-        className="material-symbols-outlined"
-        style={styles.loadingIcon}
-      >
-        progress_activity
-      </span>
+                        <div style={{ ...styles.infoRow, marginTop: "5px" }}>
+                          <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}</span>
+                          <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes || 0}</span>
+                        </div>
 
-      <p style={styles.loadingText}>
-        Memuat resep...
-      </p>
+                        <div style={styles.bottomRow}>
+                          <span style={styles.rating}>
+                            {item.rating}
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                            ))}
+                          </span>
+                          <button style={isMobile ? styles.btnLihatMobile : styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>
+                            Lihat
+                          </button>
+                        </div>
+                      </div>
 
-    </div>
-
-  ) : notFound ? (
-
-    <div style={styles.emptyResult}>
-      <h2 style={styles.emptyResultText}>
-        Resep tidak ditemukan
-      </h2>
-    </div>
-
-  ) : (
-
-    <div style={isMobile ? styles.gridMobile : styles.grid}>
-
-      {foods.map((item) => (
-
-        <div
-          key={item.id}
-          style={isMobile ? styles.horizontalCardMobile : styles.card}
-          onClick={requireLogin}
-        >
-
-          <div
-            style={{
-              ...styles.cardImgWrapper,
-              width: isMobile ? "110px" : "100%",
-              height: isMobile ? "110px" : "150px",
-            }}
-          >
-            <img
-              src={`${BASE_URL}/uploads/${item.gambar}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: isMobile ? "15px" : "0",
-              }}
-              alt=""
-            />
-          </div>
-
-          <div
-            style={{
-              ...styles.cardBody,
-              flex: 1,
-              padding: isMobile
-                ? "10px"
-                : "0px 10px 8px 15px",
-            }}
-          >
-            <h4
-              style={
-                isMobile
-                  ? {
-                      fontSize: "15px",
-                      margin: "0",
-                      fontWeight: "700",
-                      lineHeight: "1.2",
-                    }
-                  : styles.cardTitle
-              }
-            >
-              {item.nama}
-            </h4>
-
-            <div style={styles.infoRow}>
-              <span style={styles.iconText}>
-                <span
-                  className="material-symbols-outlined"
-                  style={styles.materialIcon}
-                >
-                  comment
-                </span>
-                {item.total_komentar}
-              </span>
-
-              <span style={styles.iconText}>
-                <span
-                  className="material-symbols-outlined"
-                  style={styles.materialIcon}
-                >
-                  thumb_up
-                </span>
-                {item.likes}
-              </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
-            <div style={styles.bottomRow}>
-              <span style={styles.rating}>
-                {item.rating}
-
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className="material-symbols-outlined"
-                    style={
-                      star <= Math.round(item.rating)
-                        ? styles.star
-                        : styles.starEmpty
-                    }
-                  >
-                    star
-                  </span>
-                ))}
-              </span>
-
-              <button
-                style={
-                  isMobile
-                    ? styles.btnLihatMobile
-                    : styles.btnLihat
-                }
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requireLogin();
-                }}
-              >
-                Lihat
-              </button>
-            </div>
-
           </div>
 
         </div>
-
-      ))}
-
-    </div>
-
-  )}
-
-</div>
-          </div>
-
-        </div>
- </div>
-
+      </div>
     </div>
   );
 }
 
 const styles = {
-  container: {
-    fontFamily: "sans-serif",
-    background: "#f6f6f6",
-    minHeight: "100vh",
-    fontWeight: "bold",
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px 50px",
-    background: "#fff",
-    position: "sticky",
-    top: 0,
-    zIndex: 999,
-  },
+  container: { fontFamily: "sans-serif", background: "#f7f1ec", minHeight: "100vh", fontWeight: "bold" },
+  navbar: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 50px", background: "#fff", position: "sticky", top: 0, zIndex: 999, boxShadow: "0 2px 10px rgba(0,0,0,0.03)" },
   logoContainer: { display: "flex", alignItems: "center", gap: "1px" },
   logoImg: { width: "40px" },
   logoText: { color: "#F28C28", fontWeight: "bold", fontSize: "24px", letterSpacing: "1px" },
-  menu: { display: "flex", gap: "30px", fontSize: "18px", fontWeight: "700", cursor: "pointer", marginRight: "-90px" },
+  menu: { display: "flex", gap: "30px", fontSize: "18px", fontWeight: "700", cursor: "pointer", marginLeft: "100px" },
   active: { color: "#F28C28", fontWeight: "bold" },
-  btnPrimary: { background: "#F28C28", color: "#ffffff", border: "none", padding: "8px 30px", borderRadius: "20px", marginRight: "10px", cursor: "pointer", fontWeight: "700" },
-  btnSecondary: { background: "#fbdfd1", color: "#F28C28", border: "none", padding: "8px 30px", borderRadius: "20px", cursor: "pointer", fontWeight: "700" },
-  topBg: {
-    height: "500px",
-    backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.9), rgba(245, 236, 222, 0.0)), url('/map.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundRepeat: "no-repeat",
-  },
-  sidebar: { width: "260px", position: "sticky", top: "90px", alignSelf: "flex-start", height: "fit-content" },
-  searchBox: { display: "flex", alignItems: "center", gap: "10px", border: "2px solid #C51313", borderRadius: "30px", padding: "8px 15px", width: "100%", margin: "0 0 20px -15px", background: "#fff", boxSizing: "border-box" },
-  searchIcon: { fontSize: "18px", color: "#F28C28" },
-  searchInput: { border: "none", outline: "none", fontSize: "14px", color: "#F28C28", width: "100%" },
-  clearFilterIcon: { color: "#a4a4a4", cursor: "pointer", fontSize: "22px" },
-  title: { fontSize: "28px", fontWeight: "800", marginBottom: "10px", marginTop: "10px" },
-  sectionTitle: { color: "#e15b3c", fontWeight: "700", marginBottom: "10px", borderBottom: "3px solid #e15b3c", display: "inline-block", paddingBottom: "5px", fontSize: "19px" },
-  optionRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "18px", fontSize: "16px", cursor: "pointer" },
-  radio: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", boxSizing: "border-box" },
-  radioActive: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", display: "flex", alignItems: "center", justifyContent: "center", boxSizing: "border-box" },
-  radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
-  divider: { height: "4px", background: "#e15b3c", margin: "10px 0 20px 0", width: "100%" },
-  trendingDesktopGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "28px",
-    width: "100%",
-    alignItems: "stretch",
-  },
-  trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
-  trendingCard: {
-    width: "100%",
-    borderRadius: "22px",
-    overflow: "hidden",
-    background: "#fff",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.12)",
-    display: "flex",
-    flexDirection: "column",
-  },
-  imageWrapper: {
-    position: "relative",
-    overflow: "hidden",
-    height: "350px",
-  },
-  trendingImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    display: "block",
-  },
-  overlay: { position: "absolute", top: "20px", left: "20px" },
-  trendingText: { color: " #000", fontSize: "24px", fontWeight: "900", lineHeight: "1", WebkitTextStroke: "0.7px white", margin: 0 },
-  trendingOverlay: {
-    padding: "18px 22px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "12px",
-  },
-  trendingHeading: {
-    fontSize: "25px",
-    fontWeight: "800",
-    lineHeight: "1.2",
-    margin: "0 0 16px 0",
-    color: "#000",
-  },
-  cardContainer: { flex: 1, height: "640px", overflowY: "auto", paddingRight: "10px" },
-  cardContainerMobile: { marginTop: "5px", width: "100%" },
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "25px" },
-  gridMobile: { display: "flex", flexDirection: "column", gap: "15px" },
-  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 8px 20px rgba(0,0,0,0.08)", width: "100%", cursor: "pointer" },
-  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
-  cardImgWrapper: { position: "relative", overflow: "hidden" },
-  cardBody: { display: "flex", flexDirection: "column", gap: "8px", paddingTop: "20px" },
-  cardTitle: { fontSize: "16px", margin: "0", lineHeight: "1.1" },
-  infoRow: {
-    display: "flex",
-    gap: "18px",
-    alignItems: "center",
-    color: "#555",
-    fontSize: "14px",
-  },
-  iconText: { display: "flex", alignItems: "center", gap: "4px" },
-  materialIcon: { fontSize: "20px" },
-  bottomRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: "6px",
-  },
-  rating: { display: "flex", alignItems: "center", gap: "2px", fontSize: "14px" },
-  star: { fontSize: "20px", color: "#FFC107" },
-  starEmpty: { fontSize: "22px", color: "#ddd" },
-  btnLihat: {
-    background: "#d96f3d",
-    color: "#fff",
-    border: "none",
-    padding: "10px 34px",
-    borderRadius: "25px",
-    fontWeight: "700",
-    fontSize: "15px",
-    cursor: "pointer",
-  },
-  btnLihatMobile: { background: "#d86936", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
-  emptyResult: { width: "100%", height: "300px", display: "flex", justifyContent: "center", alignItems: "center" },
-  emptyResultText: { color: "#393939", fontSize: "24px", fontWeight: "700", textAlign: "center" },
-  mobileNavbar: { 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    backgroundColor: "#FFFFFF", 
-    padding: "12px 20px", 
-    position: "sticky", 
-    top: 0, 
-    zIndex: 999, 
-    width: "100%", 
-    boxSizing: "border-box", 
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)" 
-  },
-  mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
-  mobileHeaderTitle: { display: "flex", alignItems: "center", gap: "6px", fontWeight: "700", fontSize: "20px" },
-  btnPrimaryMobile: { background: "#F28C28", color: "#ffffff", border: "none", padding: "6px 18px", borderRadius: "15px", fontWeight: "700", fontSize: "14px" },
-  mobileOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.4)", zIndex: 1001 },
-  mobileSidebar: { position: "fixed", top: 0, left: 0, width: "260px", height: "100vh", background: "#F7F1EC", zIndex: 1002, padding: "20px", boxShadow: "4px 0 20px rgba(0,0,0,0.15)", boxSizing: "border-box" },
-  mobileLogoSection: { display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ddd", paddingBottom: "12px" },
-  mobileLogoText: { color: "#E28B36", fontSize: "24px", fontWeight: "700", marginLeft: "8px" },
-  closeMenuIcon: { fontSize: "28px", color: "#5E4637", cursor: "pointer" },
-  mobileMenuTitle: { marginTop: "20px", marginBottom: "15px", fontWeight: "700", fontSize: "18px", color: "#5E4637" },
-  mobileMenuItem: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#555", fontWeight: "500", borderRadius: "10px" },
-  mobileMenuItemActive: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#e15b3c", backgroundColor: "rgba(225, 91, 60, 0.12)", fontWeight: "700", borderRadius: "10px" },
-  mobileSearchWrapper: { padding: "15px 15px 5px 15px", background: "transparent" },
-  searchBoxMobile: { display: "flex", alignItems: "center", gap: "10px", border: "1px solid rgba(0, 0, 0, 0.1)", borderRadius: "25px", padding: "10px 15px", background: "rgba(255, 255, 255, 0.6)", backdropFilter: "blur(8px)" },
+  profileCircle: { width: "35px", height: "35px", borderRadius: "50%", background: "#f4b8a3", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", cursor: "pointer", overflow: "hidden" },
+  topBg: { height: "520px", backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')", backgroundSize: "cover", backgroundPosition: "center", width: "100%" },
+  searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
+  sidebar: { width: "260px", background: "transparent", padding: "0px 10px 25px 0px", position: "sticky", top: "90px", marginLeft: "0px", marginTop: "-5px" },
+  mainListContainer: { flex: 1, width: "100%", paddingTop: "66px" },
+  searchBox: { display: "flex", alignItems: "center", gap: "10px", border: "1px solid #e15b3c", borderRadius: "30px", padding: "10px 20px", background: "#fff8f6", marginLeft: "-12px", width: "calc(100% + 12px)", boxSizing: "border-box" },
+  mobileSearchWrapper: { padding: "15px 0px 25px 0px", background: "transparent" },
+  searchBoxMobile: { display: "flex", alignItems: "center", gap: "10px", border: "1px solid rgba(0, 0, 0, 0.1)", borderRadius: "25px", padding: "10px 15px", background: "rgba(255, 255, 255, 0.4)", backdropFilter: "blur(8px)" },
+  searchIcon: { fontSize: "22px", color: "#e15b3c" },
   searchIconMobile: { fontSize: "18px", color: "#F28C28" },
+  searchInput: { border: "none", outline: "none", fontSize: "16px", color: "#e15b3c", width: "100%", background: "transparent" },
   searchInputMobile: { border: "none", outline: "none", fontSize: "14px", color: "#F28C28", width: "100%", background: "transparent" },
+  clearFilterIcon: { color: "#a4a4a4", cursor: "pointer", fontSize: "20px" },
   scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
   filterBadge: { background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#555", fontWeight: "600", cursor: "pointer" },
   filterBadgeActive: { background: "#e15b3c", border: "1px solid #e15b3c", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#fff", fontWeight: "600", cursor: "pointer" },
-  mobileNavbarLeft: {      flex: 1,
+  title: { fontSize: "26px", fontWeight: "800", marginBottom: "15px", marginTop: "10px", color: "#000" }, 
+  sectionTitle: { color: "#e15b3c", fontWeight: "700", marginBottom: "14px", borderBottom: "3px solid #e15b3c", display: "inline-block", paddingBottom: "5px", fontSize: "18px" },
+  optionRow: { display: "flex", alignItems: "center", marginBottom: "14px", fontSize: "16px", cursor: "pointer", justifyContent: "space-between", color: "#444" },
+  radio: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", background: "transparent" },
+  radioActive: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent" },
+  radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
+  divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
+  mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
+  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "70px", width: "100%" },
+  trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none" },
+  trendingCard: {
+    width: "100%",
+    height: "470px",          // tambahkan atau perbesar nilainya
+    borderRadius: "20px",
+    overflow: "hidden",
+    background: "#fff",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
     display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center"
+    flexDirection: "column",
   },
-  mobileHeaderTitleCenter: { 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center",
-    gap: "6px", 
-    color: "#9F6822", 
-    fontWeight: "700", 
-    fontSize: "18px",
-    whiteSpace: "nowrap"
+  
+  // PROPERTI BERIKUT BERFUNGSI SEBAGAI FALLBACK/BASE STYLE
+  imageWrapper: { position: "relative", width: "100%" },
+  
+  trendingImg: { width: "100%", objectFit: "cover" }, 
+  overlay: { position: "absolute", top: "15px", left: "15px", right: "15px", display: "flex", alignItems: "center", justifyContent: "space-between" },
+  trendingTextBlack: { 
+    color: "#000000", fontSize: "28px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
+    textShadow: `-3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 3px 3px 0 #fff, -3px 0px 0 #fff, 3px 0px 0 #fff, 0px -3px 0 #fff, 0px 3px 0 #fff`
   },
-  mobileHeaderIcon: { 
-    fontSize: "24px" 
-  },
-  mobileNavbarRight: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center"
-  },
-  profileCircle: { 
-    width: "35px", 
-    height: "35px", 
-    borderRadius: "50%", 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center", 
-    overflow: "hidden" 
-  },
-
-  loadingContainer: {
-  width: "100%",
-  height: "600px",
+  trendingOverlay: { padding: "12px 20px", minHeight: "110px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxSizing: "border-box", gap: "6px" },
+  trendingHeading: { fontSize: "25px", fontWeight: "800", margin: "0" },
+  infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555", marginBottom: "18px",},
+  bottomRow: {
   display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
   alignItems: "center",
+  justifyContent: "space-between",
+  marginTop: "0",
 },
+  iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "14px" },
+  materialIcon: { fontSize: "20px" },
+  rating: {
+    display: "flex",
+    alignItems: "center",
+    gap: "5px",
+    fontSize: "17px",
+    color: "#333",
+    fontWeight: "700",
+  },
+  star: {
+    fontSize: "22px",
+    color: "#FFC107",
+  },
 
-loadingIcon: {
-  fontSize: "60px",
-  color: "#E46B5C",
-},
-
-loadingText: {
-  marginTop: "15px",
-  color: "#8B5A2B",
-  fontWeight: "600",
-  fontSize: "18px",
-},
+  starEmpty: {
+    fontSize: "22px",
+    color: "#ddd",
+  },
+  btnLihat: {
+    background: "#e15b3c",
+    color: "#fff",
+    border: "none",
+    padding: "10px 34px",
+    borderRadius: "30px",
+    cursor: "pointer",
+    fontWeight: "700",
+    fontSize: "15px",
+  },
+  bookmarkBtn: { background: "#fff", border: "none", borderRadius: "50%", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
+  bookmark: { color: "#555", fontSize: "22px" },
+  bookmarkBtnCard: { position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" },
+  bookmarkCard: { color: "#555", fontSize: "24px" },
+  cardContainerMobile: { marginTop: "5px" },
+  grid: { display: "grid", gap: "25px" },
+  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
+  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px" },
+  cardImgWrapper: { position: "relative", overflow: "hidden" },
+  cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
+  btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
+  mobileNavbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#FFFFFF", padding: "10px 15px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
+  mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
+  mobileHeaderIcon: { fontSize: "22px" },
+  mobileOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.4)", zIndex: 1001 },
+  mobileSidebar: { position: "fixed", top: 0, left: 0, width: "260px", height: "100vh", background: "#F7F1EC", zIndex: 1002, padding: "20px 20px 30px 20px", boxShadow: "4px 0 20px rgba(0,0,0,0.15)", boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "space-between" },
+  mobileLogoSection: { display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ddd", paddingBottom: "12px" },
+  mobileLogoText: { color: "#E28B36", fontSize: "24px", fontWeight: "700", marginLeft: "8px" },
+  closeMenuIcon: { fontSize: "28px", color: "#5E4637", cursor: "pointer", padding: "4px" },
+  mobileMenuTitle: { marginTop: "20px", marginBottom: "15px", fontWeight: "700", fontSize: "18px", color: "#5E4637" },
+  mobileMenuItem: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#555", fontWeight: "500", borderRadius: "10px", backgroundColor: "transparent" },
+  mobileMenuItemActive: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#e15b3c", backgroundColor: "rgba(225, 91, 60, 0.12)", fontWeight: "700", borderRadius: "10px" },
+  mobileDrawerBottomActions: { display: "flex", flexDirection: "column", gap: "10px", width: "100%", marginTop: "auto" },
+  btnMasukDrawer: { border: "1.5px solid #e15b3c", color: "#e15b3c", background: "transparent", padding: "10px", borderRadius: "20px", fontWeight: "700", fontSize: "15px", cursor: "pointer", width: "100%" },
+  btnDaftarDrawer: { border: "1.5px solid #e15b3c", color: "#fff", background: "#e15b3c", padding: "10px", borderRadius: "20px", fontWeight: "700", fontSize: "15px", cursor: "pointer", width: "100%" },
+  emptyResult: { padding: "40px 0", textAlign: "center" },
+  emptyResultText: { color: "#a4a4a4", fontSize: "22px", fontWeight: "700" },
+  mobileNavbarLeft: { display: "flex", justifyContent: "flex-start", alignItems: "center" },
+  mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", color: "#9F6822", fontWeight: "700", fontSize: "15px", whiteSpace: "nowrap" },
+  mobileNavbarRight: { display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "6px" },
+  loadingContainer: { width: "100%", height: "300px", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" },
+  loadingIcon: { fontSize: "55px", color: "#E46B5C" },
+  loadingText: { marginTop: "12px", fontSize: "18px", fontWeight: "600", color: "#8B5A2B" },
+  rightMenuDesktop: { display: "flex", alignItems: "center", gap: "12px" },
+  btnMasukDesktop: { border: "2px solid #e15b3c", color: "#e15b3c", background: "transparent", padding: "8px 22px", borderRadius: "25px", fontWeight: "700", fontSize: "14px", cursor: "pointer", transition: "all 0.2s" },
+  btnDaftarDesktop: { border: "2px solid #e15b3c", color: "#fff", background: "#e15b3c", padding: "8px 22px", borderRadius: "25px", fontWeight: "700", fontSize: "14px", cursor: "pointer", transition: "all 0.2s" }
 };
+
 export default Dashboard;

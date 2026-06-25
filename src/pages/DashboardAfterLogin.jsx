@@ -18,6 +18,7 @@ function DashboardAfterLogin() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
+  const [loading, setLoading] = useState(true);
 
   // Perubahan Ukuran Layar Listener
   useEffect(() => {
@@ -31,16 +32,25 @@ function DashboardAfterLogin() {
   // Fungsi Filter Resep dengan useCallback
   const filterFoods = useCallback(
     (newKategori, newDaerah, newSearch) => {
+      setLoading(true);
+
       const kategoriValue = newKategori ?? kategori;
       const daerahValue = newDaerah ?? daerah;
       const searchValue = newSearch ?? search;
 
       api.get(`/foods?kategori=${kategoriValue}&daerah=${daerahValue}&search=${searchValue}`)
         .then((res) => {
-          setFoods(res.data);
-          setNotFound(res.data.length === 0);
+          const data = Array.isArray(res.data) ? res.data : [];
+          setFoods(data);
+          setNotFound(data.length === 0);
+          setLoading(false);
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          setFoods([]);
+          setNotFound(true);
+          setLoading(false);
+        });
     },
     [kategori, daerah, search]
   );
@@ -147,20 +157,17 @@ function DashboardAfterLogin() {
       {/* NAVBAR / HEADER */}
       {isMobile ? (
         <div style={styles.mobileNavbar}>
-          {/* Kiri: Tombol Menu */}
           <div style={styles.mobileNavbarLeft}>
             <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
               menu
             </span>
           </div>
           
-          {/* Tengah: Ikon & Tulisan Dashboard */}
           <div style={styles.mobileHeaderTitleCenter}>
             <span className="material-symbols-outlined" style={styles.mobileHeaderIcon}>space_dashboard</span>
             <span>Dashboard</span>
           </div>
           
-          {/* Kanan: Avatar Profil */}
           <div style={styles.mobileNavbarRight}>
             <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
               {user.foto ? (
@@ -207,34 +214,13 @@ function DashboardAfterLogin() {
               </div>
               <span className="material-symbols-outlined" style={styles.closeMenuIcon} onClick={() => setShowMenu(false)}>close</span>
             </div>
-            <div style={styles.mobileMenuTitle}>MENU</div>
+            <div style={styles.mobileMenuTitle}></div>
             <div className="hover-sidebar-item" style={activeMenu === "Dashboard" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Dashboard"); navigate("/dashboardafterlogin"); setShowMenu(false); }}>Dashboard</div>
+            <div className="hover-sidebar-item" style={activeMenu === "Tambah Resep" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Tambah Resep"); navigate("/tambah"); setShowMenu(false); }}>Tambah Resep</div>
             <div className="hover-sidebar-item" style={activeMenu === "Notifikasi" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Notifikasi"); navigate("/notifikasi"); setShowMenu(false); }}>Notifikasi</div>
             <div className="hover-sidebar-item" style={activeMenu === "Profil" ? styles.mobileMenuItemActive : styles.mobileMenuItem} onClick={() => { setActiveMenu("Profil"); navigate("/profil"); setShowMenu(false); }}>Profil</div>
           </div>
         </>
-      )}
-
-      {/* SEARCH BOX & FILTER MOBILE */}
-      {isMobile && (
-        <div style={styles.mobileSearchWrapper}>
-          <div style={styles.searchBoxMobile}>
-            <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
-            <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
-          </div>
-          <div style={styles.scrollFilterContainer}>
-            <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
-            {daftarKategori.map((kat) => (
-              <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
-            ))}
-          </div>
-          <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px" }}>
-            <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
-            {daftarDaerah.map((dae) => (
-              <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
-            ))}
-          </div>
-        </div>
       )}
 
       {/* BACKGROUND PETA DESKTOP */}
@@ -251,7 +237,7 @@ function DashboardAfterLogin() {
       }}>
 
         {/* 1. SECTION TRENDING */}
-        <div style={{ marginBottom: "60px" }}>
+        <div style={{ marginBottom: isMobile ? "20px" : "60px" }}>
           <div style={{ height: "25px" }}></div> 
           
           <div ref={trendingRef} style={isMobile ? styles.trendingMobileScroll : styles.trendingDesktopGrid}>
@@ -272,7 +258,11 @@ function DashboardAfterLogin() {
                     <span style={styles.trendingTextBlack}>Trending Now</span>
                     
                     {item.creator_id !== user.id && (
-                      <button style={styles.bookmarkBtn} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
+                      <button 
+                        style={styles.bookmarkBtn} 
+                        onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
+                        title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
+                      >
                         <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActive : styles.bookmark}>
                           {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                         </span>
@@ -296,11 +286,26 @@ function DashboardAfterLogin() {
                   <div style={styles.bottomRow}>
                     <span style={styles.rating}>
                       {item.rating}
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                      {[1,2,3,4,5].map((star)=>(
+                        <span
+                          key={star}
+                          className="material-symbols-outlined"
+                          style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}
+                        >
+                          star
+                        </span>
                       ))}
                     </span>
-                    <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
+
+                    <button
+                      style={styles.btnLihat}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/detail/${item.id}`)
+                      }}
+                    >
+                      Lihat
+                    </button>
                   </div>
                 </div>
               </div>
@@ -308,7 +313,29 @@ function DashboardAfterLogin() {
           </div>
         </div>
 
-        {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
+        {/* 2. SEARCH BOX & FILTER (PINDAH KE SINI KHUSUS MOBILE) */}
+        {isMobile && (
+          <div style={styles.mobileSearchWrapper}>
+            <div style={styles.searchBoxMobile}>
+              <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
+              <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <div style={styles.scrollFilterContainer}>
+              <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
+              {daftarKategori.map((kat) => (
+                <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
+              ))}
+            </div>
+            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px" }}>
+              <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
+              {daftarDaerah.map((dae) => (
+                <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
         <div style={{ 
           display: "flex", 
           flexDirection: isMobile ? "column" : "row", 
@@ -316,10 +343,9 @@ function DashboardAfterLogin() {
           alignItems: "flex-start"
         }}>
           
-          {/* SIDEBAR FILTER */}
+          {/* SIDEBAR FILTER (DESKTOP) */}
           {!isMobile && (
             <div style={styles.sidebar}>
-              {/* SEARCH BOX DESKTOP */}
               <div style={styles.searchBoxContainerSidebar}>
                 <div style={styles.searchBox}>
                   <span className="material-symbols-outlined" style={styles.searchIcon}>search</span>
@@ -332,9 +358,7 @@ function DashboardAfterLogin() {
                 </div>
               </div>
 
-              {/* Judul Kategori */}
               <h2 style={styles.title}>Kategori</h2>
-
               <p style={styles.sectionTitle}>Jenis hidangan</p>
               {daftarKategori.map((kat) => (
                 <div key={kat} style={styles.optionRow} onClick={() => setKategori(kat)}>
@@ -359,8 +383,7 @@ function DashboardAfterLogin() {
             </div>
           )}
 
-          {/* REKOMENDASI UNTUKMU / MAIN LIST */}
-          {/* 🆕 Ditambahkan styles.mainListContainer di sini agar turun mengikuti tinggi Search Box di kiri */}
+          {/* MAIN LIST CONTAINER (LOADING & GRID STATE) */}
           <div style={isMobile ? { flex: 1, width: "100%" } : styles.mainListContainer}>
             <h3 style={{ 
               ...styles.mobileSectionHeading, 
@@ -372,7 +395,12 @@ function DashboardAfterLogin() {
             </h3>
             
             <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
-              {notFound ? (
+              {loading ? (
+                <div style={styles.loadingContainer}>
+                  <span className="material-symbols-outlined" style={styles.loadingIcon}>hourglass_top</span>
+                  <p style={styles.loadingText}>Memuat resep...</p>
+                </div>
+              ) : notFound ? (
                 <div style={styles.emptyResult}>
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
                 </div>
@@ -388,7 +416,11 @@ function DashboardAfterLogin() {
                           alt=""
                         />
                         {!isMobile && item.creator_id !== user.id && (
-                          <button style={styles.bookmarkBtnCard} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
+                          <button 
+                            style={styles.bookmarkBtnCard} 
+                            onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
+                            title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
+                          >
                             <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActiveCard : styles.bookmarkCard}>
                               {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                             </span>
@@ -404,6 +436,7 @@ function DashboardAfterLogin() {
                               className="material-symbols-outlined" 
                               style={savedRecipes.includes(item.id) ? styles.bookmarkActiveCard : styles.bookmarkCard}
                               onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}
+                              title={savedRecipes.includes(item.id) ? "Hapus dari simpanan" : "Simpan resep"}
                             >
                               {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
                             </span>
@@ -447,23 +480,8 @@ function DashboardAfterLogin() {
 }
 
 const styles = {
-  container: {
-    fontFamily: "sans-serif",
-    background: "#f7f1ec",
-    minHeight: "100vh",
-    fontWeight: "bold",
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "15px 50px",
-    background: "#fff",
-    position: "sticky",
-    top: 0,
-    zIndex: 999,
-    boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
-  },
+  container: { fontFamily: "sans-serif", background: "#f7f1ec", minHeight: "100vh", fontWeight: "bold" },
+  navbar: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 50px", background: "#fff", position: "sticky", top: 0, zIndex: 999, boxShadow: "0 2px 10px rgba(0,0,0,0.03)" },
   logoContainer: { display: "flex", alignItems: "center", gap: "1px" },
   logoImg: { width: "40px" },
   logoText: { color: "#F28C28", fontWeight: "bold", fontSize: "24px", letterSpacing: "1px" },
@@ -471,17 +489,8 @@ const styles = {
   active: { color: "#F28C28", fontWeight: "bold" },
   rightMenu: { display: "flex", alignItems: "center", gap: "15px" },
   btnTambah: { border: "1.5px solid #e15b3c", color: "#e15b3c", background: "transparent", padding: "6px 15px", borderRadius: "20px", cursor: "pointer", fontWeight: "600" },
-  topBg: {
-    height: "520px",
-    backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')",
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    width: "100%",
-  },
-  searchBoxContainerSidebar: {
-    width: "100%",
-    marginBottom: "20px", 
-  },
+  topBg: { height: "520px", backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')", backgroundSize: "cover", backgroundPosition: "center", width: "100%" },
+  searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
   sidebar: {
     width: "260px",
     background: "transparent", 
@@ -490,15 +499,10 @@ const styles = {
     boxShadow: "none",
     position: "sticky",
     top: "90px",
-    marginLeft: "-30px", 
+    marginLeft: "0px",
     marginTop: "-5px" 
   },
-  // 🆕 Menggeser konten resep ke bawah sejauh tinggi search box + margin (+- 66px) agar presisi horizontal dengan teks "Kategori"
-  mainListContainer: {
-    flex: 1,
-    width: "100%",
-    paddingTop: "66px" 
-  },
+  mainListContainer: { flex: 1, width: "100%", paddingTop: "66px" },
   searchBox: {
     display: "flex",
     alignItems: "center",
@@ -507,74 +511,39 @@ const styles = {
     borderRadius: "30px",
     padding: "10px 20px",
     background: "#fff8f6", 
-    width: "105%", 
+    marginLeft: "-12px",
+    width: "calc(100% + 12px)",
     boxSizing: "border-box",
   },
-  mobileSearchWrapper: { padding: "15px 15px 5px 15px", background: "transparent" },
+  mobileSearchWrapper: { padding: "15px 0px 25px 0px", background: "transparent" },
   searchBoxMobile: { display: "flex", alignItems: "center", gap: "10px", border: "1px solid rgba(0, 0, 0, 0.1)", borderRadius: "25px", padding: "10px 15px", background: "rgba(255, 255, 255, 0.4)", backdropFilter: "blur(8px)" },
   searchIcon: { fontSize: "22px", color: "#e15b3c" },
   searchIconMobile: { fontSize: "18px", color: "#F28C28" },
-  
   searchInput: { border: "none", outline: "none", fontSize: "16px", color: "#e15b3c", width: "100%", background: "transparent" },
   searchInputMobile: { border: "none", outline: "none", fontSize: "14px", color: "#F28C28", width: "100%", background: "transparent" },
-  
   clearFilterIcon: { color: "#a4a4a4", cursor: "pointer", fontSize: "20px" },
   scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
   filterBadge: { background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#555", fontWeight: "600", cursor: "pointer" },
   filterBadgeActive: { background: "#e15b3c", border: "1px solid #e15b3c", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#fff", fontWeight: "600", cursor: "pointer" },
-  
   title: { fontSize: "26px", fontWeight: "800", marginBottom: "15px", marginTop: "10px", color: "#000" }, 
   sectionTitle: { color: "#e15b3c", fontWeight: "700", marginBottom: "14px", borderBottom: "3px solid #e15b3c", display: "inline-block", paddingBottom: "5px", fontSize: "18px" },
   optionRow: { display: "flex", alignItems: "center", marginBottom: "14px", fontSize: "16px", cursor: "pointer", justifyContent: "space-between", color: "#444" },
-  
   radio: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", background: "transparent" },
   radioActive: { width: "18px", height: "18px", borderRadius: "50%", border: "2px solid #e15b3c", display: "flex", alignItems: "center", justifyContent: "center", background: "transparent" },
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
-  trendingDesktopGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "45px", 
-    width: "100%",
-  },
+  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "70px", width: "100%" },
   trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none" },
   trendingCard: { width: "100%", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
   imageWrapper: { position: "relative" },
   trendingImg: { width: "100%", objectFit: "cover" }, 
   overlay: { position: "absolute", top: "20px", left: "20px", right: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
   trendingTextBlack: { 
-    color: "#000000", 
-    fontSize: "24px", 
-    fontWeight: "900",
-    fontFamily: "'Arial Black', sans-serif, system-ui",
-    letterSpacing: "-0.5px",
-    textShadow: `
-      -3.5px -3.5px 0 #fff,  
-       3.5px -3.5px 0 #fff,
-      -3.5px  3.5px 0 #fff,
-       3.5px  3.5px 0 #fff,
-      -3.5px  0px   0 #fff,
-       3.5px  0px   0 #fff,
-       0px   -3.5px 0 #fff,
-       0px    3.5px 0 #fff,
-      -2px -4px 0 #fff,
-       2px -4px 0 #fff,
-      -2px  4px 0 #fff,
-       2px  4px 0 #fff
-    `,
+    color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
+    textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff, -2px -4px 0 #fff, 2px -4px 0 #fff, -2px 4px 0 #fff, 2px 4px 0 #fff`
   },
-  
-  trendingOverlay: { 
-    padding: "15px 24px", 
-    minHeight: "130px", 
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between", 
-    boxSizing: "border-box",
-    gap: "10px"
-  },
-
+  trendingOverlay: { padding: "15px 24px", minHeight: "130px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxSizing: "border-box", gap: "10px" },
   trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
   infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
   bottomRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "5px" },
@@ -584,15 +553,12 @@ const styles = {
   star: { fontSize: "22px", color: "#FFC107" },
   starEmpty: { fontSize: "22px", color: "#ddd" },
   btnLihat: { background: "#e15b3c", color: "#fff", border: "none", padding: "10px 34px", borderRadius: "25px", cursor: "pointer", fontWeight: "700", fontSize: "15px" },
-  
   bookmarkBtn: { background: "#fff", border: "none", borderRadius: "50%", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
   bookmark: { color: "#555", fontSize: "26px" },
   bookmarkActive: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "26px" },
-  
   bookmarkBtnCard: { position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" },
   bookmarkCard: { color: "#555", fontSize: "24px" },
   bookmarkActiveCard: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "24px" },
-
   cardContainer: { width: "100%" },
   cardContainerMobile: { marginTop: "5px" },
   grid: { display: "grid", gap: "25px" },
@@ -602,28 +568,8 @@ const styles = {
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
   btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
   feedbackBtn: { position: "fixed", bottom: "20px", right: "20px", width: "52px", height: "52px", borderRadius: "50%", background: "#e15b3c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 99 },
-  mobileNavbar: { 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
-    backgroundColor: "#FFFFFF", 
-    padding: "12px 20px", 
-    position: "sticky", 
-    top: 0, 
-    zIndex: 999, 
-    width: "100%", 
-    boxSizing: "border-box", 
-    boxShadow: "0 2px 10px rgba(0,0,0,0.05)" 
-  },
+  mobileNavbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#FFFFFF", padding: "12px 20px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
   mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
-  mobileHeaderTitle: { 
-    display: "flex", 
-    alignItems: "center", 
-    gap: "6px", // sedikit dirapatkan jarak ikon kotak dan teksnya
-    color: "#9F6822", 
-    fontWeight: "700", 
-    fontSize: "18px" // disesuaikan agar pas di layar HP kecil
-  },
   mobileHeaderIcon: { fontSize: "24px" },
   profileCircle: { width: "35px", height: "35px", borderRadius: "50%", background: "#f4b8a3", display: "flex", alignItems: "center", justifyContent: "center", color: "#FFF", cursor: "pointer", overflow: "hidden" },
   profileImg: { width: "100%", height: "100%", objectFit: "cover" },
@@ -637,28 +583,13 @@ const styles = {
   mobileMenuItemActive: { padding: "12px 14px", fontSize: "16px", cursor: "pointer", color: "#e15b3c", backgroundColor: "rgba(225, 91, 60, 0.12)", fontWeight: "700", borderRadius: "10px" },
   emptyResult: { padding: "40px 0", textAlign: "center" },
   emptyResultText: { color: "#a4a4a4", fontSize: "22px", fontWeight: "700" },
-  mobileNavbarLeft: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center"
-  },
-  mobileHeaderTitleCenter: { 
-    display: "flex", 
-    alignItems: "center", 
-    justifyContent: "center",
-    gap: "6px", 
-    color: "#9F6822", 
-    fontWeight: "700", 
-    fontSize: "18px",
-    whiteSpace: "nowrap"
-  },
-  mobileNavbarRight: {
-    flex: 1,
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "center"
-  },
+  mobileNavbarLeft: { flex: 1, display: "flex", justifyContent: "flex-start", alignItems: "center" },
+  mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "#9F6822", fontWeight: "700", fontSize: "18px", whiteSpace: "nowrap" },
+  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" },
+  clearFilterBtn: { width: "100%", padding: "10px", border: "2px solid #d86936", background: "#fff", borderRadius: "25px", cursor: "pointer", fontWeight: "bold", marginBottom: "15px" },
+  loadingContainer: { width: "100%", height: "300px", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column" },
+  loadingIcon: { fontSize: "55px", color: "#E46B5C" },
+  loadingText: { marginTop: "12px", fontSize: "18px", fontWeight: "600", color: "#8B5A2B" }
 };
 
 export default DashboardAfterLogin;
