@@ -68,25 +68,32 @@ function Profil() {
   };
 
   const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      alert("Konfirmasi password tidak cocok");
-      return;
-    }
-    try {
-      const res = await api.put("/change-password", { oldPassword, newPassword }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
-      
-      setShowPasswordPopup(false);
-      setShowSuccessPasswordPopup(true);
-      
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      alert(err.response?.data?.message || "Gagal mengubah password");
-    }
-  };
+  if (newPassword !== confirmPassword) {
+    alert("Konfirmasi password tidak cocok");
+    return;
+  }
+
+  try {
+    await api.put(
+      "/change-password",
+      { oldPassword, newPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    setShowPasswordPopup(false);
+    setShowSuccessPasswordPopup(true);
+
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  } catch (err) {
+    alert(err.response?.data?.message || "Gagal mengubah password");
+  }
+};
 
   const handleRemovePhoto = async (e) => {
     e.preventDefault(); 
