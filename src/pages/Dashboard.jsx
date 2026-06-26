@@ -196,7 +196,12 @@ function Dashboard() {
 
       {/* ==== OUTER LAYOUT WRAPPER ==== */}
       <div style={{
+        width: "100%",
         maxWidth: "1400px",
+        overflowX: "hidden",
+
+        margin: "0 auto",
+        padding: isMobile ? "0" : "0 50px",
         margin: "0 auto",
         padding: isMobile ? "0px" : "0 50px", 
         marginTop: isMobile ? "0px" : "-460px", 
@@ -214,17 +219,35 @@ function Dashboard() {
         >
           <div style={{ height: "10px" }}></div> 
           
-          <div ref={trendingRef} style={isMobile ? styles.trendingMobileScroll : styles.trendingDesktopGrid}>
-            {trendingFoods.map((item) => (
-              <div 
-                key={item.id} 
-                style={{ ...styles.trendingCard, minWidth: isMobile ? "85vw" : "auto" }} 
+          <div
+          ref={trendingRef}
+          style={
+            isMobile
+              ? {
+                  ...styles.trendingMobileScroll,
+                    gap: "12px",
+    paddingLeft: "20px",
+    paddingRight: "20px",
+    boxSizing: "border-box",
+                  }
+              : styles.trendingDesktopGrid
+          }
+        >
+          {trendingFoods.map((item) => (
+              
+              <div
+                key={item.id}
+                style={{
+                  ...styles.trendingCard,
+                  minWidth: isMobile ? "86vw" : "auto",
+                  scrollSnapAlign: "start",
+                }}
                 onClick={requireLogin}
               >
                 <div style={styles.imageWrapper}>
                   <img
                     src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                    style={{ ...styles.trendingImg, height: isMobile ? "230px" : "330px" }}
+                    style={{ ...styles.trendingImg, height: isMobile ? "200px" : "330px" }}
                     alt={item.nama}
                     onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                   />
@@ -287,12 +310,16 @@ function Dashboard() {
         )}
 
         {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
-        <div style={{ 
-          display: "flex", 
-          flexDirection: isMobile ? "column" : "row", 
-          gap: isMobile ? "20px" : "40px",
-          alignItems: "flex-start"
-        }}>
+        <div
+           style={{
+    display: "flex",
+    flexDirection: isMobile ? "column" : "row",
+    gap: isMobile ? "40px" : "70px",
+    alignItems: "flex-start",
+    marginLeft: "-50px",
+marginRight:"-200px",
+  }}
+>
           
           {/* SIDEBAR FILTER DESKTOP */}
           {!isMobile && (
@@ -342,7 +369,7 @@ function Dashboard() {
                 style={{
                   ...styles.mobileSectionHeading,
                   fontSize: "18px",
-                  margin: "0 0 15px 0",
+                  margin: "0 0 15px 15px", // geser ke kanan
                 }}
               >
                 Rekomendasi Untukmu
@@ -355,7 +382,10 @@ function Dashboard() {
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
                 </div>
               ) : (
-                <div style={{ ...styles.grid, gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                <div style={{ ...styles.grid, gridTemplateColumns:
+                    isMobile
+                      ? "1fr"
+                      : "repeat(3, minmax(30px, 1fr))",}}>
                   {foods.map((item) => (
                     <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={requireLogin}>
                       
@@ -413,11 +443,15 @@ function Dashboard() {
 
 const styles = {
   container: {
+    width: "100%",
+    maxWidth: "100vw",
+    overflowX: "hidden",
+
     fontFamily: "sans-serif",
     background: "#f7f1ec",
     minHeight: "100vh",
     fontWeight: "bold",
-  },
+},
   navbar: {
     display: "flex",
     justifyContent: "space-between",
@@ -445,19 +479,22 @@ const styles = {
   },
   searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
   sidebar: {
-    width: "260px",
+    width: "230px",
     background: "transparent", 
     padding: "0px 10px 25px 0px", 
     position: "sticky",
     top: "90px",
-    marginLeft: "-30px", 
+    marginLeft: "0px", 
     marginTop: "0px"
   },
   mainListContainer: {
-    flex: 1,
-    width: "100%",
-    paddingTop: "50px",
-  },
+  flex: 1,
+
+  width: "100%",
+  maxWidth: "850px",
+
+  paddingTop: "50px",
+},
   searchBox: {
     display: "flex",
     alignItems: "center",
@@ -466,7 +503,7 @@ const styles = {
     borderRadius: "30px",
     padding: "10px 20px",
     background: "#fff8f6", 
-    width: "105%", 
+    width: "100%", 
     boxSizing: "border-box",
   },
   // PERBAIKAN JARAK: Diubah dari 20px menjadi hanya 5px agar naik mendekati navbar
@@ -520,20 +557,72 @@ const styles = {
     color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
     textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff`
   },
-  trendingOverlay: { padding: "15px 24px", minHeight: "130px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxSizing: "border-box", gap: "10px" },
-  trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
-  infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
-  bottomRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "5px" },
-  iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px" },
-  materialIcon: { fontSize: "22px" },
-  rating: { display: "flex", alignItems: "center", fontSize: "16px", color: "#333", fontWeight: "700" },
-  starContainer: { display: "flex", gap: "1px" }, 
-  star: { fontSize: "20px", color: "#FFC107" },
-  starEmpty: { fontSize: "20px", color: "#ddd" },
-  btnLihat: { background: "#e15b3c", color: "#fff", border: "none", padding: "10px 34px", borderRadius: "25px", cursor: "pointer", fontWeight: "700", fontSize: "15px" },
+  trendingOverlay: {
+  padding: "12px 20px",
+  minHeight: "95px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+},
+
+trendingHeading: {
+  fontSize: "24px",
+  fontWeight: "800",
+  margin: "0",
+},
+
+infoRow: {
+  display: "flex",
+  gap: "18px",
+  fontSize: "14px",
+  color: "#555",
+},
+
+bottomRow: {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginTop: "5px",
+},
+
+iconText: {
+  display: "flex",
+  alignItems: "center",
+  gap: "6px",
+  fontSize: "15px",
+},
+
+materialIcon: {
+  fontSize: "22px",
+},
+
+rating: {
+  display: "flex",
+  alignItems: "center",
+  fontSize: "16px",
+  color: "#333",
+  fontWeight: "700",
+},
+
+starContainer: {
+  display: "flex",
+  gap: "1px",
+},
+
+star: {
+  fontSize: "20px",
+  color: "#FFC107",
+},
+
+starEmpty: {
+  fontSize: "20px",
+  color: "#ddd",
+},
   cardContainer: { width: "100%" },
   cardContainerMobile: { marginTop: "5px", padding: "0 15px", boxSizing: "border-box" },
-  grid: { display: "grid", gap: "25px" },
+  grid: {  display:"grid",
+    columnGap:"60px",
+    rowGap:"35px", },
   card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
   horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
