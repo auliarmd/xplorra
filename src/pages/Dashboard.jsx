@@ -13,7 +13,7 @@ function Dashboard() {
   const [trendingFoods, setTrendingFoods] = useState([]);
   const trendingRef = useRef(null);
 
-  // State Responsif & Menu Mobile (Disamakan dengan DashboardAfterLogin)
+  // State Responsif & Menu Mobile (Dioptimalkan ke 3 tingkat: Mobile, Tablet, Desktop)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
@@ -36,7 +36,10 @@ function Dashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Penentuan tipe perangkat secara presisi
   const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth > 768 && windowWidth <= 1024;
+  const isDesktop = windowWidth > 1024;
 
   const goToRegister = () => {
     navigate("/Register");
@@ -50,14 +53,14 @@ function Dashboard() {
     navigate("/Masuk");
   };
 
-  // Auto-Scroll untuk Card Trending di Mobile
+  // Auto-Scroll untuk Card Trending (Aktif di Mobile & Tablet jika dalam mode scroll horizontal)
   useEffect(() => {
-    if (windowWidth > 768) return;
+    if (isDesktop) return;
 
     const interval = setInterval(() => {
       if (trendingRef.current) {
         const container = trendingRef.current;
-        const cardWidth = container.clientWidth * 0.85 + 25;
+        const cardWidth = container.clientWidth * 0.82 + 16;
         
         if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10) {
           container.scrollTo({ left: 0, behavior: "smooth" });
@@ -68,7 +71,7 @@ function Dashboard() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [windowWidth, trendingFoods]);
+  }, [isDesktop, trendingFoods]);
 
   useEffect(() => {
     fetch(`${BASE_URL}/foods/trending`)
@@ -98,10 +101,17 @@ function Dashboard() {
   const daftarKategori = ["Makanan utama", "Minuman", "Dessert"];
   const daftarDaerah = ["Sumatera", "Kalimantan", "Sulawesi", "Maluku", "Irian Jaya", "Nusa Tenggara", "Jawa"];
 
+  // Pengaturan margin top pembungkus konten utama secara dinamis
+  const getLayoutMarginTop = () => {
+    if (isDesktop) return "-460px";
+    if (isTablet) return "-250px"; // Disesuaikan untuk tinggi background peta di tablet
+    return "0px";
+  };
+
   return (
     <div style={{
         ...styles.container,
-        backgroundImage: isMobile 
+        backgroundImage: (isMobile || isTablet)
           ? "linear-gradient(to bottom, rgba(247, 241, 236, 0.2), rgba(247, 241, 236, 0.95)), url('/bg_peta.jpg')" 
           : "none",
         backgroundSize: "cover",
@@ -118,10 +128,17 @@ function Dashboard() {
           color: #e15b3c !important;
           padding-left: 18px !important;
         }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
       
-      {/* NAVBAR / HEADER */}
-      {isMobile ? (
+      {/* NAVBAR / HEADER (Mobile & Tablet menggunakan Hamburger Menu) */}
+      {(isMobile || isTablet) ? (
         <div style={styles.mobileNavbar}>
           <div style={styles.mobileNavbarLeft}>
             <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
@@ -135,7 +152,6 @@ function Dashboard() {
           </div>
           
           <div style={styles.mobileNavbarRight}>
-            {/* Ganti dengan icon profil */}
             <span 
               className="material-symbols-outlined" 
               style={styles.profileIconMobile} 
@@ -164,8 +180,8 @@ function Dashboard() {
         </div>
       )}
 
-      {/* TAMPILAN SIDEBAR DRAWER MOBILE */}
-      {isMobile && showMenu && (
+      {/* DRAWER SIDEBAR MOBILE & TABLET */}
+      {(isMobile || isTablet) && showMenu && (
         <>
           <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
           <div style={styles.mobileSidebar}>
@@ -182,7 +198,6 @@ function Dashboard() {
               <div className="hover-sidebar-item" style={styles.mobileMenuItem} onClick={() => { requireLogin(); setShowMenu(false); }}>Profil</div>
             </div>
 
-            {/* Tombol diletakkan di paling bawah */}
             <div style={styles.mobileSidebarBottomButtons}>
                 <button style={{ ...styles.btnPrimary, width: "100%", margin: 0 }} onClick={goToRegister}>Daftar</button>
                 <button style={{ ...styles.btnSecondary, width: "100%", textAlign: "center" }} onClick={goToMasuk}>Masuk</button>
@@ -191,62 +206,56 @@ function Dashboard() {
         </>
       )}
 
-      {/* BACKGROUND PETA DESKTOP */}
-      {!isMobile && <div style={styles.topBg}></div>}
+      {/* BACKGROUND PETA DESKTOP & TABLET */}
+      {isDesktop && <div style={styles.topBg}></div>}
+      {isTablet && <div style={{ ...styles.topBg, height: "320px" }}></div>}
 
       {/* ==== OUTER LAYOUT WRAPPER ==== */}
       <div style={{
         width: "100%",
         maxWidth: "1400px",
         overflowX: "hidden",
-
         margin: "0 auto",
-        padding: isMobile ? "0" : "0 60px",
-   
-        marginTop: isMobile ? "0px" : "-460px", 
+        padding: isDesktop ? "0 60px" : (isTablet ? "0 30px" : "0"),
+        marginTop: getLayoutMarginTop(), 
         position: "relative",
         zIndex: 10,
-     
         boxSizing: "border-box"
       }}>
 
         {/* 1. SECTION TRENDING */}
-        <div
-          style={{
-            marginBottom: isMobile ? "25px" : "70px",
-          }}
-        >
+        <div style={{ marginBottom: isDesktop ? "70px" : "25px" }}>
           <div style={{ height: "10px" }}></div> 
           
           <div
-          ref={trendingRef}
-          style={
-            isMobile
-              ? {
-                  ...styles.trendingMobileScroll,
-                    gap: "12px",
-    paddingLeft: "20px",
-    paddingRight: "20px",
-    boxSizing: "border-box",
+            ref={trendingRef}
+            className="no-scrollbar"
+            style={
+              isDesktop
+                ? styles.trendingDesktopGrid
+                : {
+                    ...styles.trendingMobileScroll,
+                    gap: "16px",
+                    paddingLeft: isTablet ? "10vw" : "20px",
+                    paddingRight: isTablet ? "10vw" : "20px",
+                    boxSizing: "border-box",
                   }
-              : styles.trendingDesktopGrid
-          }
-        >
-          {trendingFoods.map((item) => (
-              
+            }
+          >
+            {trendingFoods.map((item) => (
               <div
                 key={item.id}
                 style={{
                   ...styles.trendingCard,
-                  minWidth: isMobile ? "86vw" : "auto",
-                  scrollSnapAlign: "start",
+                  minWidth: isDesktop ? "auto" : (isTablet ? "76vw" : "86vw"),
+                  scrollSnapAlign: "center",
                 }}
                 onClick={requireLogin}
               >
                 <div style={styles.imageWrapper}>
                   <img
                     src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                    style={{ ...styles.trendingImg, height: isMobile ? "200px" : "330px" }}
+                    style={{ ...styles.trendingImg, height: isMobile ? "200px" : (isTablet ? "260px" : "330px") }}
                     alt={item.nama}
                     onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                   />
@@ -284,8 +293,8 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* SEARCH BOX & FILTER MOBILE */}
-        {isMobile && (
+        {/* BOX PENCARIAN & BADGE FILTER (Tampil di Mobile & Tablet) */}
+        {!isDesktop && (
           <div style={styles.mobileSearchWrapper}>
             <div style={styles.mobileSearchContainer}>
               <div style={styles.searchBoxMobile}>
@@ -293,13 +302,13 @@ function Dashboard() {
                 <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
             </div>
-            <div style={styles.scrollFilterContainer}>
+            <div className="no-scrollbar" style={{ ...styles.scrollFilterContainer, paddingLeft: isTablet ? "30px" : "15px" }}>
               <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
               {daftarKategori.map((kat) => (
                 <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
               ))}
             </div>
-            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px" }}>
+            <div className="no-scrollbar" style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px", paddingLeft: isTablet ? "30px" : "15px" }}>
               <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
               {daftarDaerah.map((dae) => (
                 <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
@@ -310,18 +319,17 @@ function Dashboard() {
 
         {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
         <div
-  style={{
-    display: "flex",
-    flexDirection: isMobile ? "column" : "row",
-    gap: isMobile ? "25px" : "40px",
-    alignItems: "flex-start",
-    marginLeft: isMobile ? "0" : "-50px",
-    marginRight: isMobile ? "0" : "-200px",
-  }}
->
+          style={{
+            display: "flex",
+            flexDirection: isDesktop ? "row" : "column",
+            gap: isDesktop ? "40px" : "25px",
+            alignItems: "flex-start",
+            width: "100%"
+          }}
+        >
           
           {/* SIDEBAR FILTER DESKTOP */}
-          {!isMobile && (
+          {isDesktop && (
             <div style={styles.sidebar}>
               <div style={styles.searchBoxContainerSidebar}>
                 <div style={styles.searchBox}>
@@ -362,41 +370,46 @@ function Dashboard() {
           )}
 
           {/* REKOMENDASI UNTUKMU / MAIN LIST */}
-          <div style={isMobile ? { flex: 1, width: "100%" } : styles.mainListContainer}>
-            {isMobile && (
-              <h3
-                style={{
-                  ...styles.mobileSectionHeading,
-                  fontSize: "18px",
-                  margin: "0 0 15px 15px", // geser ke kanan
-                }}
-              >
+          <div style={{ flex: 1, width: "100%", paddingBottom: "40px" }}>
+            {!isDesktop && (
+              <h3 style={{ ...styles.mobileSectionHeading, fontSize: "20px", margin: isTablet ? "0 30px 15px 30px" : "0 15px 15px 15px" }}>
                 Rekomendasi Untukmu
               </h3>
             )}
             
-            <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
+            <div style={isDesktop ? styles.cardContainer : { ...styles.cardContainerMobile, padding: isTablet ? "0 30px" : "0 15px" }}>
               {notFound ? (
                 <div style={styles.emptyResult}>
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
                 </div>
               ) : (
-                <div style={{ ...styles.grid, gridTemplateColumns:
-                    isMobile
-                      ? "1fr"
-                      : "repeat(3, minmax(320px, 1fr))",}}>
+                <div 
+                  style={{ 
+                    ...styles.grid, 
+                    rowGap: isDesktop ? "35px" : "15px",
+                    columnGap: "30px",
+                    justifyContent: "center",
+                    gridTemplateColumns: isDesktop
+                      ? "repeat(3, minmax(320px, 1fr))"
+                      : (isTablet ? "repeat(2, 1fr)" : "1fr"), // Grid rapi 2 kolom saat tablet, 1 kolom saat mobile
+                  }}
+                >
                   {foods.map((item) => (
                     <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={requireLogin}>
                       
-                      <div style={{ ...styles.cardImgWrapper, width: isMobile ? "110px" : "100%", height: isMobile ? "110px" : "160px" }}>
+                      <div style={{ 
+                        ...styles.cardImgWrapper, 
+                        width: isMobile ? "110px" : "100%", 
+                        height: isMobile ? "110px" : "180px" 
+                      }}>
                         <img
                           src={`${BASE_URL}/uploads/${item.gambar}`}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "0" }}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "18px 18px 0 0" }}
                           alt=""
                         />
                       </div>
 
-                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px 15px 12px 15px" }}>
+                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                           <h4 style={{ fontSize: isMobile ? "15px" : "17px", margin: "0", fontWeight: "700", lineHeight: "1.2" }}>{item.nama}</h4>
                         </div>
@@ -445,12 +458,11 @@ const styles = {
     width: "100%",
     maxWidth: "100vw",
     overflowX: "hidden",
-
     fontFamily: "sans-serif",
     background: "#f7f1ec",
     minHeight: "100vh",
     fontWeight: "bold",
-},
+  },
   navbar: {
     display: "flex",
     justifyContent: "space-between",
@@ -467,8 +479,8 @@ const styles = {
   logoText: { color: "#F28C28", fontWeight: "bold", fontSize: "24px", letterSpacing: "1px" },
   menu: { display: "flex", gap: "30px", fontSize: "18px", fontWeight: "700", cursor: "pointer", marginRight: "-90px" },
   active: { color: "#F28C28", fontWeight: "bold" },
-  btnPrimary: { background: "#F28C28", color: "#ffffff", border: "none", padding: "8px 30px", borderRadius: "20px", marginRight: "10px", cursor: "pointer" },
-  btnSecondary: { background: "#fbdfd1", color: "#F28C28", border: "none", padding: "8px 30px", borderRadius: "20px", cursor: "pointer" },
+  btnPrimary: { background: "#F28C28", color: "#ffffff", border: "none", padding: "8px 30px", borderRadius: "20px", marginRight: "10px", cursor: "pointer", fontWeight: "600" },
+  btnSecondary: { background: "#fbdfd1", color: "#F28C28", border: "none", padding: "8px 30px", borderRadius: "20px", cursor: "pointer", fontWeight: "600" },
   topBg: {
     height: "520px",
     backgroundImage: "linear-gradient(to bottom, rgba(180, 113, 71, 0.85), rgba(247, 241, 236, 0.1)), url('/map.png')",
@@ -476,24 +488,20 @@ const styles = {
     backgroundPosition: "center",
     width: "100%",
   },
-  searchBoxContainerSidebar: { width: "250px", marginBottom: "20px",marginLeft: "-10px"  },
+  searchBoxContainerSidebar: { width: "250px", marginBottom: "20px", marginLeft: "-10px" },
   sidebar: {
     width: "230px",
     background: "transparent", 
     padding: "0px 10px 25px 0px", 
     position: "sticky",
     top: "90px",
-    marginLeft: "0px", 
-    marginTop: "0px"
   },
   mainListContainer: {
-  flex: 1,
-
-  width: "100%",
-  maxWidth: "850px",
-
-  paddingTop: "50px",
-},
+    flex: 1,
+    width: "100%",
+    maxWidth: "850px",
+    paddingTop: "50px",
+  },
   searchBox: {
     display: "flex",
     alignItems: "center",
@@ -505,9 +513,8 @@ const styles = {
     width: "100%", 
     boxSizing: "border-box",
   },
-  // PERBAIKAN JARAK: Diubah dari 20px menjadi hanya 5px agar naik mendekati navbar
   mobileSearchWrapper: { 
-    padding: "5px 15px 5px 15px", 
+    padding: "5px 0px", 
     background: "transparent", 
     width: "100%", 
     boxSizing: "border-box" 
@@ -516,6 +523,8 @@ const styles = {
     display: "flex",
     justifyContent: "center", 
     width: "100%",
+    padding: "0 15px",
+    boxSizing: "border-box",
     marginBottom: "15px" 
   },
   searchBoxMobile: { 
@@ -535,7 +544,7 @@ const styles = {
   searchInput: { border: "none", outline: "none", fontSize: "16px", color: "#e15b3c", width: "100%", background: "transparent" },
   searchInputMobile: { border: "none", outline: "none", fontSize: "14px", color: "#F28C28", width: "100%", background: "transparent" },
   clearFilterIcon: { color: "#a4a4a4", cursor: "pointer", fontSize: "20px" },
-  scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
+  scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", WebkitOverflowScrolling: "touch" },
   filterBadge: { background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#555", fontWeight: "600", cursor: "pointer" },
   filterBadgeActive: { background: "#e15b3c", border: "1px solid #e15b3c", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#fff", fontWeight: "600", cursor: "pointer" },
   title: { fontSize: "26px", fontWeight: "800", marginBottom: "15px", marginTop: "10px", color: "#000" }, 
@@ -547,7 +556,7 @@ const styles = {
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
   trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "45px", width: "100%" },
-  trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none" },
+  trendingMobileScroll: { display: "flex", overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch", scrollSnapType: "x mandatory", width: "100%" },
   trendingCard: { width: "100%", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)", cursor: "pointer" },
   imageWrapper: { position: "relative" },
   trendingImg: { width: "100%", objectFit: "cover" }, 
@@ -556,74 +565,21 @@ const styles = {
     color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
     textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff`
   },
-  trendingOverlay: {
-  padding: "12px 20px",
-  minHeight: "95px",
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "space-between",
-},
-
-trendingHeading: {
-  fontSize: "24px",
-  fontWeight: "800",
-  margin: "0",
-},
-
-infoRow: {
-  display: "flex",
-  gap: "18px",
-  fontSize: "14px",
-  color: "#555",
-},
-
-bottomRow: {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  marginTop: "5px",
-},
-
-iconText: {
-  display: "flex",
-  alignItems: "center",
-  gap: "6px",
-  fontSize: "15px",
-},
-
-materialIcon: {
-  fontSize: "22px",
-},
-
-rating: {
-  display: "flex",
-  alignItems: "center",
-  fontSize: "16px",
-  color: "#333",
-  fontWeight: "700",
-},
-
-starContainer: {
-  display: "flex",
-  gap: "1px",
-},
-
-star: {
-  fontSize: "20px",
-  color: "#FFC107",
-},
-
-starEmpty: {
-  fontSize: "20px",
-  color: "#ddd",
-},
+  trendingOverlay: { padding: "12px 20px", minHeight: "95px", display: "flex", flexDirection: "column", justifyContent: "space-between" },
+  trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
+  infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
+  bottomRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "5px" },
+  iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px" },
+  materialIcon: { fontSize: "22px" },
+  rating: { display: "flex", alignItems: "center", fontSize: "16px", color: "#333", fontWeight: "700" },
+  starContainer: { display: "flex", gap: "1px" },
+  star: { fontSize: "20px", color: "#FFC107" },
+  starEmpty: { fontSize: "20px", color: "#ddd" },
   cardContainer: { width: "100%" },
-  cardContainerMobile: { marginTop: "5px", padding: "0 15px", boxSizing: "border-box" },
-  grid: {  display:"grid",
-    columnGap:"60px",
-    rowGap:"35px", },
+  cardContainerMobile: { marginTop: "5px", boxSizing: "border-box" },
+  grid: { display: "grid" },
   card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
-  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
+  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer", width: "100%", boxSizing: "border-box" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
   btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
@@ -645,17 +601,17 @@ starEmpty: {
   mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "#9F6822", fontWeight: "700", fontSize: "18px", whiteSpace: "nowrap" },
   mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" },
   btnLihat: {
-  background: "#E15B3C",
-  color: "#fff",
-  border: "none",
-  borderRadius: "20px",
-  padding: "8px 24px",
-  fontSize: "14px",
-  fontWeight: "600",
-  cursor: "pointer",
-  transition: "all 0.25s ease",
-  boxShadow: "0 4px 12px rgba(225, 91, 60, 0.25)",
-},
+    background: "#E15B3C",
+    color: "#fff",
+    border: "none",
+    borderRadius: "20px",
+    padding: "8px 24px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all 0.25s ease",
+    boxShadow: "0 4px 12px rgba(225, 91, 60, 0.25)",
+  },
 };
 
 export default Dashboard;
