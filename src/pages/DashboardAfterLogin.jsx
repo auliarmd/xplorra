@@ -235,9 +235,10 @@ function DashboardAfterLogin() {
 
       {/* ==== OUTER LAYOUT WRAPPER ==== */}
       <div style={{
-        maxWidth: "1400px",
+        maxWidth: "1200px",
         margin: "0 auto",
-        padding: isMobile ? "0px" : "0 50px", 
+        padding: isMobile ? "0" : "0 20px",
+        overflowX: "hidden",
         marginTop: isMobile ? "0px" : "-460px", 
         position: "relative",
         zIndex: 10,
@@ -245,65 +246,88 @@ function DashboardAfterLogin() {
         boxSizing: "border-box"
       }}>
 
-        {/* 1. SECTION TRENDING */}
+        {/* 1. SECTION TRENDING (Dipastikan berada di tengah layar) */}
         <div
           style={{
-            marginBottom: isMobile ? "25px" : "70px",
+            marginBottom: isMobile ? "25px" : "50px",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center"
           }}
         >
           <div style={{ height: "10px" }}></div> 
           
-          <div ref={trendingRef} style={isMobile ? styles.trendingMobileScroll : styles.trendingDesktopGrid}>
-            {Array.isArray(trendingFoods) && trendingFoods.map((item) => (
-              <div 
-                key={item.id} 
-                style={{ ...styles.trendingCard, minWidth: isMobile ? "85vw" : "auto", cursor: "pointer" }} 
-                onClick={() => navigate(`/detail/${item.id}`)}
-              >
-                <div style={styles.imageWrapper}>
-                  <img
-                    src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                    style={{ ...styles.trendingImg, height: isMobile ? "230px" : "330px" }}
-                    alt={item.nama}
-                    onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
-                  />
-                  <div style={styles.overlay}>
-                    <span style={styles.trendingTextBlack}>Trending Now</span>
-                    
-                    {item.creator_id !== user.id && (
-                      <button style={styles.bookmarkBtn} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
-                        <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActive : styles.bookmark}>
-                          {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div style={styles.trendingOverlay}>
-                  <h4 style={styles.trendingHeading}>{item.nama}</h4>
+          <div
+            ref={trendingRef}
+            style={
+              isMobile
+                ? {
+                    ...styles.trendingMobileScroll,
+                    gap: "12px",
+                    paddingLeft: "16px",
+                    paddingRight: "16px",
+                    boxSizing: "border-box",
+                    scrollSnapType: "x mandatory",
+                    WebkitOverflowScrolling: "touch",
+                  }
+                : styles.trendingDesktopGrid
+            }
+          >
+          {trendingFoods.map((item, index) => (
+            <div
+              key={item.id}
+              style={{
+                ...styles.trendingCard,
+                minWidth: isMobile ? "84vw" : "auto",
+                scrollSnapAlign: "start",
+                marginLeft: 0,
+              }}
+              onClick={() => navigate(`/detail/${item.id}`)}
+            >
+              <div style={styles.imageWrapper}>
+                <img
+                  src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
+                  style={{ ...styles.trendingImg, height: isMobile ? "200px" : "300px" }}
+                  alt={item.nama}
+                  onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
+                />
+                <div style={styles.overlay}>
+                  <span style={styles.trendingTextBlack}>Trending Now</span>
                   
-                  <div style={styles.infoRow}>
-                    <span style={styles.iconText}>
-                      <span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}
-                    </span>
-                    <span style={styles.iconText}>
-                      <span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes || 0}
-                    </span>
-                  </div>
-
-                  <div style={styles.bottomRow}>
-                    <span style={styles.rating}>
-                      {item.rating}
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
-                      ))}
-                    </span>
-                    <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
-                  </div>
+                  {item.creator_id !== user.id && (
+                    <button style={styles.bookmarkBtn} onClick={(e) => { e.stopPropagation(); toggleSave(item.id); }}>
+                      <span className="material-symbols-outlined" style={savedRecipes.includes(item.id) ? styles.bookmarkActive : styles.bookmark}>
+                        {savedRecipes.includes(item.id) ? "bookmark" : "bookmark_border"}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
-            ))}
+
+              <div style={styles.trendingOverlay}>
+                <h4 style={styles.trendingHeading}>{item.nama}</h4>
+                
+                <div style={styles.infoRow}>
+                  <span style={styles.iconText}>
+                    <span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}
+                  </span>
+                  <span style={styles.iconText}>
+                    <span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes || 0}
+                  </span>
+                </div>
+
+                <div style={styles.bottomRow}>
+                  <span style={styles.rating}>
+                    {item.rating}
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                    ))}
+                  </span>
+                  <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
+                </div>
+              </div>
+            </div>
+          ))}
           </div>
         </div>
 
@@ -336,9 +360,9 @@ function DashboardAfterLogin() {
           style={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
-            gap: isMobile ? "20px" : "40px",
+            gap: isMobile ? "25px" : "30px",
             alignItems: "flex-start",
-            marginTop: isMobile ? "0px" : "35px",
+            width: "100%"
           }}
         >
           
@@ -384,7 +408,20 @@ function DashboardAfterLogin() {
           )}
 
           {/* REKOMENDASI UNTUKMU / MAIN LIST */}
-          <div style={isMobile ? { flex: 1, width: "100%" } : styles.mainListContainer}>
+          <div
+            style={
+              isMobile
+                ? {
+                    flex: 1,
+                    width: "100%",
+                    height: "calc(100vh - 320px)",
+                    overflowY: "auto",
+                    WebkitOverflowScrolling: "touch",
+                    paddingBottom: "20px",
+                  }
+                : styles.mainListContainer
+            }
+          >
             {isMobile && (
               <h3
                 style={{
@@ -403,7 +440,17 @@ function DashboardAfterLogin() {
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
                 </div>
               ) : (
-                <div style={{ ...styles.grid, gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                <div
+                  style={{
+                    ...styles.grid,
+                    rowGap: isMobile ? "15px" : "30px",
+                    columnGap: isMobile ? "0px" : "30px",
+                    justifyContent: isMobile ? "stretch" : "center",
+                    gridTemplateColumns: isMobile
+                      ? "1fr"
+                      : "repeat(auto-fill, minmax(280px, 1fr))",
+                  }}
+                >
                   {(Array.isArray(foods) ? foods : []).map((item) => (
                     <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={() => navigate(`/detail/${item.id}`)}>
                       
@@ -474,11 +521,13 @@ function DashboardAfterLogin() {
 
 const styles = {
   container: {
-    fontFamily: "sans-serif",
-    background: "#f7f1ec",
-    minHeight: "100vh",
-    fontWeight: "bold",
-  },
+      fontFamily: "sans-serif",
+      background: "#f7f1ec",
+      minHeight: "100vh",
+      fontWeight: "bold",
+      width: "100%",
+      overflowX: "hidden",
+    },
   navbar: {
     display: "flex",
     justifyContent: "space-between",
@@ -504,20 +553,20 @@ const styles = {
     backgroundPosition: "center",
     width: "100%",
   },
-  searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
+  searchBoxContainerSidebar:{
+    width:"100%",
+    marginBottom:"20px"
+  },
   sidebar: {
-    width: "260px",
+    width: "230px",
     background: "transparent", 
     padding: "0px 10px 25px 0px", 
     position: "sticky",
     top: "90px",
-    marginLeft: "-30px", 
-    marginTop: "0px"
   },
   mainListContainer: {
     flex: 1,
     width: "100%",
-    paddingTop: "50px",
   },
   searchBox: {
     display: "flex",
@@ -527,12 +576,11 @@ const styles = {
     borderRadius: "30px",
     padding: "10px 20px",
     background: "#fff8f6", 
-    width: "105%", 
+    width: "100%", 
     boxSizing: "border-box",
   },
-  // PERBAIKAN: Dikurangi ke 5px agar kotak search mobile naik proporsional mendekati navbar seperti image_84a637.png
   mobileSearchWrapper: { 
-    padding: "5px 15px 5px 15px", 
+    padding: "5px 15px", 
     background: "transparent", 
     width: "100%", 
     boxSizing: "border-box" 
@@ -571,9 +619,25 @@ const styles = {
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
-  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "45px", width: "100%" },
-  trendingMobileScroll: { display: "flex", gap: "25px", overflowX: "auto", paddingBottom: "10px", scrollbarWidth: "none" },
-  trendingCard: { width: "100%", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
+  trendingDesktopGrid: { 
+    display: "grid", 
+    gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))", 
+    justifyContent: "center",
+    justifyItems: "center",                                    
+    gap: "30px", 
+    width: "100%",
+  },
+  trendingMobileScroll: {
+    display: "flex",
+    overflowX: "auto",
+    gap: "12px",
+    padding: "0 16px 10px",
+    scrollbarWidth: "none",
+    WebkitOverflowScrolling: "touch",
+    scrollSnapType: "x mandatory",
+    boxSizing: "border-box",
+  },
+  trendingCard: { width: "100%", maxWidth: "520px", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
   imageWrapper: { position: "relative" },
   trendingImg: { width: "100%", objectFit: "cover" }, 
   overlay: { position: "absolute", top: "20px", left: "20px", right: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
@@ -581,7 +645,13 @@ const styles = {
     color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
     textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff`
   },
-  trendingOverlay: { padding: "15px 24px", minHeight: "130px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxSizing: "border-box", gap: "10px" },
+  trendingOverlay: {
+    padding: "12px 20px",
+    minHeight: "95px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
   trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
   infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
   bottomRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "5px" },
@@ -590,7 +660,18 @@ const styles = {
   rating: { display: "flex", alignItems: "center", gap: "4px", fontSize: "16px", color: "#333", fontWeight: "700" },
   star: { fontSize: "22px", color: "#FFC107" },
   starEmpty: { fontSize: "22px", color: "#ddd" },
-  btnLihat: { background: "#e15b3c", color: "#fff", border: "none", padding: "10px 34px", borderRadius: "25px", cursor: "pointer", fontWeight: "700", fontSize: "15px" },
+  btnLihat:{
+    background:"#E15B3C",
+    color:"#fff",
+    border:"none",
+    borderRadius:"20px",
+    padding:"8px 24px",
+    fontSize:"14px",
+    fontWeight:"600",
+    cursor:"pointer",
+    transition:"all .25s ease",
+    boxShadow:"0 4px 12px rgba(225,91,60,.25)"
+  },
   bookmarkBtn: { background: "#fff", border: "none", borderRadius: "50%", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
   bookmark: { color: "#555", fontSize: "26px" },
   bookmarkActive: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "26px" },
@@ -599,12 +680,23 @@ const styles = {
   bookmarkActiveCard: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "24px" },
   cardContainer: { width: "100%" },
   cardContainerMobile: { marginTop: "5px", padding: "0 15px", boxSizing: "border-box" },
-  grid: { display: "grid", gap: "25px" },
+  grid: {
+    display: "grid",
+  },
   card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18 rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
   horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
-  btnLihatMobile: { background: "#e15b3c", color: "#fff", border: "none", padding: "6px 20px", borderRadius: "15px", fontSize: "13px", fontWeight: "600", cursor: "pointer" },
+  btnLihatMobile:{
+    background:"#E15B3C",
+    color:"#fff",
+    border:"none",
+    borderRadius:"18px",
+    padding:"6px 18px",
+    fontSize:"13px",
+    fontWeight:"600",
+    cursor:"pointer"
+  },
   feedbackBtn: { position: "fixed", bottom: "20px", right: "20px", width: "52px", height: "52px", borderRadius: "50%", background: "#e15b3c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 99 },
   mobileNavbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#FFFFFF", padding: "12px 20px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
   mobileMenuIcon: { fontSize: "30px", color: "#9F6822", cursor: "pointer" },
