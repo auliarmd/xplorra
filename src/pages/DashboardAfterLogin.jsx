@@ -14,21 +14,23 @@ function DashboardAfterLogin() {
   const [daerah, setDaerah] = useState("");
   const trendingRef = useRef(null);
   
-  // State Responsive & Menu Mobile
+  // State Responsif 3 Tingkat (Mobile, Tablet, Desktop)
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showMenu, setShowMenu] = useState(false);
   const [activeMenu, setActiveMenu] = useState("Dashboard");
 
-  // Perubahan Ukuran Layar Listener
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Penentuan tipe perangkat secara presisi
   const isMobile = windowWidth <= 768;
+  const isTablet = windowWidth > 768 && windowWidth <= 1024;
+  const isDesktop = windowWidth > 1024;
 
-  // CARA OTOMATIS RESPONSIF: Menyuntikkan meta viewport jika tidak ada index.html
+  // Menyuntikkan meta viewport agar responsif di mobile & tablet berjalan lancar
   useEffect(() => {
     let metaViewport = document.querySelector('meta[name="viewport"]');
     if (!metaViewport) {
@@ -39,17 +41,11 @@ function DashboardAfterLogin() {
     metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
   }, []);
 
-  // Fungsi Filter Resep dengan useCallback
   const filterFoods = useCallback(async () => {
     try {
       const res = await api.get("/foods", {
-        params: {
-          kategori,
-          daerah,
-          search,
-        },
+        params: { kategori, daerah, search },
       });
-
       setFoods(Array.isArray(res.data) ? res.data : []);
       setNotFound(res.data.length === 0);
     } catch (err) {
@@ -59,14 +55,14 @@ function DashboardAfterLogin() {
     }
   }, [kategori, daerah, search]);
 
-  // Auto-Scroll untuk Card Trending di Mobile
+  // Auto-Scroll untuk Card Trending (Aktif di Mobile & Tablet jika dalam mode scroll horizontal)
   useEffect(() => {
-    if (windowWidth > 768) return;
+    if (isDesktop) return;
 
     const interval = setInterval(() => {
       if (trendingRef.current) {
         const container = trendingRef.current;
-        const cardWidth = container.clientWidth * 0.85 + 25;
+        const cardWidth = container.clientWidth * 0.82 + 16;
         
         if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 10) {
           container.scrollTo({ left: 0, behavior: "smooth" });
@@ -77,9 +73,8 @@ function DashboardAfterLogin() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [windowWidth, trendingFoods]);
+  }, [isDesktop, trendingFoods]);
 
-  // Pengambilan Data Awal
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -104,11 +99,7 @@ function DashboardAfterLogin() {
 
     api.get('/foods/trending')
       .then((res) => {
-        if (Array.isArray(res.data)) {
-          setTrendingFoods(res.data);
-        } else {
-          setTrendingFoods([]);
-        }
+        setTrendingFoods(Array.isArray(res.data) ? res.data : []);
       })
       .catch((err) => {
         console.log(err);
@@ -136,10 +127,17 @@ function DashboardAfterLogin() {
   const daftarKategori = ["Makanan utama", "Minuman", "Dessert"];
   const daftarDaerah = ["Sumatera", "Kalimantan", "Sulawesi", "Maluku", "Irian Jaya", "Nusa Tenggara", "Jawa"];
 
+  // Pengaturan margin top pembungkus konten utama secara dinamis
+  const getLayoutMarginTop = () => {
+    if (isDesktop) return "-460px";
+    if (isTablet) return "-250px"; // Disesuaikan untuk tinggi background peta di tablet
+    return "0px";
+  };
+
   return (
     <div style={{
         ...styles.container,
-        backgroundImage: isMobile 
+        backgroundImage: (isMobile || isTablet)
           ? "linear-gradient(to bottom, rgba(247, 241, 236, 0.2), rgba(247, 241, 236, 0.95)), url('/bg_peta.jpg')" 
           : "none",
         backgroundSize: "cover",
@@ -156,10 +154,17 @@ function DashboardAfterLogin() {
           color: #e15b3c !important;
           padding-left: 18px !important;
         }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
       
-      {/* NAVBAR / HEADER */}
-      {isMobile ? (
+      {/* NAVBAR / HEADER (Mobile & Tablet menggunakan Hamburger Menu) */}
+      {(isMobile || isTablet) ? (
         <div style={styles.mobileNavbar}>
           <div style={styles.mobileNavbarLeft}>
             <span className="material-symbols-outlined" style={styles.mobileMenuIcon} onClick={() => setShowMenu(true)}>
@@ -206,8 +211,8 @@ function DashboardAfterLogin() {
         </div>
       )}
 
-      {/* TAMPILAN SIDEBAR DRAWER MOBILE */}
-      {isMobile && showMenu && (
+      {/* DRAWER SIDEBAR MOBILE & TABLET */}
+      {(isMobile || isTablet) && showMenu && (
         <>
           <div style={styles.mobileOverlay} onClick={() => setShowMenu(false)} />
           <div style={styles.mobileSidebar}>
@@ -230,56 +235,54 @@ function DashboardAfterLogin() {
         </>
       )}
 
-      {/* BACKGROUND PETA DESKTOP */}
-      {!isMobile && <div style={styles.topBg}></div>}
+      {/* BACKGROUND PETA DESKTOP & TABLET */}
+      {isDesktop && <div style={styles.topBg}></div>}
+      {isTablet && <div style={{ ...styles.topBg, height: "320px" }}></div>}
 
       {/* ==== OUTER LAYOUT WRAPPER ==== */}
       <div style={{
-        maxWidth: "1200px",
+        maxWidth: "1400px",
         margin: "0 auto",
-        padding: isMobile ? "0" : "0 20px",
+        padding: isDesktop ? "0 60px" : (isTablet ? "0 30px" : "0"),
         overflowX: "hidden",
-        marginTop: isMobile ? "0px" : "-460px", 
+        marginTop: getLayoutMarginTop(), 
         position: "relative",
         zIndex: 10,
         width: "100%",
         boxSizing: "border-box"
       }}>
 
-        {/* 1. SECTION TRENDING (Dipastikan berada di tengah layar) */}
+        {/* 1. SECTION TRENDING NOW (Pusat Sentralisasi) */}
         <div
           style={{
-            marginBottom: isMobile ? "25px" : "50px",
+            marginBottom: isDesktop ? "70px" : "25px",
             width: "100%",
             display: "flex",
             justifyContent: "center"
           }}
         >
-          <div style={{ height: "10px" }}></div> 
-          
           <div
             ref={trendingRef}
+            className="no-scrollbar"
             style={
-              isMobile
-                ? {
+              isDesktop
+                ? styles.trendingDesktopGrid
+                : {
                     ...styles.trendingMobileScroll,
-                    gap: "12px",
-                    paddingLeft: "16px",
-                    paddingRight: "16px",
+                    gap: "16px",
+                    paddingLeft: isTablet ? "10vw" : "9vw", 
+                    paddingRight: isTablet ? "10vw" : "9vw",
                     boxSizing: "border-box",
-                    scrollSnapType: "x mandatory",
-                    WebkitOverflowScrolling: "touch",
                   }
-                : styles.trendingDesktopGrid
             }
           >
-          {trendingFoods.map((item, index) => (
+          {trendingFoods.map((item) => (
             <div
               key={item.id}
               style={{
                 ...styles.trendingCard,
-                minWidth: isMobile ? "84vw" : "auto",
-                scrollSnapAlign: "start",
+                minWidth: isDesktop ? "auto" : (isTablet ? "76vw" : "82vw"),
+                scrollSnapAlign: "center",
                 marginLeft: 0,
               }}
               onClick={() => navigate(`/detail/${item.id}`)}
@@ -287,7 +290,7 @@ function DashboardAfterLogin() {
               <div style={styles.imageWrapper}>
                 <img
                   src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                  style={{ ...styles.trendingImg, height: isMobile ? "200px" : "300px" }}
+                  style={{ ...styles.trendingImg, height: isMobile ? "200px" : (isTablet ? "260px" : "330px") }}
                   alt={item.nama}
                   onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                 />
@@ -331,8 +334,8 @@ function DashboardAfterLogin() {
           </div>
         </div>
 
-        {/* SEARCH BOX & FILTER MOBILE */}
-        {isMobile && (
+        {/* BOX PENCARIAN & BADGE FILTER (Tampil di Mobile & Tablet) */}
+        {!isDesktop && (
           <div style={styles.mobileSearchWrapper}>
             <div style={styles.mobileSearchContainer}>
               <div style={styles.searchBoxMobile}>
@@ -340,13 +343,13 @@ function DashboardAfterLogin() {
                 <input placeholder="Cari resep atau daerah asal..." style={styles.searchInputMobile} value={search} onChange={(e) => setSearch(e.target.value)} />
               </div>
             </div>
-            <div style={styles.scrollFilterContainer}>
+            <div className="no-scrollbar" style={{ ...styles.scrollFilterContainer, paddingLeft: isTablet ? "30px" : "15px" }}>
               <button style={!kategori ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori("")}>Semua</button>
               {daftarKategori.map((kat) => (
                 <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
               ))}
             </div>
-            <div style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px" }}>
+            <div className="no-scrollbar" style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px", paddingLeft: isTablet ? "30px" : "15px" }}>
               <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
               {daftarDaerah.map((dae) => (
                 <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
@@ -355,19 +358,19 @@ function DashboardAfterLogin() {
           </div>
         )}
 
-        {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
+        {/* 2. LAYOUT BAWAH (Rekomendasi Untukmu) */}
         <div
           style={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            gap: isMobile ? "25px" : "30px",
+            flexDirection: isDesktop ? "row" : "column",
+            gap: isDesktop ? "40px" : "20px",
             alignItems: "flex-start",
             width: "100%"
           }}
         >
           
-          {/* SIDEBAR FILTER DESKTOP */}
-          {!isMobile && (
+          {/* SIDEBAR FILTER (Hanya Tampil di Desktop) */}
+          {isDesktop && (
             <div style={styles.sidebar}>
               <div style={styles.searchBoxContainerSidebar}>
                 <div style={styles.searchBox}>
@@ -407,34 +410,15 @@ function DashboardAfterLogin() {
             </div>
           )}
 
-          {/* REKOMENDASI UNTUKMU / MAIN LIST */}
-          <div
-            style={
-              isMobile
-                ? {
-                    flex: 1,
-                    width: "100%",
-                    height: "calc(100vh - 320px)",
-                    overflowY: "auto",
-                    WebkitOverflowScrolling: "touch",
-                    paddingBottom: "20px",
-                  }
-                : styles.mainListContainer
-            }
-          >
-            {isMobile && (
-              <h3
-                style={{
-                  ...styles.mobileSectionHeading,
-                  fontSize: "18px",
-                  margin: "0 0 15px 0",
-                }}
-              >
+          {/* DAFTAR RESEP / REKOMENDASI UNTUKMU */}
+          <div style={{ flex: 1, width: "100%", paddingBottom: "40px" }}>
+            {!isDesktop && (
+              <h3 style={{ ...styles.mobileSectionHeading, fontSize: "20px", margin: isTablet ? "0 30px 15px 30px" : "0 15px 15px 15px" }}>
                 Rekomendasi Untukmu
               </h3>
             )}
             
-            <div style={isMobile ? styles.cardContainerMobile : styles.cardContainer}>
+            <div style={isDesktop ? styles.cardContainer : { ...styles.cardContainerMobile, padding: isTablet ? "0 30px" : "0 15px" }}>
               {notFound ? (
                 <div style={styles.emptyResult}>
                   <h2 style={styles.emptyResultText}>Resep tidak ditemukan</h2>
@@ -443,21 +427,29 @@ function DashboardAfterLogin() {
                 <div
                   style={{
                     ...styles.grid,
-                    rowGap: isMobile ? "15px" : "30px",
-                    columnGap: isMobile ? "0px" : "30px",
-                    justifyContent: isMobile ? "stretch" : "center",
-                    gridTemplateColumns: isMobile
-                      ? "1fr"
-                      : "repeat(auto-fill, minmax(280px, 1fr))",
+                    rowGap: isDesktop ? "35px" : "15px",
+                    columnGap: "30px",
+                    justifyContent: "center",
+                    gridTemplateColumns: isDesktop
+                      ? "repeat(3, minmax(320px, 1fr))"
+                      : (isTablet ? "repeat(2, 1fr)" : "1fr"), // Tablet menampilkan 2 kolom kartu grid seimbang di tengah
                   }}
                 >
                   {(Array.isArray(foods) ? foods : []).map((item) => (
-                    <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={() => navigate(`/detail/${item.id}`)}>
+                    <div 
+                      key={item.id} 
+                      style={isMobile ? styles.horizontalCardMobile : styles.card} 
+                      onClick={() => navigate(`/detail/${item.id}`)}
+                    >
                       
-                      <div style={{ ...styles.cardImgWrapper, width: isMobile ? "110px" : "100%", height: isMobile ? "110px" : "160px" }}>
+                      <div style={{ 
+                        ...styles.cardImgWrapper, 
+                        width: isMobile ? "110px" : "100%", 
+                        height: isMobile ? "110px" : "180px" 
+                      }}>
                         <img
                           src={`${api.defaults.baseURL}/uploads/${item.gambar}`}
-                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "0" }}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: isMobile ? "15px" : "18px 18px 0 0" }}
                           alt=""
                         />
                         {!isMobile && item.creator_id !== user.id && (
@@ -469,9 +461,9 @@ function DashboardAfterLogin() {
                         )}
                       </div>
 
-                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px 15px 12px 15px" }}>
+                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                          <h4 style={{ fontSize: isMobile ? "15px" : "17px", margin: "0", fontWeight: "700", lineHeight: "1.2" }}>{item.nama}</h4>
+                          <h4 style={{ fontSize: "17px", margin: "0", fontWeight: "700", lineHeight: "1.2" }}>{item.nama}</h4>
                           {isMobile && item.creator_id !== user.id && (
                             <span 
                               className="material-symbols-outlined" 
@@ -554,8 +546,9 @@ const styles = {
     width: "100%",
   },
   searchBoxContainerSidebar:{
-    width:"100%",
-    marginBottom:"20px"
+    width:"250px",
+    marginBottom:"20px",
+    marginLeft:"-10px"
   },
   sidebar: {
     width: "230px",
@@ -567,6 +560,7 @@ const styles = {
   mainListContainer: {
     flex: 1,
     width: "100%",
+    paddingTop: "50px",
   },
   searchBox: {
     display: "flex",
@@ -576,11 +570,11 @@ const styles = {
     borderRadius: "30px",
     padding: "10px 20px",
     background: "#fff8f6", 
-    width: "100%", 
+    width: "105%", 
     boxSizing: "border-box",
   },
   mobileSearchWrapper: { 
-    padding: "5px 15px", 
+    padding: "5px 0px", 
     background: "transparent", 
     width: "100%", 
     boxSizing: "border-box" 
@@ -589,6 +583,8 @@ const styles = {
     display: "flex",
     justifyContent: "center", 
     width: "100%",
+    padding: "0 15px",
+    boxSizing: "border-box",
     marginBottom: "15px" 
   },
   searchBoxMobile: { 
@@ -608,7 +604,7 @@ const styles = {
   searchInput: { border: "none", outline: "none", fontSize: "16px", color: "#e15b3c", width: "100%", background: "transparent" },
   searchInputMobile: { border: "none", outline: "none", fontSize: "14px", color: "#F28C28", width: "100%", background: "transparent" },
   clearFilterIcon: { color: "#a4a4a4", cursor: "pointer", fontSize: "20px" },
-  scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" },
+  scrollFilterContainer: { display: "flex", gap: "8px", overflowX: "auto", padding: "10px 0 5px 0", whiteSpace: "nowrap", WebkitOverflowScrolling: "touch" },
   filterBadge: { background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.08)", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#555", fontWeight: "600", cursor: "pointer" },
   filterBadgeActive: { background: "#e15b3c", border: "1px solid #e15b3c", padding: "6px 16px", borderRadius: "20px", fontSize: "13px", color: "#fff", fontWeight: "600", cursor: "pointer" },
   title: { fontSize: "26px", fontWeight: "800", marginBottom: "15px", marginTop: "10px", color: "#000" }, 
@@ -619,25 +615,16 @@ const styles = {
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
-  trendingDesktopGrid: { 
-    display: "grid", 
-    gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))", 
-    justifyContent: "center",
-    justifyItems: "center",                                    
-    gap: "30px", 
-    width: "100%",
-  },
+  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "45px", width: "100%" },
   trendingMobileScroll: {
     display: "flex",
     overflowX: "auto",
-    gap: "12px",
-    padding: "0 16px 10px",
     scrollbarWidth: "none",
     WebkitOverflowScrolling: "touch",
     scrollSnapType: "x mandatory",
-    boxSizing: "border-box",
+    width: "100%",
   },
-  trendingCard: { width: "100%", maxWidth: "520px", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
+  trendingCard: { width: "100%", borderRadius: "20px", overflow: "hidden", background: "#fff", boxShadow: "0 8px 25px rgba(0,0,0,0.1)" },
   imageWrapper: { position: "relative" },
   trendingImg: { width: "100%", objectFit: "cover" }, 
   overlay: { position: "absolute", top: "20px", left: "20px", right: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
@@ -654,23 +641,23 @@ const styles = {
   },
   trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
   infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
-  bottomRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "5px" },
+  bottomRow: { display: "flex", alignItems: "center", stroke: "black", justifyContent: "space-between", marginTop: "5px" },
   iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px" },
   materialIcon: { fontSize: "22px" },
   rating: { display: "flex", alignItems: "center", gap: "4px", fontSize: "16px", color: "#333", fontWeight: "700" },
   star: { fontSize: "22px", color: "#FFC107" },
   starEmpty: { fontSize: "22px", color: "#ddd" },
-  btnLihat:{
-    background:"#E15B3C",
-    color:"#fff",
-    border:"none",
-    borderRadius:"20px",
-    padding:"8px 24px",
-    fontSize:"14px",
-    fontWeight:"600",
-    cursor:"pointer",
-    transition:"all .25s ease",
-    boxShadow:"0 4px 12px rgba(225,91,60,.25)"
+  btnLihat: {
+    background: "#E15B3C",
+    color: "#fff",
+    border: "none",
+    borderRadius: "20px",
+    padding: "8px 24px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "all .25s ease",
+    boxShadow: "0 4px 12px rgba(225,91,60,.25)"
   },
   bookmarkBtn: { background: "#fff", border: "none", borderRadius: "50%", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
   bookmark: { color: "#555", fontSize: "26px" },
@@ -679,23 +666,21 @@ const styles = {
   bookmarkCard: { color: "#555", fontSize: "24px" },
   bookmarkActiveCard: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "24px" },
   cardContainer: { width: "100%" },
-  cardContainerMobile: { marginTop: "5px", padding: "0 15px", boxSizing: "border-box" },
-  grid: {
-    display: "grid",
-  },
-  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18 rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
-  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer" },
+  cardContainerMobile: { marginTop: "5px", boxSizing: "border-box" },
+  grid: { display: "grid" },
+  card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
+  horizontalCardMobile: { display: "flex", background: "#fff", borderRadius: "18px", padding: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.04)", alignItems: "center", gap: "12px", cursor: "pointer", width: "100%", boxSizing: "border-box" },
   cardImgWrapper: { position: "relative", overflow: "hidden" },
   cardBody: { display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "8px" },
-  btnLihatMobile:{
-    background:"#E15B3C",
-    color:"#fff",
-    border:"none",
-    borderRadius:"18px",
-    padding:"6px 18px",
-    fontSize:"13px",
-    fontWeight:"600",
-    cursor:"pointer"
+  btnLihatMobile: {
+    background: "#E15B3C",
+    color: "#fff",
+    border: "none",
+    borderRadius: "18px",
+    padding: "6px 18px",
+    fontSize: "13px",
+    fontWeight: "600",
+    cursor: "pointer"
   },
   feedbackBtn: { position: "fixed", bottom: "20px", right: "20px", width: "52px", height: "52px", borderRadius: "50%", background: "#e15b3c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", cursor: "pointer", boxShadow: "0 4px 12px rgba(0,0,0,0.2)", zIndex: 99 },
   mobileNavbar: { display: "flex", alignItems: "center", justifyContent: "space-between", backgroundColor: "#FFFFFF", padding: "12px 20px", position: "sticky", top: 0, zIndex: 999, width: "100%", boxSizing: "border-box", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" },
