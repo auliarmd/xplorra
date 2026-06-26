@@ -202,12 +202,11 @@ function Dashboard() {
 
         margin: "0 auto",
         padding: isMobile ? "0" : "0 50px",
-        margin: "0 auto",
-        padding: isMobile ? "0px" : "0 50px", 
+   
         marginTop: isMobile ? "0px" : "-460px", 
         position: "relative",
         zIndex: 10,
-        width: "100%",
+     
         boxSizing: "border-box"
       }}>
 
