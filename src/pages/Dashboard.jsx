@@ -201,7 +201,7 @@ function Dashboard() {
         overflowX: "hidden",
 
         margin: "0 auto",
-        padding: isMobile ? "0" : "0 50px",
+        padding: isMobile ? "0" : "0 60px",
    
         marginTop: isMobile ? "0px" : "-460px", 
         position: "relative",
@@ -310,13 +310,13 @@ function Dashboard() {
 
         {/* 2. TATA LETAK BAWAH: SIDEBAR & REKOMENDASI */}
         <div
-           style={{
+  style={{
     display: "flex",
     flexDirection: isMobile ? "column" : "row",
-    gap: isMobile ? "40px" : "70px",
+    gap: isMobile ? "25px" : "40px",
     alignItems: "flex-start",
-    marginLeft: "-50px",
-marginRight:"-200px",
+    marginLeft: isMobile ? "0" : "-50px",
+    marginRight: isMobile ? "0" : "-200px",
   }}
 >
           
@@ -384,7 +384,7 @@ marginRight:"-200px",
                 <div style={{ ...styles.grid, gridTemplateColumns:
                     isMobile
                       ? "1fr"
-                      : "repeat(3, minmax(30px, 1fr))",}}>
+                      : "repeat(3, minmax(320px, 1fr))",}}>
                   {foods.map((item) => (
                     <div key={item.id} style={isMobile ? styles.horizontalCardMobile : styles.card} onClick={requireLogin}>
                       
@@ -476,7 +476,7 @@ const styles = {
     backgroundPosition: "center",
     width: "100%",
   },
-  searchBoxContainerSidebar: { width: "100%", marginBottom: "20px" },
+  searchBoxContainerSidebar: { width: "250px", marginBottom: "20px",marginLeft: "-10px"  },
   sidebar: {
     width: "230px",
     background: "transparent", 
@@ -643,7 +643,19 @@ starEmpty: {
   emptyResultText: { color: "#a4a4a4", fontSize: "22px", fontWeight: "700" },
   mobileNavbarLeft: { flex: 1, display: "flex", justifyContent: "flex-start", alignItems: "center" },
   mobileHeaderTitleCenter: { display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", color: "#9F6822", fontWeight: "700", fontSize: "18px", whiteSpace: "nowrap" },
-  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" }
+  mobileNavbarRight: { flex: 1, display: "flex", justifyContent: "flex-end", alignItems: "center" },
+  btnLihat: {
+  background: "#E15B3C",
+  color: "#fff",
+  border: "none",
+  borderRadius: "20px",
+  padding: "8px 24px",
+  fontSize: "14px",
+  fontWeight: "600",
+  cursor: "pointer",
+  transition: "all 0.25s ease",
+  boxShadow: "0 4px 12px rgba(225, 91, 60, 0.25)",
+},
 };
 
 export default Dashboard;
