@@ -241,9 +241,9 @@ function DashboardAfterLogin() {
 
       {/* ==== OUTER LAYOUT WRAPPER ==== */}
       <div style={{
-        maxWidth: "1400px",
+        maxWidth: "1500px",
         margin: "0 auto",
-        padding: isDesktop ? "0 60px" : (isTablet ? "0 30px" : "0"),
+        padding: isDesktop ? "0 20px" : (isTablet ? "0 30px" : "0"),
         overflowX: "hidden",
         marginTop: getLayoutMarginTop(), 
         position: "relative",
@@ -255,6 +255,7 @@ function DashboardAfterLogin() {
         {/* 1. SECTION TRENDING NOW (Pusat Sentralisasi) */}
         <div
           style={{
+            marginTop: isDesktop ? "20px" : "15px",
             marginBottom: isDesktop ? "70px" : "25px",
             width: "100%",
             display: "flex",
@@ -281,7 +282,7 @@ function DashboardAfterLogin() {
               key={item.id}
               style={{
                 ...styles.trendingCard,
-                minWidth: isDesktop ? "auto" : (isTablet ? "76vw" : "82vw"),
+                minWidth: isDesktop ? "auto" : (isTablet ? "68vw" : "70vw"),
                 scrollSnapAlign: "center",
                 marginLeft: 0,
               }}
@@ -290,7 +291,7 @@ function DashboardAfterLogin() {
               <div style={styles.imageWrapper}>
                 <img
                   src={`https://xplorra-production.up.railway.app/uploads/${item.gambar}`}
-                  style={{ ...styles.trendingImg, height: isMobile ? "200px" : (isTablet ? "260px" : "330px") }}
+                  style={{ ...styles.trendingImg, height: isMobile ? "160px" : (isTablet ? "240px" : "330px") }}
                   alt={item.nama}
                   onError={(e) => { e.target.src = "https://via.placeholder.com/600x250?text=No+Image"; }}
                 />
@@ -307,10 +308,20 @@ function DashboardAfterLogin() {
                 </div>
               </div>
 
-              <div style={styles.trendingOverlay}>
+              <div style={{
+                ...styles.trendingOverlay,
+                minHeight: isMobile ? "70px" : "95px",
+                padding: isMobile ? "10px 16px" : "12px 20px",
+              }}
+            >
                 <h4 style={styles.trendingHeading}>{item.nama}</h4>
                 
-                <div style={styles.infoRow}>
+                <div
+                    style={{
+                      ...styles.infoRow,
+                      marginTop: isMobile ? "-12px" : "0px",
+                    }}
+                  >
                   <span style={styles.iconText}>
                     <span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}
                   </span>
@@ -320,10 +331,21 @@ function DashboardAfterLogin() {
                 </div>
 
                 <div style={styles.bottomRow}>
-                  <span style={styles.rating}>
-                    {item.rating}
+                  <span
+                    style={{
+                      ...styles.rating,
+                      marginTop: isMobile ? "-18px" : "-10px",
+                    }}
+                  >
+                                      {item.rating}
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                      <span
+                        key={star}
+                        className="material-symbols-outlined"
+                        style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}
+                      >
+                        star
+                      </span>
                     ))}
                   </span>
                   <button style={styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>Lihat</button>
@@ -336,7 +358,15 @@ function DashboardAfterLogin() {
 
         {/* BOX PENCARIAN & BADGE FILTER (Tampil di Mobile & Tablet) */}
         {!isDesktop && (
-          <div style={styles.mobileSearchWrapper}>
+          <div
+            style={{
+              ...styles.mobileSearchWrapper,
+              position: "sticky",
+              top: "65px",
+              zIndex: 998,
+              background: "#f7f1ec",
+            }}
+          >
             <div style={styles.mobileSearchContainer}>
               <div style={styles.searchBoxMobile}>
                 <span className="material-symbols-outlined" style={styles.searchIconMobile}>search</span>
@@ -349,7 +379,16 @@ function DashboardAfterLogin() {
                 <button key={kat} style={kategori === kat ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setKategori(kategori === kat ? "" : kat)}>{kat}</button>
               ))}
             </div>
-            <div className="no-scrollbar" style={{ ...styles.scrollFilterContainer, paddingTop: "4px", marginBottom: "20px", paddingLeft: isTablet ? "30px" : "15px" }}>
+            <div
+  className="no-scrollbar"
+  style={{
+    ...styles.scrollFilterContainer,
+    paddingTop: "4px",
+    marginBottom: "20px",
+    paddingLeft: isTablet ? "30px" : "15px",
+    paddingRight: isTablet ? "30px" : "15px",
+  }}
+>
               <button style={!daerah ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah("")}>Semua Wilayah</button>
               {daftarDaerah.map((dae) => (
                 <button key={dae} style={daerah === dae ? styles.filterBadgeActive : styles.filterBadge} onClick={() => setDaerah(daerah === dae ? "" : dae)}>{dae}</button>
@@ -363,7 +402,7 @@ function DashboardAfterLogin() {
           style={{
             display: "flex",
             flexDirection: isDesktop ? "row" : "column",
-            gap: isDesktop ? "40px" : "20px",
+            gap: isDesktop ? "60px" : "20px",
             alignItems: "flex-start",
             width: "100%"
           }}
@@ -371,7 +410,12 @@ function DashboardAfterLogin() {
           
           {/* SIDEBAR FILTER (Hanya Tampil di Desktop) */}
           {isDesktop && (
-            <div style={styles.sidebar}>
+            <div
+              style={{
+                ...styles.sidebar,
+                transform: "translateX(-40px)",
+              }}
+            >
               <div style={styles.searchBoxContainerSidebar}>
                 <div style={styles.searchBox}>
                   <span className="material-symbols-outlined" style={styles.searchIcon}>search</span>
@@ -411,7 +455,15 @@ function DashboardAfterLogin() {
           )}
 
           {/* DAFTAR RESEP / REKOMENDASI UNTUKMU */}
-          <div style={{ flex: 1, width: "100%", paddingBottom: "40px" }}>
+          <div
+  style={{
+    flex: 1,
+    width: "100%",
+    paddingBottom: "40px",
+    height: "calc(100vh - 120px)",
+    overflowY: "auto",
+  }}
+>
             {!isDesktop && (
               <h3 style={{ ...styles.mobileSectionHeading, fontSize: "20px", margin: isTablet ? "0 30px 15px 30px" : "0 15px 15px 15px" }}>
                 Rekomendasi Untukmu
@@ -445,7 +497,7 @@ function DashboardAfterLogin() {
                       <div style={{ 
                         ...styles.cardImgWrapper, 
                         width: isMobile ? "110px" : "100%", 
-                        height: isMobile ? "110px" : "180px" 
+                        height: isMobile ? "110px" : "150px" 
                       }}>
                         <img
                           src={`${api.defaults.baseURL}/uploads/${item.gambar}`}
@@ -461,7 +513,13 @@ function DashboardAfterLogin() {
                         )}
                       </div>
 
-                      <div style={{ ...styles.cardBody, flex: 1, padding: isMobile ? "10px" : "15px" }}>
+                     <div
+                        style={{
+                          ...styles.cardBody,
+                          flex: 1,
+                          padding: isMobile ? "10px" : "8px", marginLeft:"8px"
+                        }}
+                      >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                           <h4 style={{ fontSize: "17px", margin: "0", fontWeight: "700", lineHeight: "1.2" }}>{item.nama}</h4>
                           {isMobile && item.creator_id !== user.id && (
@@ -475,19 +533,42 @@ function DashboardAfterLogin() {
                           )}
                         </div>
 
-                        <div style={{ ...styles.infoRow, marginTop: "5px" }}>
+                        <div
+                          style={{
+                            ...styles.infoRow,
+                            marginTop: isDesktop ? "12px" : "5px",
+                          }}
+                        >
                           <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>comment</span> {item.total_komentar}</span>
                           <span style={styles.iconText}><span className="material-symbols-outlined" style={styles.materialIcon}>thumb_up</span> {item.likes || 0}</span>
                         </div>
 
-                        <div style={styles.bottomRow}>
+                        <div
+                          style={{
+                            ...styles.bottomRow,
+                            marginTop: isDesktop ? "-12px" : "5px",
+                          }}
+                        >
                           <span style={styles.rating}>
                             {item.rating}
                             {[1, 2, 3, 4, 5].map((star) => (
-                              <span key={star} className="material-symbols-outlined" style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}>star</span>
+                              <span
+                                key={star}
+                                className="material-symbols-outlined"
+                                style={star <= Math.round(item.rating) ? styles.star : styles.starEmpty}
+                              >
+                                star
+                              </span>
                             ))}
                           </span>
-                          <button style={isMobile ? styles.btnLihatMobile : styles.btnLihat} onClick={(e) => { e.stopPropagation(); navigate(`/detail/${item.id}`); }}>
+
+                          <button
+                            style={isMobile ? styles.btnLihatMobile : styles.btnLihat}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/detail/${item.id}`);
+                            }}
+                          >
                             Lihat
                           </button>
                         </div>
@@ -524,7 +605,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "15px 50px",
+    padding: "15px 21px",
     background: "#fff",
     position: "sticky",
     top: 0,
@@ -544,19 +625,24 @@ const styles = {
     backgroundSize: "cover",
     backgroundPosition: "center",
     width: "100%",
+    overflow: "visible"
   },
   searchBoxContainerSidebar:{
     width:"250px",
     marginBottom:"20px",
-    marginLeft:"-10px"
+    marginLeft:"-20px"
   },
   sidebar: {
-    width: "230px",
-    background: "transparent", 
-    padding: "0px 10px 25px 0px", 
-    position: "sticky",
-    top: "90px",
-  },
+  width: "230px",
+  background: "transparent",
+  padding: "0px 10px 25px 0px",
+  position: "sticky",
+  top: "90px",
+  marginLeft: "90px",
+  alignSelf: "flex-start",
+  height: "calc(100vh - 100px)",
+ 
+},
   mainListContainer: {
     flex: 1,
     width: "100%",
@@ -615,8 +701,13 @@ const styles = {
   radioInner: { width: "8px", height: "8px", borderRadius: "50%", background: "#e15b3c" },
   divider: { height: "2px", background: "rgba(0, 0, 0, 0.06)", margin: "20px 0" },
   mobileSectionHeading: { fontSize: "20px", fontWeight: "800", color: "#333", marginBottom: "15px" },
-  trendingDesktopGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "45px", width: "100%" },
-  trendingMobileScroll: {
+  trendingDesktopGrid: {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, 600px)",
+  justifyContent: "center",
+  gap: "100px",
+},
+trendingMobileScroll: {
     display: "flex",
     overflowX: "auto",
     scrollbarWidth: "none",
@@ -628,36 +719,51 @@ const styles = {
   imageWrapper: { position: "relative" },
   trendingImg: { width: "100%", objectFit: "cover" }, 
   overlay: { position: "absolute", top: "20px", left: "20px", right: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" },
-  trendingTextBlack: { 
-    color: "#000000", fontSize: "24px", fontWeight: "900", fontFamily: "'Arial Black', sans-serif, system-ui", letterSpacing: "-0.5px",
-    textShadow: `-3.5px -3.5px 0 #fff, 3.5px -3.5px 0 #fff, -3.5px 3.5px 0 #fff, 3.5px 3.5px 0 #fff, -3.5px 0px 0 #fff, 3.5px 0px 0 #fff, 0px -3.5px 0 #fff, 0px 3.5px 0 #fff`
-  },
+  trendingTextBlack: {
+  color: "#000",
+  fontSize: "24px",
+  fontWeight: "800",
+  fontFamily: "'Arial Black', sans-serif, system-ui",
+  letterSpacing: "-0.5px",
+  textShadow: `
+    -2px -2px 0 #fff,
+     2px -2px 0 #fff,
+    -2px  2px 0 #fff,
+     2px  2px 0 #fff,
+    -2px  0px 0 #fff,
+     2px  0px 0 #fff,
+     0px -2px 0 #fff,
+     0px  2px 0 #fff`
+},
   trendingOverlay: {
     padding: "12px 20px",
-    minHeight: "95px",
+    minHeight: "130px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
   },
-  trendingHeading: { fontSize: "24px", fontWeight: "800", margin: "0" },
-  infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555" },
+  trendingHeading: { fontSize: "24px", fontWeight: "600", marginTop: "5px", },
+  infoRow: { display: "flex", gap: "18px", fontSize: "14px", color: "#555", marginBottom: "5px" },
   bottomRow: { display: "flex", alignItems: "center", stroke: "black", justifyContent: "space-between", marginTop: "5px" },
-  iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px" },
+  iconText: { display: "flex", alignItems: "center", gap: "6px", fontSize: "15px", },
   materialIcon: { fontSize: "22px" },
-  rating: { display: "flex", alignItems: "center", gap: "4px", fontSize: "16px", color: "#333", fontWeight: "700" },
+  rating: { display: "flex", alignItems: "center", gap: "4px", fontSize: "16px", color: "#333", fontWeight: "700", marginTop: "-10px", },
   star: { fontSize: "22px", color: "#FFC107" },
   starEmpty: { fontSize: "22px", color: "#ddd" },
   btnLihat: {
     background: "#E15B3C",
     color: "#fff",
     border: "none",
-    borderRadius: "20px",
-    padding: "8px 24px",
-    fontSize: "14px",
+    borderRadius: "24px",
+    padding: "11px 32px",
+    fontSize: "16px",
     fontWeight: "600",
     cursor: "pointer",
     transition: "all .25s ease",
-    boxShadow: "0 4px 12px rgba(225,91,60,.25)"
+    boxShadow: "0 4px 12px rgba(225,91,60,.25)",
+    marginBottom: "10px",
+    width: "110px",
+    
   },
   bookmarkBtn: { background: "#fff", border: "none", borderRadius: "50%", width: "42px", height: "42px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" },
   bookmark: { color: "#555", fontSize: "26px" },
@@ -665,7 +771,7 @@ const styles = {
   bookmarkBtnCard: { position: "absolute", top: "10px", right: "10px", background: "#fff", border: "none", borderRadius: "50%", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 6px rgba(0,0,0,0.15)" },
   bookmarkCard: { color: "#555", fontSize: "24px" },
   bookmarkActiveCard: { color: "#e15b3c", fontVariationSettings: "'FILL' 1", fontSize: "24px" },
-  cardContainer: { width: "100%" },
+  cardContainer: { width: "100%", marginTop: "40px", },
   cardContainerMobile: { marginTop: "5px", boxSizing: "border-box" },
   grid: { display: "grid" },
   card: { background: "#fff", borderRadius: "18px", overflow: "hidden", boxShadow: "0 6px 18px rgba(0,0,0,0.06)", cursor: "pointer", display: "flex", flexDirection: "column" },
