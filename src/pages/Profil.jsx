@@ -429,7 +429,7 @@ function Profil() {
                 <span className="material-symbols-outlined" style={{ cursor: "pointer", color: "#9C5B00" }} onClick={() => setIsDrawerOpen(false)} title="Tutup menu">close</span>
               </div>
               <div style={styles.drawerMenuContent}>
-                <div style={styles.drawerMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setIsDrawerOpen(false); }}>Home</div>
+                <div style={styles.drawerMenuItem} onClick={() => { navigate("/dashboardafterlogin"); setIsDrawerOpen(false); }}>Dashboard</div>
                 <div style={{ ...styles.drawerMenuItem, ...styles.drawerMenuActive }} onClick={() => { setActiveTab("profil"); setIsDrawerOpen(false); }}>Profil</div>
                 <div style={styles.drawerMenuItem} onClick={() => { navigate("/Notifikasi"); setIsDrawerOpen(false); }}>Notifikasi</div>
               </div>
