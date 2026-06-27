@@ -1,3 +1,5 @@
+
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Splash from "./pages/Splash";
 import Register from "./pages/Register";
@@ -11,14 +13,30 @@ import Notifikasi from "./pages/Notifikasi";
 import Feedback from "./pages/Feedback";
 import EditResep from "./pages/EditResep";
 import LupaPassword from "./pages/LupaPassword";
+import DashboardMobile from "./pages/DashboardMobile";
 
 function App() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/dashboard"
+          element={isMobile ? <DashboardMobile /> : <Dashboard />}
+        />
         <Route path="/masuk" element={<Masuk />} />
         <Route path="/dashboardafterlogin" element={<DashboardAfterLogin />} />
         <Route path="/detail/:id" element={<Detail />} />
