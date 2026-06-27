@@ -43,3 +43,13 @@ input::-ms-clear {
 ::-webkit-scrollbar-thumb:hover {
   background: #9f6822;
 }
+
+/* Hilangkan scrollbar Trending */
+.trending-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.trending-scroll {
+  scrollbar-width: none;   /* Firefox */
+  -ms-overflow-style: none; /* IE & Edge lama */
+}
