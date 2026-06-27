@@ -192,10 +192,13 @@ export default function DashboardMobile() {
 
         {/* ================= TRENDING ================= */}
 
+        <div style={styles.trendingWrapper}>
+
         <div
-          ref={trendingRef}
-          className="trending-scroll"
-          style={styles.trendingContainer}
+          style={{
+            ...styles.trendingContainer,
+            transform: `translateX(-${currentSlide * 100}%)`,
+          }}
         >
 
         {trendingFoods.slice(0,2).map((item)=>(
@@ -291,6 +294,8 @@ export default function DashboardMobile() {
 
           </div>
         ))}
+
+      </div>
 
       </div>
 
@@ -652,7 +657,12 @@ const styles = {
   },
 
   /* ================= TRENDING ================= */
-
+  trendingWrapper: {
+  overflow: "hidden",
+  width: "100%",
+  padding: "0px",
+},
+  
   trendingCard: {
     width: "100%",
     minWidth: "100%",
@@ -671,12 +681,6 @@ const styles = {
     width: "100%",
     height: "220px",
     objectFit: "cover",
-  },
-
-  overlay: {
-    position: "absolute",
-    top: "0px",
-    left: "0px",
   },
 
   trendingText: {
@@ -705,14 +709,13 @@ const styles = {
 
   trendingContainer: {
     display: "flex",
-    gap: "15px",
-    overflowX: "auto",
-    overflowY: "hidden",
+    gap: "50px",
+   
     padding: "25px",
     scrollSnapType: "x mandatory",
     scrollbarWidth: "none",
     scrollBehavior: "smooth",
-    scrollbarWidth: "none",
+    transition: "transform .8s ease-in-out",
   },
 
   trendingOverlay: {
