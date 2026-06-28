@@ -14,6 +14,7 @@ import Feedback from "./pages/Feedback";
 import EditResep from "./pages/EditResep";
 import LupaPassword from "./pages/LupaPassword";
 import DashboardMobile from "./pages/DashboardMobile";
+import DashboardAfterLoginMobile from "./pages/DashboardAfterLoginMobile";
 
 function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -38,7 +39,14 @@ useEffect(() => {
           element={isMobile ? <DashboardMobile /> : <Dashboard />}
         />
         <Route path="/masuk" element={<Masuk />} />
-        <Route path="/dashboardafterlogin" element={<DashboardAfterLogin />} />
+        <Route
+          path="/dashboardafterlogin"
+          element={
+            isMobile
+              ? <DashboardAfterLoginMobile />
+              : <DashboardAfterLogin />
+          }
+        />
         <Route path="/detail/:id" element={<Detail />} />
         <Route path="/tambah" element={<Tambah />} />
         <Route path="/profil" element={<Profil />} />
