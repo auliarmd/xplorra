@@ -363,32 +363,28 @@ export default function DashboardAfterLoginMobile() {
                 style={styles.trendingImage}
               />
 
+              {item.user_id !== user.id && (
               <button
                 style={styles.bookmarkButton}
-                onClick={(e)=>{
-
+                onClick={(e) => {
                   e.stopPropagation();
                   toggleSave(item.id);
-
                 }}
               >
-
                 <span
                   className="material-symbols-outlined"
                   style={
                     savedRecipes.includes(item.id)
-                    ? styles.bookmarkActive
-                    : styles.bookmarkInactive
+                      ? styles.bookmarkActive
+                      : styles.bookmarkInactive
                   }
                 >
-
                   {savedRecipes.includes(item.id)
                     ? "bookmark"
                     : "bookmark_border"}
-
                 </span>
-
               </button>
+            )}
 
               <div style={styles.trendingOverlay}>
                 <p style={styles.trendingText}>
@@ -454,19 +450,12 @@ export default function DashboardAfterLoginMobile() {
 
                 <button
                   style={styles.trendingButton}
-                  onClick={(e)=>{
-
+                  onClick={(e) => {
                     e.stopPropagation();
-
                     openRecipe(item);
-
                   }}
                 >
-
-                  {item.creator_id === user.id
-                    ? "Edit"
-                    : "Lihat"}
-
+                  Lihat
                 </button>
 
               </div>
@@ -702,33 +691,28 @@ export default function DashboardAfterLoginMobile() {
                         }}
                       />
 
-                      <button
-                        style={styles.recipeBookmark}
-                        onClick={(e)=>{
-
-                          e.stopPropagation();
-
-                          toggleSave(item.id);
-
-                        }}
-                      >
-
-                        <span
-                          className="material-symbols-outlined"
-                          style={
-                            savedRecipes.includes(item.id)
-                              ? styles.bookmarkActive
-                              : styles.bookmarkInactive
-                          }
+                      {item.user_id !== user.id && (
+                        <button
+                          style={styles.recipeBookmark}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSave(item.id);
+                          }}
                         >
-
-                          {savedRecipes.includes(item.id)
-                            ? "bookmark"
-                            : "bookmark_border"}
-
-                        </span>
-
-                      </button>
+                          <span
+                            className="material-symbols-outlined"
+                            style={
+                              savedRecipes.includes(item.id)
+                                ? styles.bookmarkActive
+                                : styles.bookmarkInactive
+                            }
+                          >
+                            {savedRecipes.includes(item.id)
+                              ? "bookmark"
+                              : "bookmark_border"}
+                          </span>
+                        </button>
+                      )}
 
                     </div>
 
@@ -792,19 +776,12 @@ export default function DashboardAfterLoginMobile() {
 
                         <button
                           style={styles.editButton}
-                          onClick={(e)=>{
-
+                          onClick={(e) => {
                             e.stopPropagation();
-
                             openRecipe(item);
-
                           }}
                         >
-
-                          {item.creator_id === user.id
-                            ? "Edit"
-                            : "Lihat"}
-
+                          Lihat
                         </button>
 
                         </div>
