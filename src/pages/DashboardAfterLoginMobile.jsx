@@ -53,17 +53,7 @@ export default function DashboardAfterLoginMobile() {
   );
 
   const openRecipe = (item) => {
-
-    if (item.user_id === user.id) {
-
-      navigate(`/edit/${item.id}`);
-
-    } else {
-
-      navigate(`/detail/${item.id}`);
-
-    }
-
+    navigate(`/detail/${item.id}`);
   };
 
     useEffect(() => {
@@ -453,19 +443,12 @@ export default function DashboardAfterLoginMobile() {
 
                 <button
                   style={styles.trendingButton}
-                  onClick={(e)=>{
-
+                  onClick={(e) => {
                     e.stopPropagation();
-
-                    openRecipe(item);
-
+                    navigate(`/detail/${item.id}`);
                   }}
                 >
-
-                  {item.creator_id === user.id
-                    ? "Edit"
-                    : "Lihat"}
-
+                  Lihat
                 </button>
 
               </div>
@@ -790,20 +773,13 @@ export default function DashboardAfterLoginMobile() {
                         </div>
 
                         <button
-                          style={styles.editButton}
-                          onClick={(e)=>{
-
+                          style={styles.trendingButton}
+                          onClick={(e) => {
                             e.stopPropagation();
-
-                            openRecipe(item);
-
+                            navigate(`/detail/${item.id}`);
                           }}
                         >
-
-                          {item.creator_id === user.id
-                            ? "Edit"
-                            : "Lihat"}
-
+                          Lihat
                         </button>
 
                         </div>
