@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 function Detail() {
   const { id } = useParams();
@@ -170,19 +171,11 @@ function Detail() {
             Detail Resep
           </div>
 
-          <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-            {user.foto ? (
-              <img
-                src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                alt="Profile"
-                style={styles.profileImg}
-              />
-            ) : (
-              <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
-                person
-              </span>
-            )}
-          </div>
+          <ProfileAvatar
+            user={user}
+            size={38}
+            onClick={() => navigate("/profil")}
+          />
         </div>
       ) : (
         // HEADER DESKTOP / TABLET
@@ -200,13 +193,11 @@ function Detail() {
               <span style={styles.navItem} onClick={() => navigate("/profil")}>Profile</span>
               <span style={styles.navItem} onClick={() => navigate("/notifikasi")}>Notifikasi</span>
             </div>
-            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-              {user.foto ? (
-                <img src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`} alt="Profile" style={styles.profileImg} />
-              ) : (
-                <span className="material-symbols-outlined" style={{ fontSize: "20px" }}>person</span>
-              )}
-            </div>
+            <ProfileAvatar
+              user={user}
+              size={38}
+              onClick={() => navigate("/profil")}
+            />
           </div>
         </div>
       )}

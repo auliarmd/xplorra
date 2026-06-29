@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 function Notifikasi() {
   const [tabAktif, setTabAktif] = useState("semua");
@@ -95,22 +96,11 @@ function Notifikasi() {
 
           {/* Kanan */}
           <div style={styles.mobileNavbarRight}>
-            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-              {user?.foto ? (
-                <img
-                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <span className="material-symbols-outlined">person</span>
-              )}
-            </div>
+            <ProfileAvatar
+            user={user}
+            size={38}
+            onClick={() => navigate("/profil")}
+          />
           </div>
         </div>
       )}
@@ -142,22 +132,11 @@ function Notifikasi() {
               <span style={styles.active}>Notifikasi</span>
             </div>
 
-            <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-              {user?.foto ? (
-                <img
-                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                  alt="Profile"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: "50%",
-                    objectFit: "cover"
-                  }}
-                />
-              ) : (
-                <span className="material-symbols-outlined">person</span>
-              )}
-            </div>
+            <ProfileAvatar
+              user={user}
+              size={38}
+              onClick={() => navigate("/profil")}
+            />
           </div>
         </div>
       )}

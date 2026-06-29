@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+
 function Profil() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -160,8 +161,10 @@ function Profil() {
       return;
     }
 
-    api.get('/profile')
+    api.get("/profile")
       .then((res) => {
+        console.log("PROFILE =", res.data);
+
         if (res.data.status) {
           setUser(res.data.user);
         }

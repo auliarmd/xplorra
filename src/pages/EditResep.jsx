@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 function EditResep() {
   const navigate = useNavigate();
@@ -179,20 +180,11 @@ function EditResep() {
 
             <div style={styles.mobileHeaderTitle}>Edit Resep</div>
 
-            <div
-              style={styles.profileCircle}
+            <ProfileAvatar
+              user={user}
+              size={38}
               onClick={() => navigate("/profil")}
-            >
-              {user?.foto ? (
-                <img
-                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                  alt="profile"
-                  style={styles.profileImage}
-                />
-              ) : (
-                <span className="material-symbols-outlined">person</span>
-              )}
-            </div>
+            />
           </>
         ) : (
           <>
@@ -213,20 +205,11 @@ function EditResep() {
               <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
             </div>
 
-            <div
-              style={styles.profileCircle}
+            <ProfileAvatar
+              user={user}
+              size={38}
               onClick={() => navigate("/profil")}
-            >
-              {user?.foto ? (
-                <img
-                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                  alt="profile"
-                  style={styles.profileImage}
-                />
-              ) : (
-                <span className="material-symbols-outlined">person</span>
-              )}
-            </div>
+            />
           </>
         )}
       </div>

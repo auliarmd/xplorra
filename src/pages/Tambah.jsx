@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 function TambahResep() {
   const navigate = useNavigate();
@@ -248,17 +249,11 @@ useEffect(() => {
               <span onClick={() => navigate("/Notifikasi")}>Notifikasi</span>
             </div>
           )}
-          <div style={styles.profileCircle} onClick={() => navigate("/profil")}>
-            {user?.foto ? (
-              <img
-                src={`${api.defaults.baseURL}/uploads/${user.foto}`}
-                style={styles.profileImage}
-                alt=""
-              />
-            ) : (
-              <span className="material-symbols-outlined">person</span>
-            )}
-          </div>
+          <ProfileAvatar
+            user={user}
+            size={38}
+            onClick={() => navigate("/profil")}
+          />
         </div>
       </div>
 

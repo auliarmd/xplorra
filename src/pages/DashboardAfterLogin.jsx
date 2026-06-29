@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, {useState, useEffect} from "react";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 function DashboardAfterLogin() {
   const navigate = useNavigate();
@@ -180,26 +181,11 @@ const toggleSave = async (id) => {
             + Tambah resep
           </button>
 
-          <div
-            style={styles.profileCircle}
+          <ProfileAvatar
+            user={user}
+            size={38}
             onClick={() => navigate("/profil")}
-          >
-
-            {
-              user.foto ? (
-                <img
-                  src={`https://xplorra-production.up.railway.app/uploads/${user.foto}`}
-                  alt="Profile"
-                  style={styles.profileImg}
-                />
-              ) : (
-                <span className="material-symbols-outlined">
-                  person
-                </span>
-              )
-            }
-
-          </div>
+          />
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState, useCallback } from "react";
 import api from "../api/axios";
+import ProfileAvatar from "../components/ProfileAvatar";
 
 export default function DashboardAfterLoginMobile() {
   const navigate = useNavigate();
@@ -196,31 +197,11 @@ export default function DashboardAfterLoginMobile() {
           Dashboard
         </h2>
 
-        <div
-          style={styles.profileWrapper}
-          onClick={() => navigate("/profil")}
-        >
-
-          {user.foto ? (
-
-            <img
-              src={`${api.defaults.baseURL}/uploads/${user.foto}`}
-              alt="Profil"
-              style={styles.profileImage}
-            />
-
-          ) : (
-
-            <span
-              className="material-symbols-outlined"
-              style={styles.profileIcon}
-            >
-              account_circle
-            </span>
-
-          )}
-
-        </div>
+       <ProfileAvatar
+        user={user}
+        size={38}
+        onClick={() => navigate("/profil")}
+      />
 
       </div>
 
@@ -768,7 +749,7 @@ export default function DashboardAfterLoginMobile() {
                         </div>
 
                         <button
-                          style={styles.trendingButton}
+                          style={styles.editButton}
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/detail/${item.id}`);
@@ -1109,7 +1090,7 @@ const styles = {
     cursor: "pointer",
   },
 
-  profileImage: {
+  profileImg: {
     width: "100%",
     height: "100%",
     objectFit: "cover",
