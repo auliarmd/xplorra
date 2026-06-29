@@ -14,7 +14,6 @@ export default function DashboardAfterLoginMobile() {
   const [notFound, setNotFound] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const trendingRef = useRef(null);
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   const filterFoods = useCallback(
     (newKategori, newDaerah, newSearch) => {
@@ -54,17 +53,7 @@ export default function DashboardAfterLoginMobile() {
   );
 
   const openRecipe = (item) => {
-
-    if (item.user_id === user.id) {
-
-      navigate(`/edit/${item.id}`);
-
-    } else {
-
-      navigate(`/detail/${item.id}`);
-
-    }
-
+    navigate(`/detail/${item.id}`);
   };
 
     useEffect(() => {
@@ -240,7 +229,7 @@ export default function DashboardAfterLoginMobile() {
         {showMenu && (
         <>
             <div
-            style={styles.overlay}
+            style={styles.menuoverlay}
             onClick={() => setShowMenu(false)}
             />
 
@@ -452,7 +441,11 @@ export default function DashboardAfterLoginMobile() {
                   style={styles.trendingButton}
                   onClick={(e) => {
                     e.stopPropagation();
+
                     openRecipe(item);
+
+                    navigate(`/detail/${item.id}`);
+
                   }}
                 >
                   Lihat
@@ -775,10 +768,11 @@ export default function DashboardAfterLoginMobile() {
                         </div>
 
                         <button
-                          style={styles.editButton}
+                          style={styles.trendingButton}
                           onClick={(e) => {
                             e.stopPropagation();
-                            openRecipe(item);
+                            navigate(`/detail/${item.id}`);
+
                           }}
                         >
                           Lihat
@@ -912,7 +906,6 @@ const styles = {
     scrollSnapType: "x mandatory",
     scrollbarWidth: "none",
     scrollBehavior: "smooth",
-    scrollbarWidth: "none",
   },
 
   trendingOverlay: {
@@ -1182,7 +1175,7 @@ const styles = {
  recipeBookmark: {
     position: "absolute",
     top: 0,
-    right: -220,
+    left: 290,
 
     width: 38,
     height: 38,
@@ -1217,7 +1210,7 @@ const styles = {
 
   /* ================= MOBILE MENU ================= */
 
-    overlay: {
+    menuoverlay: {
     position: "fixed",
     top: 0,
     left: 0,
