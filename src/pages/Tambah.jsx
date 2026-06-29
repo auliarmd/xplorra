@@ -110,7 +110,11 @@ useEffect(() => {
   };
 
   const tambahBahan = () => setBahan([...bahan, ""]);
-  const hapusBahan = (index) => setBahan(bahan.filter((_, i) => i !== index));
+  const hapusBahan = (index) => {
+    if (bahan.length === 1) return;
+
+    setBahan(bahan.filter((_, i) => i !== index));
+  };
   const ubahBahan = (index, value) => {
     const data = [...bahan];
     data[index] = value;
@@ -118,7 +122,11 @@ useEffect(() => {
   };
 
   const tambahLangkah = () => setLangkah([...langkah, ""]);
-  const hapusLangkah = (index) => setLangkah(langkah.filter((_, i) => i !== index));
+  const hapusLangkah = (index) => {
+    if (langkah.length === 1) return;
+
+    setLangkah(langkah.filter((_, i) => i !== index));
+  };
   const ubahLangkah = (index, value) => {
     const data = [...langkah];
     data[index] = value;
@@ -126,7 +134,7 @@ useEffect(() => {
   };
 
   const mobileStyles = {
-    navbar: { padding: "10px 15px" },
+    navbar: { padding: "0 12px",height: "56px"  },
     content: { padding: "20px 10px" },
     formContainer: { padding: "20px" },
     uploadBox: { height: "250px" },
@@ -225,7 +233,7 @@ useEffect(() => {
           </div>
         ) : (
           <div style={styles.logoContainer}>
-            <img src="/logo_Xplorra.png" alt="logo" style={styles.logoImg} />
+            <img src="/logo_X.png" alt="logo" style={styles.logoImg} />
             <span style={styles.logoText}>pLorra</span>
           </div>
         )}
@@ -300,10 +308,12 @@ useEffect(() => {
           >
             <option value="">Pilih Daerah</option>
             <option value="Sumatera">Sumatera</option>
+            <option value="Jawa">Jawa</option>
             <option value="Kalimantan">Kalimantan</option>
             <option value="Sulawesi">Sulawesi</option>
             <option value="Maluku">Maluku</option>
-            <option value="Jawa">Jawa</option>
+            <option value="Nusa Tenggara">Nusa Tenggara</option>
+            <option value="Irian Jaya">Irian Jaya</option>
           </select>
 
           {/* MEDIA */}
@@ -345,7 +355,6 @@ useEffect(() => {
                   photo_camera
                 </span>
                 <div style={styles.uploadTitle}>Unggah file</div>
-                <div style={styles.uploadText}>atau tarik dan lepas</div>
                 <div style={styles.uploadInfo}>PNG, JPG, GIF up to 10MB</div>
                 <input
                   hidden
@@ -381,7 +390,12 @@ useEffect(() => {
               />
               <button
                 type="button"
-                style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnMobile : {}) }}
+                style={{
+                  ...styles.deleteBtn,
+                  opacity: bahan.length === 1 ? 0.4 : 1,
+                  cursor: bahan.length === 1 ? "not-allowed" : "pointer"
+                }}
+                disabled={bahan.length === 1}
                 onClick={() => hapusBahan(index)}
               >
                 🗑
@@ -409,7 +423,12 @@ useEffect(() => {
               />
               <button
                 type="button"
-                style={{ ...styles.deleteBtn, ...(isMobile ? mobileStyles.deleteBtnMobile : {}) }}
+                style={{
+                  ...styles.deleteBtn,
+                  opacity: langkah.length === 1 ? 0.4 : 1,
+                  cursor: langkah.length === 1 ? "not-allowed" : "pointer"
+                }}
+                disabled={langkah.length === 1}
                 onClick={() => hapusLangkah(index)}
               >
                 🗑
@@ -507,12 +526,12 @@ const styles = {
     alignItems: "center"
   },
   logoImg: {
-    width: "50px"
+    width: "40px"
   },
   logoText: {
     color: "#F28C28",
     fontWeight: "bold",
-    fontSize: "28px"
+    fontSize: "25px"
   },
   rightSection: {
     display: "flex",
@@ -556,9 +575,11 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: "14px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.12)"
+    boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+    marginTop: "-45px"
   },
   input: {
+    flex: 1,
     width: "100%",
     padding: "12px",
     border: "1px solid #d89d73",
@@ -626,15 +647,16 @@ const styles = {
   },
   dynamicRow: {
     display: "flex",
+    flexDirection: "row",
     alignItems: "center",
-    gap: "10px"
+    gap: "8px",
+    width: "100%"
   },
-  deleteBtn: {
-    background: "transparent",
-    border: "none",
-    color: "red",
-    fontSize: "18px",
-    cursor: "pointer"
+  deleteBtnMobile: {
+    width: "42px",
+    height: "42px",
+    flexShrink: 0,
+    marginTop: "0"
   },
   mapBackground: {
     position: "fixed",

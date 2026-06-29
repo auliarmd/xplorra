@@ -770,7 +770,18 @@ export default function DashboardAfterLoginMobile() {
                 )}
 
             </div>
-
+              <div
+                style={styles.feedbackBtn}
+                onClick={() => navigate("/feedback")}
+                title="Feedback"
+              >
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: 28 }}
+                >
+                  chat
+                </span>
+              </div>
     </div>
   );
 }
@@ -1265,6 +1276,29 @@ const styles = {
       borderLeft: "5px solid #D96E45",
       cursor: "pointer",
       transition: ".2s",
+    },
+
+    feedbackBtn: {
+      position: "fixed",
+      bottom: "20px",
+      right: "20px",
+
+      width: "55px",
+      height: "55px",
+
+      borderRadius: "50%",
+      background: "#D96E45",
+
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+
+      color: "#fff",
+      cursor: "pointer",
+
+      boxShadow: "0 5px 15px rgba(0,0,0,.2)",
+
+      zIndex: 999,
     },
     
 };
