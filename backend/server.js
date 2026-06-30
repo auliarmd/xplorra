@@ -1061,6 +1061,10 @@ app.post(
       ? req.file.filename
       : null;
 
+    console.log("FILE =", req.file);
+console.log("PATH =", req.file?.path);
+console.log("DESTINATION =", req.file?.destination);
+
     db.query(
     `
     INSERT INTO foods
