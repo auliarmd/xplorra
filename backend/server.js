@@ -20,6 +20,26 @@ process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
 });
 
+const fs = require("fs");
+const path = require("path");
+
+app.get("/debug/uploads", (req, res) => {
+  const uploadPath = path.join(__dirname, "uploads");
+
+  if (!fs.existsSync(uploadPath)) {
+    return res.json({
+      exists: false,
+      path: uploadPath
+    });
+  }
+
+  res.json({
+    exists: true,
+    path: uploadPath,
+    files: fs.readdirSync(uploadPath)
+  });
+});
+
 const app = express();
 
 app.set("trust proxy", 1);
