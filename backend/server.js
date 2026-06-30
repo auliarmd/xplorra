@@ -20,10 +20,6 @@ process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);
 });
 
-const path = require('path');
-
-const fs = require("fs");
-
 const app = express();
 
 app.set("trust proxy", 1);
@@ -31,7 +27,6 @@ app.set("trust proxy", 1);
 app.get("/ping", (req, res) => {
   res.send("pong");
 });
-
 
 app.get("/health", (req, res) => {
   console.log("HEALTHCHECK HIT");
@@ -65,6 +60,9 @@ app.use(
 
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const path = require('path');
+
+const fs = require("fs");
 
 console.log("DIRNAME:", __dirname);
 console.log("UPLOAD EXISTS:", fs.existsSync(path.join(__dirname, "uploads")));
@@ -82,8 +80,10 @@ app.use(
 
 const storage = multer.diskStorage({
 
-  destination: (req, file, cb) => {
-  cb(null, path.join(__dirname, "uploads"));
+  destination:(req,file,cb)=>{
+
+  cb(null,'uploads/');
+
 },
 
 
@@ -100,9 +100,11 @@ const storage = multer.diskStorage({
 
 const profileStorage = multer.diskStorage({
 
-  destination: (req, file, cb) => {
-  cb(null, path.join(__dirname, "uploads"));
-},
+  destination:(req,file,cb)=>{
+
+    cb(null,'uploads/');
+
+  },
 
   filename:(req,file,cb)=>{
 
@@ -1060,10 +1062,6 @@ app.post(
     const gambar = req.file
       ? req.file.filename
       : null;
-
-    console.log("FILE =", req.file);
-console.log("PATH =", req.file?.path);
-console.log("DESTINATION =", req.file?.destination);
 
     db.query(
     `
